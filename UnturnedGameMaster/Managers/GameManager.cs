@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Providers;
 
@@ -12,20 +13,14 @@ namespace UnturnedGameMaster.Managers
 {
     public class GameManager : IManager
     {
-        private DataManager dataManager;
-        private TeamManager teamManager;
-        private GameManager gameManager;
-        private PlayerDataManager playerDataManager;
+        [InjectDependency]
+        private DataManager dataManager{ get; set; }
+        [InjectDependency]
+        private TeamManager teamManager{ get; set; }
+        [InjectDependency]
+        private PlayerDataManager playerDataManager{ get; set; }
 
         public event EventHandler OnGameStateChanged;
-
-        public GameManager(DataManager dataManager, TeamManager teamManager, GameManager gameManager, PlayerDataManager playerDataManager)
-        {
-            this.dataManager = dataManager ?? throw new ArgumentNullException(nameof(dataManager));
-            this.teamManager = teamManager ?? throw new ArgumentNullException(nameof(teamManager));
-            this.gameManager = gameManager ?? throw new ArgumentNullException(nameof(gameManager));
-            this.playerDataManager = playerDataManager ?? throw new ArgumentNullException(nameof(playerDataManager));
-        }
 
         public void Init()
         { }
@@ -57,7 +52,7 @@ namespace UnturnedGameMaster.Managers
             sb.AppendLine("Witaj jasiu na serverze hentai!");
             sb.AppendLine($"Obecnie mierzy się z sobą {playerDataManager.GetPlayerCount() - 1} innych graczy z {teamManager.GetTeamCount()} drużyn");
             sb.AppendLine($"Na serwerze online jest {Provider.clients.Count} osób");
-            sb.AppendLine($"Obecny stan gry: {GameStateFriendlyNameProvider.GetFriendlyName(gameManager.GetGameState())}");
+            sb.AppendLine($"Obecny stan gry: {GameStateFriendlyNameProvider.GetFriendlyName(GetGameState())}");
 
             return sb.ToString();
         }

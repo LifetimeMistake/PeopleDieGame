@@ -9,12 +9,14 @@ namespace UnturnedGameMaster.Models
     public class PlayerData
     {
         public ulong Id { get; private set; }
+        public string Name { get; private set; }
         public string Bio { get; private set; }
         public int? TeamId { get; set; }
 
-        public PlayerData(ulong id, string bio = "", int? teamId = null)
+        public PlayerData(ulong id, string name, string bio = "", int? teamId = null)
         {
             Id = id;
+            Name = name;
             Bio = bio ?? throw new ArgumentNullException(nameof(bio));
             TeamId = teamId;
         }
@@ -25,6 +27,14 @@ namespace UnturnedGameMaster.Models
                 throw new ArgumentNullException(nameof(bio));
 
             Bio = bio;
+        }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            Name = name;
         }
     }
 }

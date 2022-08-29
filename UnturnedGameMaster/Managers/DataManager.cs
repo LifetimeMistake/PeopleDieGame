@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Providers;
 
@@ -10,13 +11,9 @@ namespace UnturnedGameMaster.Managers
 {
     public class DataManager : IDisposableManager
     {
-        private IDatabaseProvider<GameData> databaseProvider;
+        [InjectDependency]
+        private IDatabaseProvider<GameData> databaseProvider { get; set; }
         public GameData GameData { get { return databaseProvider.GetData(); } }
-
-        public DataManager(IDatabaseProvider<GameData> databaseProvider)
-        {
-            this.databaseProvider = databaseProvider ?? throw new ArgumentNullException(nameof(databaseProvider));
-        }
 
         public void Init()
         { }

@@ -74,7 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Autofac\AutowirePropertySelector.cs" />
     <Compile Include="Autofac\IAutoFacRegistrar.cs" />
+    <Compile Include="Autofac\InjectDependencyAttribute.cs" />
     <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
     <Compile Include="Autofac\ServiceLocator.cs" />
     <Compile Include="Commands\BioCommand.cs" />

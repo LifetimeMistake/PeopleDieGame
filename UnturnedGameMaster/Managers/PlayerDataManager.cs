@@ -7,22 +7,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Providers;
-using static Rocket.Unturned.Events.UnturnedPlayerEvents;
 
 namespace UnturnedGameMaster.Managers
 {
     public class PlayerDataManager : IDisposableManager
     {
-        private DataManager dataManager;
-        private TeamManager teamManager;
-        
-        public PlayerDataManager(DataManager dataManager, TeamManager teamManager)
-        {
-            this.dataManager = dataManager ?? throw new ArgumentNullException(nameof(dataManager));
-            this.teamManager = teamManager ?? throw new ArgumentNullException(nameof(teamManager));
-        }
+        [InjectDependency]
+        private DataManager dataManager{ get; set; }
+        [InjectDependency]
+        private TeamManager teamManager{ get; set; }
 
         public void Init()
         {
@@ -37,12 +33,18 @@ namespace UnturnedGameMaster.Managers
         private void Instance_OnPlayerConnected(Rocket.Unturned.Player.UnturnedPlayer player)
         {
             List<PlayerData> playerList = dataManager.GameData.PlayerData;
-            if (playerList.Any(x => x.Id == (ulong)player.CSteamID))
-                return; // no need to register a new player data struct, this player has been here before
+            PlayerData playerData = playerList.FirstOrDefault(x => x.Id == (ulong)player.CSteamID);
 
-            // register a new player
-            PlayerData playerData = new PlayerData((ulong)player.CSteamID);
-            playerList.Add(playerData);
+            if(playerData == null)
+            {
+                // register a new player
+                playerData = new PlayerData((ulong)player.CSteamID, player.CharacterName);
+                playerList.Add(playerData);
+            }
+            else
+            {
+                playerData.SetName(player.CharacterName);
+            }
         }
 
         public PlayerData GetPlayer(ulong id)
@@ -55,9 +57,9 @@ namespace UnturnedGameMaster.Managers
         {
             List<PlayerData> playerList = dataManager.GameData.PlayerData;
             if (exactMatch)
-                return playerList.FirstOrDefault(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id).DisplayName.ToLowerInvariant() == name.ToLowerInvariant());
+                return playerList.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
-                return playerList.FirstOrDefault(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id).DisplayName.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+                return playerList.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
         public PlayerData[] GetPlayers()
@@ -88,9 +90,7 @@ namespace UnturnedGameMaster.Managers
         public string GetPlayerSummary(PlayerData playerData)
         {
             StringBuilder sb = new StringBuilder();
-
-            UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-            sb.Append($"Profil gracza \"{player.CharacterName}\"");
+            sb.AppendLine($"Profil gracza \"{playerData.Name}\"");
 
             if (playerData.TeamId.HasValue)
             {

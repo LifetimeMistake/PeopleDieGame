@@ -24,7 +24,7 @@ namespace UnturnedGameMaster.Commands.Admin
         public string Syntax => "<getTeam/joinTeam/leaveTeam/promotePlayer/setBio> <playerName/playerId> [<teamName/teamId/bio>]";
         public List<string> Aliases => new List<string>();
 
-        public List<string> Permissions => new List<string> { "manage" };
+        public List<string> Permissions => new List<string>();
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
@@ -38,19 +38,19 @@ namespace UnturnedGameMaster.Commands.Admin
             string[] verbArgs = command.Skip(1).ToArray();
             switch (command[0].ToLowerInvariant())
             {
-                case "getTeam":
+                case "getteam":
                     VerbGetTeam(caller, verbArgs);
                     break;
-                case "joinTeam":
+                case "jointeam":
                     VerbJoinTeam(caller, verbArgs);
                     break;
-                case "leaveTeam":
+                case "leaveteam":
                     VerbLeaveTeam(caller, verbArgs);
                     break;
-                case "promotePlayer":
+                case "promoteplayer":
                     VerbPromotePlayer(caller, verbArgs);
                     break;
-                case "setBio":
+                case "setbio":
                     VerbSetBio(caller, verbArgs);
                     break;
 

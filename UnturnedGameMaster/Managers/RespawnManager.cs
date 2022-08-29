@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
@@ -15,22 +16,18 @@ namespace UnturnedGameMaster.Managers
 {
     public class RespawnManager : IDisposableManager
     {
-        private DataManager dataManager;
-        private LoadoutManager loadoutManager;
-        private PlayerDataManager playerDataManager;
-        private TeamManager teamManager;
-        private GameManager gameManager;
+        [InjectDependency]
+        private DataManager dataManager{ get; set; }
+        [InjectDependency]
+        private LoadoutManager loadoutManager{ get; set; }
+        [InjectDependency]
+        private PlayerDataManager playerDataManager{ get; set; }
+        [InjectDependency]
+        private TeamManager teamManager{ get; set; }
+        [InjectDependency]
+        private GameManager gameManager{ get; set; }
 
         public event EventHandler<PlayerEventArgs> OnRespawnFinished;
-
-        public RespawnManager(DataManager dataManager, LoadoutManager loadoutManager, PlayerDataManager playerDataManager, TeamManager teamManager, GameManager gameManager)
-        {
-            this.dataManager = dataManager ?? throw new ArgumentNullException(nameof(dataManager));
-            this.loadoutManager = loadoutManager ?? throw new ArgumentNullException(nameof(loadoutManager));
-            this.playerDataManager = playerDataManager ?? throw new ArgumentNullException(nameof(playerDataManager));
-            this.teamManager = teamManager ?? throw new ArgumentNullException(nameof(teamManager));
-            this.gameManager = gameManager ?? throw new ArgumentNullException(nameof(gameManager));
-        }
 
         public void Init()
         {

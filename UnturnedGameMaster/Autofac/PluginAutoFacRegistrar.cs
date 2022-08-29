@@ -21,16 +21,17 @@ namespace UnturnedGameMaster.Autofac
 
         public void RegisterComponents(ContainerBuilder builder)
         {
-            builder.RegisterType<GameManager>().InstancePerLifetimeScope();
-            builder.RegisterType<LoadoutManager>().InstancePerLifetimeScope();
-            builder.RegisterType<DataManager>().InstancePerLifetimeScope();
-            builder.RegisterType<TimerManager>().InstancePerLifetimeScope();
-            builder.RegisterType<RespawnManager>().InstancePerLifetimeScope();
-            builder.RegisterType<TeamManager>().InstancePerLifetimeScope();
-            builder.RegisterType<PlayerDataManager>().InstancePerLifetimeScope();
+            AutowirePropertySelector autowirePropertySelector = new AutowirePropertySelector();
+            builder.RegisterType<GameManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<LoadoutManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<DataManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<TimerManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<RespawnManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<TeamManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<PlayerDataManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
 
-            builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope();
-            builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
 
             builder.RegisterInstance(databaseProvider).As<IDatabaseProvider<GameData>>().ExternallyOwned();
         }

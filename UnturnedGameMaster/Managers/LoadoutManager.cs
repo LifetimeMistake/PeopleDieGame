@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
 
@@ -12,18 +13,14 @@ namespace UnturnedGameMaster.Managers
 {
     public class LoadoutManager : IManager
     {
-        private DataManager dataManager;
-        private LoadoutIdProvider loadoutIdProvider;
+        [InjectDependency]
+        private DataManager dataManager{ get; set; }
+        [InjectDependency]
+        private LoadoutIdProvider loadoutIdProvider{ get; set; }
 
         public event EventHandler<LoadoutAppliedEventArgs> OnLoadoutApplied;
         public event EventHandler<LoadoutEventArgs> OnLoadoutCreated;
         public event EventHandler<LoadoutEventArgs> OnLoadoutRemoved;
-
-        public LoadoutManager(DataManager configManager, LoadoutIdProvider loadoutIdProvider)
-        {
-            this.dataManager = configManager ?? throw new ArgumentNullException(nameof(configManager));
-            this.loadoutIdProvider = loadoutIdProvider ?? throw new ArgumentNullException(nameof(loadoutIdProvider));
-        }
 
         public void Init()
         { }

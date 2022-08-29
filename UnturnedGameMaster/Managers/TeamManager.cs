@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
@@ -15,23 +16,19 @@ namespace UnturnedGameMaster.Managers
 {
     public class TeamManager : IManager
     {
-        private DataManager dataManager;
-        private PlayerDataManager playerDataManager;
-        private LoadoutManager loadoutManager;
-        private TeamIdProvider teamIdProvider;
+        [InjectDependency]
+        private DataManager dataManager { get; set; }
+        [InjectDependency]
+        private PlayerDataManager playerDataManager { get; set; }
+        [InjectDependency]
+        private LoadoutManager loadoutManager { get; set; }
+        [InjectDependency]
+        private TeamIdProvider teamIdProvider { get; set; }
 
         public event EventHandler<TeamMembershipEventArgs> OnPlayerJoinedTeam;
         public event EventHandler<TeamMembershipEventArgs> OnPlayerLeftTeam;
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
-
-        public TeamManager(DataManager dataManager, PlayerDataManager playerDataManager, LoadoutManager loadoutManager, TeamIdProvider teamIdProvider)
-        {
-            this.dataManager = dataManager ?? throw new ArgumentNullException(nameof(dataManager));
-            this.playerDataManager = playerDataManager ?? throw new ArgumentNullException(nameof(playerDataManager));
-            this.loadoutManager = loadoutManager ?? throw new ArgumentNullException(nameof(loadoutManager));
-            this.teamIdProvider = teamIdProvider ?? throw new ArgumentNullException(nameof(teamIdProvider));
-        }
 
         public void Init()
         { }
