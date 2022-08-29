@@ -79,6 +79,7 @@
     <Compile Include="Autofac\InjectDependencyAttribute.cs" />
     <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
     <Compile Include="Autofac\ServiceLocator.cs" />
+    <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
     <Compile Include="Commands\BioCommand.cs" />
     <Compile Include="Commands\InfoCommand.cs" />
     <Compile Include="Commands\Admin\ManageGameCommand.cs" />

@@ -16,7 +16,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription> <teamName/teamId> [<name/description/spawnpoint>]";
+        public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutId>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();

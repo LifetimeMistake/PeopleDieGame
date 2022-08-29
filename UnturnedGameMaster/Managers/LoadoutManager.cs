@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Commands.Admin;
 using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
 
@@ -77,10 +78,28 @@ namespace UnturnedGameMaster.Managers
             return loadouts[id];
         }
 
-        public Loadout GetLoadoutByName(string name)
+        public Loadout GetLoadoutByName(string name, bool exactMatch = true)
         {
             Dictionary<int, Loadout> loadouts = dataManager.GameData.Loadouts;
-            return loadouts.Values.FirstOrDefault(x => x.Name == name);
+            if (exactMatch)
+                return loadouts.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
+            else
+                return loadouts.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+        }
+
+        public Loadout ResolveLoadout(string loadoutNameOrId, bool exactMatch)
+        {
+            int id;
+            if (int.TryParse(loadoutNameOrId, out id))
+            {
+                // might be an ID but idk
+                Loadout loadout = GetLoadout(id);
+                if (loadout != null)
+                    return loadout;
+            }
+
+            //otherwise try matching by name
+            return GetLoadoutByName(loadoutNameOrId, exactMatch);
         }
 
         public Loadout[] GetLoadouts()
