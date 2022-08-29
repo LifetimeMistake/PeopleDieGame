@@ -111,7 +111,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void VerbJoinTeam(IRocketPlayer caller, string[] command)
         {
-            if (command.Length != 2)
+            if (command.Length < 2)
             {
                 UnturnedChat.Say(caller, "Musisz podać nazwę lub ID gracza oraz nazwę lub ID drużyny");
                 ShowSyntax(caller);
