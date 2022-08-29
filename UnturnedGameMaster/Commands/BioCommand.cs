@@ -30,6 +30,7 @@ namespace UnturnedGameMaster.Commands
         {
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
             PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+
             if(playerData == null)
             {
                 UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");

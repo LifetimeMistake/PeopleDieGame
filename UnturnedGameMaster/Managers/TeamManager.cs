@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Rocket.Unturned.Player;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -136,6 +137,11 @@ namespace UnturnedGameMaster.Managers
             return dataManager.GameData.Teams.Values.ToArray();
         }
 
+        public int GetTeamCount()
+        {
+            return dataManager.GameData.Teams.Count;
+        }
+
         public Team ResolveTeam(string teamNameOrId, bool exactMatch)
         {
             int id;
@@ -149,6 +155,28 @@ namespace UnturnedGameMaster.Managers
 
             // otherwise try matching by name
             return GetTeamByName(teamNameOrId, exactMatch);
+        }
+
+        public string GetTeamSummary(Team team)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"\"{team.Name}\"");
+
+            if (team.Description != "")
+                sb.AppendLine($"Opis: \"{team.Description}\"");
+            else
+                sb.AppendLine("Opis: Brak opisu");
+
+            List<PlayerData> members = new List<PlayerData>();
+            foreach(PlayerData playerData in playerDataManager.GetPlayers())
+            {
+                if (playerData.TeamId == team.Id)
+                    members.Add(playerData);
+            }
+
+            int onlineMembers = Provider.clients.Count(x => members.Any(m => (CSteamID)m.Id == x.playerID.steamID));
+            sb.AppendLine($"Liczba graczy w drużynie: {members} ({onlineMembers} online)");
+            return sb.ToString();
         }
     }
 }

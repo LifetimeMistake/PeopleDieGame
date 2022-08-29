@@ -1,6 +1,7 @@
 ﻿using Rocket.API;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
+using Rocket.Unturned.Serialisation;
 using SDG.Unturned;
 using Steamworks;
 using System;
@@ -63,12 +64,11 @@ namespace UnturnedGameMaster.Commands
 
         private void VerbPlayerInfo(IRocketPlayer caller, string[] command)
         {
-            PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-            TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-            PlayerData playerData;
-
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                PlayerData playerData;
+
                 if (command.Length == 0)
                 {
                     playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
@@ -89,22 +89,7 @@ namespace UnturnedGameMaster.Commands
                     }
                 }
 
-                StringBuilder sb = new StringBuilder();
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-                if (playerData.TeamId.HasValue)
-                {
-                    Team team = teamManager.GetTeam(playerData.TeamId.Value);
-                    sb.AppendLine($"\"{player.CharacterName}\" z drużyny \"{team.Name}\"");
-                }
-                else
-                {
-                    sb.AppendLine($"\"{player.CharacterName}\", brak drużyny");
-                }
-
-                if(playerData.Bio != "")
-                    sb.AppendLine($"\"{playerData.Bio}\"");
-
-                UnturnedChat.Say(caller, sb.ToString());
+                UnturnedChat.Say(caller, playerDataManager.GetPlayerSummary(playerData));
             }
             catch(Exception ex)
             {
@@ -115,12 +100,60 @@ namespace UnturnedGameMaster.Commands
 
         private void VerbTeamInfo(IRocketPlayer caller, string[] command)
         {
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team;
 
+                if (command.Length == 0)
+                {
+                    PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                    if (playerData == null)
+                    {
+                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                        return;
+                    }
+
+                    if (!playerData.TeamId.HasValue)
+                    {
+                        UnturnedChat.Say(caller, "Nie należysz do żadnej z drużyn.");
+                        return;
+                    }
+
+                    team = teamManager.GetTeam(playerData.TeamId.Value);
+                }
+                else
+                {
+                    string searchTerm = string.Join(" ", command);
+                    team = teamManager.ResolveTeam(searchTerm, false);
+                }
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny");
+                    return;
+                }
+
+                UnturnedChat.Say(caller, teamManager.GetTeamSummary(team));
+            }
+            catch(Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
+            }
         }
 
         private void VerbGameInfo(IRocketPlayer caller)
         {
-
+            try
+            {
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+                UnturnedChat.Say(caller, gameManager.GetGameSummary());
+            }
+            catch(Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
+            }
         }
     }
 }
