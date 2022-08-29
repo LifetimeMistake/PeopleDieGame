@@ -1,5 +1,6 @@
 ﻿using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,19 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Providers;
+using static Rocket.Unturned.Events.UnturnedPlayerEvents;
 
 namespace UnturnedGameMaster.Managers
 {
     public class PlayerDataManager : IDisposableManager
     {
         private DataManager dataManager;
+        private TeamManager teamManager;
         
-        public PlayerDataManager(DataManager dataManager)
+        public PlayerDataManager(DataManager dataManager, TeamManager teamManager)
         {
             this.dataManager = dataManager ?? throw new ArgumentNullException(nameof(dataManager));
+            this.teamManager = teamManager ?? throw new ArgumentNullException(nameof(teamManager));
         }
 
         public void Init()
@@ -61,6 +65,11 @@ namespace UnturnedGameMaster.Managers
             return dataManager.GameData.PlayerData.ToArray();
         }
 
+        public int GetPlayerCount()
+        {
+            return dataManager.GameData.PlayerData.Count;
+        }
+
         public PlayerData ResolvePlayer(string playerNameOrId, bool exactMatch)
         {
             ulong id;
@@ -74,6 +83,29 @@ namespace UnturnedGameMaster.Managers
 
             // otherwise try matching by name
             return GetPlayerByName(playerNameOrId, exactMatch); 
+        }
+        
+        public string GetPlayerSummary(PlayerData playerData)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
+            sb.Append($"Profil gracza \"{player.CharacterName}\"");
+
+            if (playerData.TeamId.HasValue)
+            {
+                Team team = teamManager.GetTeam(playerData.TeamId.Value);
+                sb.AppendLine($"Drużyna: \"{team.Name}\"");
+            }
+            else
+            {
+                sb.AppendLine($"Drużyna: Brak drużyny");
+            }
+
+            if (playerData.Bio != "")
+                sb.AppendLine($"Bio: \"{playerData.Bio}\"");
+
+            return sb.ToString();
         }
     }
 }

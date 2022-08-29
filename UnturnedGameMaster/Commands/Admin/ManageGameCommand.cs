@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Managers;
+using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
@@ -94,26 +95,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 GameState state = gameManager.GetGameState();
-                string stateName = $"[{state}] ";
-                switch (state)
-                {
-                    case GameState.InLobby:
-                        stateName += "W lobby";
-                        break;
-                    case GameState.Intermission:
-                        stateName += "W grze (okres przygotowania)";
-                        break;
-                    case GameState.InGame:
-                        stateName += "W grze";
-                        break;
-                    case GameState.Finished:
-                        stateName += "Gra zakończona";
-                        break;
-                    default:
-                        stateName += "Nieznany";
-                        break;
-                }
-
+                string stateName = $"[{state}] {GameStateFriendlyNameProvider.GetFriendlyName(state)}";
                 UnturnedChat.Say(caller, $"Aktualny stan gry: {stateName}");
             }
             catch (Exception ex)
@@ -131,9 +113,9 @@ namespace UnturnedGameMaster.Commands.Admin
                 return;
             }
 
-            GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
             try
             {
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
                 GameState gameState;
                 if (!Enum.TryParse(command[0], out gameState))
                     throw new ArgumentException(nameof(command));
