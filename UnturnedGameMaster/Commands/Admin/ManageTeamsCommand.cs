@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutId>]";
+        public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -59,7 +59,9 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "setdescription":
                     VerbSetDescription(caller, verbArgs);
                     break;
-
+                case "setloadout":
+                    VerbSetLoadout(caller, verbArgs);
+                    break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
@@ -152,14 +154,15 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-                string name = string.Join(" ", command.Skip(1));
+                string name = string.Join(" ", command);
                 if (teamManager.GetTeamByName(name) != null)
                 {
                     UnturnedChat.Say(caller, "Drużyna o tej nazwie już istnieje");
                     return;
                 }
 
-                teamManager.CreateTeam(name);
+                Team team = teamManager.CreateTeam(name);
+                UnturnedChat.Say(caller, $"Utworzono drużynę o ID {team.Id}");
             }
             catch (Exception ex)
             {
@@ -293,10 +296,6 @@ namespace UnturnedGameMaster.Commands.Admin
                 string name = string.Join(" ", command.Skip(1));
                 team.SetName(name);
             }
-            catch (ArgumentNullException)
-            {
-                UnturnedChat.Say(caller, "Nazwa drużyny nie może być pusta");
-            }
             catch (ArgumentException)
             {
                 UnturnedChat.Say(caller, "Nazwa drużyny nie może być pusta");
@@ -323,18 +322,51 @@ namespace UnturnedGameMaster.Commands.Admin
                 if (team == null)
                 {
                     UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
                 }
 
                 string desc = string.Join(" ", command.Skip(1));
                 team.SetDescription(desc);
             }
-            catch (ArgumentNullException)
-            {
-                UnturnedChat.Say(caller, "Opis drużyny nie może być pusty");
-            }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się  z powodu błędu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się ustawić opisu z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetLoadout(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length != 2)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny i nazwę lub ID zestawu wyposażenia.");
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+
+                Team team = teamManager.ResolveTeam(command[0], false);
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
+                }
+
+                Loadout loadout = loadoutManager.ResolveLoadout(command[1], false);
+                if (loadout == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono zestawu wyposażenia");
+                    return;
+                }
+
+                team.SetDefaultLoadout(loadout);
+                UnturnedChat.Say(caller, "Ustawiono nowy zestaw wyposażenia!");
+            }
+            catch(Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }
         }
     }

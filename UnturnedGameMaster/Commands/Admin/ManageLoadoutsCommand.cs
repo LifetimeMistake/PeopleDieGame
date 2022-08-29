@@ -18,7 +18,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/create/remove/additem/removeitem> <loadout name/item id> [<item amount>]";
+        public string Syntax => "<inspect/create/remove/additem/removeitem> <loadout name/loadout id> [<item id>] [<item amount>]";
 
         public List<string> Aliases => new List<string>();
 

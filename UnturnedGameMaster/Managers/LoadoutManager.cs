@@ -29,7 +29,7 @@ namespace UnturnedGameMaster.Managers
         public Loadout CreateLoadout(string name, string description = "")
         {
             Dictionary<int, Loadout> loadouts = dataManager.GameData.Loadouts;
-            if (loadouts.Values.Any(x => x.Name == name))
+            if (GetLoadoutByName(name) != null)
                 return null;
 
             int loadoutId = loadoutIdProvider.GenerateId();

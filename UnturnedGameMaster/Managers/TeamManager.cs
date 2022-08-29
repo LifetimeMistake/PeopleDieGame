@@ -36,7 +36,7 @@ namespace UnturnedGameMaster.Managers
         public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null)
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
-            if (teams.Values.Any(x => x.Name == name))
+            if (GetTeamByName(name) != null)
                 return null;
 
             int teamId = teamIdProvider.GenerateId();
