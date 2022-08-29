@@ -128,6 +128,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 UnturnedChat.Say(caller, "Musisz podać stan gry.");
                 ShowSyntax(caller);
+                return;
             }
 
             GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
