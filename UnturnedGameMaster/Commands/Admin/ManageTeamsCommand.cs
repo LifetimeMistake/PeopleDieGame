@@ -19,7 +19,7 @@ namespace UnturnedGameMaster.Commands.Admin
         public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription> <teamName/teamId> [<name/description/spawnpoint>]";
         public List<string> Aliases => new List<string>();
 
-        public List<string> Permissions => new List<string> { "manage" };
+        public List<string> Permissions => new List<string>();
 
         public void Execute(IRocketPlayer caller, string[] command)
         {

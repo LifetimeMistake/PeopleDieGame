@@ -82,10 +82,13 @@ namespace UnturnedGameMaster.Managers
             return teams[id];
         }
 
-        public Team GetTeamByName(string name)
+        public Team GetTeamByName(string name, bool exactMatch = true)
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
-            return teams.Values.FirstOrDefault(x => x.Name == name);
+            if (exactMatch)
+                return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
+            else
+                return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
         public int GetTeamPlayerCount(int id)
@@ -131,6 +134,21 @@ namespace UnturnedGameMaster.Managers
         public Team[] GetTeams()
         {
             return dataManager.GameData.Teams.Values.ToArray();
+        }
+
+        public Team ResolveTeam(string teamNameOrId, bool exactMatch)
+        {
+            int id;
+            if (int.TryParse(teamNameOrId, out id))
+            {
+                // might be an ID but idk
+                Team teamData = GetTeam(id);
+                if (teamData != null)
+                    return teamData;
+            }
+
+            // otherwise try matching by name
+            return GetTeamByName(teamNameOrId, exactMatch);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Rocket.Unturned.Events;
+using Rocket.Unturned.Player;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,9 +47,33 @@ namespace UnturnedGameMaster.Managers
             return playerList.FirstOrDefault(x => x.Id == id);
         }
 
+        public PlayerData GetPlayerByName(string name, bool exactMatch = true)
+        {
+            List<PlayerData> playerList = dataManager.GameData.PlayerData;
+            if (exactMatch)
+                return playerList.FirstOrDefault(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id).DisplayName.ToLowerInvariant() == name.ToLowerInvariant());
+            else
+                return playerList.FirstOrDefault(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id).DisplayName.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+        }
+
         public PlayerData[] GetPlayers()
         {
             return dataManager.GameData.PlayerData.ToArray();
+        }
+
+        public PlayerData ResolvePlayer(string playerNameOrId, bool exactMatch)
+        {
+            ulong id;
+            if (ulong.TryParse(playerNameOrId, out id))
+            {
+                // might be an ID but idk
+                PlayerData playerData = GetPlayer(id);
+                if (playerData != null)
+                    return playerData;
+            }
+
+            // otherwise try matching by name
+            return GetPlayerByName(playerNameOrId, exactMatch); 
         }
     }
 }
