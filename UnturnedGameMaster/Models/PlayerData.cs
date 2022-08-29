@@ -12,7 +12,7 @@ namespace UnturnedGameMaster.Models
         public string Bio { get; private set; }
         public int? TeamId { get; set; }
 
-        public PlayerData(ulong id, string bio, int? teamId = null)
+        public PlayerData(ulong id, string bio = "", int? teamId = null)
         {
             Id = id;
             Bio = bio ?? throw new ArgumentNullException(nameof(bio));

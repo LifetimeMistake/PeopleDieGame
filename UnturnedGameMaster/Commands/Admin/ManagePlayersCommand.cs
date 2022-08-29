@@ -6,25 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.Admin
 {
-    public class TestCommand : IRocketCommand
+    public class ManagePlayersCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "test";
+        public string Name => "players";
 
         public string Help => "";
 
-        public string Syntax => "[args]";
-
+        public string Syntax => "<getTeam/joinTeam/leaveTeam/promotePlayer/setBio> <playerName/playerId> [<teamName/teamId/bio>]";
         public List<string> Aliases => new List<string>();
 
-        public List<string> Permissions => new List<string>();
+        public List<string> Permissions => new List<string> { "manage" };
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            UnturnedChat.Say(caller, $"halo: {string.Join(", ", command)}");
+            UnturnedChat.Say("augh");
         }
     }
 }

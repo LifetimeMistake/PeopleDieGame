@@ -12,15 +12,15 @@ using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Commands
 {
-    public class BioCommand : IRocketCommand
+    public class ResetBioCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "bio";
+        public string Name => "resetbio";
 
-        public string Help => "Pokazuje obecne bio lub ustawia nowe.";
+        public string Help => "Resetuje bio gracza na domyślne.";
 
-        public string Syntax => "[<bio>]";
+        public string Syntax => "";
 
         public List<string> Aliases => new List<string>();
 
@@ -30,24 +30,14 @@ namespace UnturnedGameMaster.Commands
         {
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
             PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
-            if(playerData == null)
+            if (playerData == null)
             {
                 UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
                 return;
             }
 
-            if(command.Length == 0)
-            {
-                UnturnedChat.Say(caller, $"Twoje publiczne bio: \"{playerData.Bio}\"");
-                return;
-            }
-            else
-            {
-                playerData.SetBio(string.Join(" ", command));
-                UnturnedChat.Say(caller, $"Ustawiono twoje bio na: \"{playerData.Bio}\"");
-
-                return;
-            }
+            playerData.SetBio("");
+            UnturnedChat.Say("Zresetowano twoje bio!");
         }
     }
 }

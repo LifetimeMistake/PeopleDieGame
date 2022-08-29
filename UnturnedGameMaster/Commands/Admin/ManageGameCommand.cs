@@ -9,7 +9,7 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Managers;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.Admin
 {
     public class ManageGameCommand : IRocketCommand
     {

@@ -35,7 +35,7 @@ namespace UnturnedGameMaster.Managers
                 return; // no need to register a new player data struct, this player has been here before
 
             // register a new player
-            PlayerData playerData = new PlayerData((ulong)player.CSteamID, "Bardzo tajemniczy...");
+            PlayerData playerData = new PlayerData((ulong)player.CSteamID);
             playerList.Add(playerData);
         }
 

@@ -1,4 +1,5 @@
-﻿using Rocket.Unturned.Player;
+﻿using JetBrains.Annotations;
+using Rocket.Unturned.Player;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -85,6 +86,22 @@ namespace UnturnedGameMaster.Managers
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
             return teams.Values.FirstOrDefault(x => x.Name == name);
+        }
+
+        public int GetTeamPlayerCount(int id)
+        {
+            Dictionary<int, Team> teams = dataManager.GameData.Teams;
+            if (!teams.ContainsKey(id))
+                return 0;
+
+            int playerCount = 0;
+            foreach(PlayerData playerData in playerDataManager.GetPlayers())
+            {
+                if(playerData.TeamId == id)
+                    playerCount++;
+            }
+
+            return playerCount;
         }
 
         public bool JoinTeam(UnturnedPlayer player, Team team)

@@ -45,7 +45,7 @@ namespace UnturnedGameMaster.Managers
         private void UnturnedPlayerEvents_OnPlayerRevive(Rocket.Unturned.Player.UnturnedPlayer player, UnityEngine.Vector3 position, byte angle)
         {
             PlayerEventArgs playerEventArgs = new PlayerEventArgs(player);
-            UnturnedChat.Say("Witaj w świecie żywych!");
+            UnturnedChat.Say(player, "Witaj w świecie żywych!");
             RespawnPoint? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
 
             PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);

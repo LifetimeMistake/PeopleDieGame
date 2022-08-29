@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.Admin
 {
     public class ManageTeamsCommand : IRocketCommand
     {
