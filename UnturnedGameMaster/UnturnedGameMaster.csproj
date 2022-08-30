@@ -82,13 +82,12 @@
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
     <Compile Include="Commands\Admin\ManageWorldSpawnCommand.cs" />
-    <Compile Include="Commands\General\BioCommand.cs" />
-    <Compile Include="Commands\General\InfoCommand.cs" />
+    <Compile Include="Commands\BioCommand.cs" />
+    <Compile Include="Commands\InfoCommand.cs" />
     <Compile Include="Commands\Admin\ManageGameCommand.cs" />
     <Compile Include="Commands\Admin\ManagePlayersCommand.cs" />
     <Compile Include="Commands\Admin\ManageTeamsCommand.cs" />
-    <Compile Include="Commands\General\ResetBioCommand.cs" />
-    <Compile Include="Commands\Teams\TeamCommand.cs" />
+    <Compile Include="Commands\ResetBioCommand.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\GameManager.cs" />
@@ -112,6 +111,7 @@
     <Compile Include="Models\PluginConfig.cs" />
     <Compile Include="Models\RespawnPoint.cs" />
     <Compile Include="Models\TeamInvitation.cs" />
+    <Compile Include="Models\TeamBank.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\GameStateFriendlyNameProvider.cs" />
