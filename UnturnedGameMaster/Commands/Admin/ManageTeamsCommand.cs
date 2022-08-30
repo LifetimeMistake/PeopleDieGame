@@ -82,15 +82,12 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-                StringBuilder sb = new StringBuilder();
 
-                sb.AppendLine($"Lista drużyn:");
+                UnturnedChat.Say(caller, $"Lista drużyn:");
                 foreach (Team team in teamManager.GetTeams().OrderBy(x => x.Id))
                 {
-                    sb.AppendLine($"ID: {team.Id} | Nazwa: {team.Name}");
+                    UnturnedChat.Say(caller, $"ID: {team.Id} | Nazwa: {team.Name}");
                 }
-
-                UnturnedChat.Say(caller, sb.ToString());
             }
             catch (Exception ex)
             {
@@ -112,33 +109,31 @@ namespace UnturnedGameMaster.Commands.Admin
                 string searchTerm = string.Join(" ", command);
                 Team team = teamManager.ResolveTeam(searchTerm, false);
 
-                StringBuilder sb = new StringBuilder();
-
                 if (team == null)
                 {
                     UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
-                sb.AppendLine($"ID: {team.Id}");
-                sb.AppendLine($"Nazwa: {team.Name}");
+                UnturnedChat.Say(caller, $"ID: {team.Id}");
+                UnturnedChat.Say(caller, $"Nazwa: {team.Name}");
 
                 if (team.Description == "")
                 {
-                    sb.AppendLine("Opis: Brak");
+                    UnturnedChat.Say(caller, "Opis: Brak");
                 }
                 else
                 {
-                    sb.AppendLine($"Opis: \"{team.Description}\"");
+                    UnturnedChat.Say(caller, $"Opis: \"{team.Description}\"");
                 }
 
                 if (!team.DefaultLoadoutId.HasValue)
                 {
-                    sb.AppendLine("ID wyposażenia drużyny: Brak");
+                    UnturnedChat.Say(caller, "ID wyposażenia drużyny: Brak");
                 }
                 else
                 {
-                    sb.AppendLine($"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
+                    UnturnedChat.Say(caller, $"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
                 }
 
                 //leader info
@@ -146,19 +141,14 @@ namespace UnturnedGameMaster.Commands.Admin
                 RespawnPoint? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
-                    sb.AppendLine("Respawn point: Brak");
+                    UnturnedChat.Say(caller, "Respawn point: Brak");
                 }
                 else
                 {
-                    sb.AppendLine("Respawn point:");
-                    sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
-                    sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
+                    UnturnedChat.Say(caller, "Respawn point:");
+                    UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
+                    UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
                 }
-
-                //member info
-
-                UnturnedChat.Say(caller, sb.ToString());
-
             }
             catch (Exception ex)
             {
@@ -255,13 +245,9 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"Respawn point drużyny \"{searchTerm}\":");
-                sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
-                sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
-
-                UnturnedChat.Say(caller, sb.ToString());
-
+                UnturnedChat.Say(caller, $"Respawn point drużyny \"{searchTerm}\":");
+                UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
+                UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
             }
             catch (Exception ex)
             {

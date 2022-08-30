@@ -27,6 +27,7 @@ namespace UnturnedGameMaster.Managers
 
         public event EventHandler<TeamMembershipEventArgs> OnPlayerJoinedTeam;
         public event EventHandler<TeamMembershipEventArgs> OnPlayerLeftTeam;
+        public event EventHandler<TeamMembershipEventArgs> OnTeamLeaderChanged;
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
 
@@ -58,15 +59,16 @@ namespace UnturnedGameMaster.Managers
             if (!teams.ContainsKey(id))
                 return false;
 
+            Team team = teams[id];
+            teams.Remove(id);
+
             // Make sure all players leave the team prior to deletion.
-            foreach(PlayerData data in playerDataManager.GetPlayers())
+            foreach (PlayerData data in playerDataManager.GetPlayers())
             {
                 if (data.TeamId == id)
                     LeaveTeam(UnturnedPlayer.FromCSteamID((CSteamID)data.Id));
             }
 
-            Team team = teams[id];
-            teams.Remove(id);
             OnTeamRemoved?.Invoke(this, new TeamEventArgs(team));
             return true;
         }
@@ -129,6 +131,17 @@ namespace UnturnedGameMaster.Managers
             return true;
         }
 
+        public bool SetLeader(Team team, UnturnedPlayer player)
+        {
+            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+            if (playerData == null || playerData.TeamId != team.Id) // player doesn't exist or does not belong to this team
+                return false;
+
+            team.SetTeamLeader(player);
+            OnTeamLeaderChanged?.Invoke(this, new TeamMembershipEventArgs(player, team));
+            return true;
+        }
+
         public Team[] GetTeams()
         {
             return dataManager.GameData.Teams.Values.ToArray();
@@ -172,7 +185,8 @@ namespace UnturnedGameMaster.Managers
             }
 
             int onlineMembers = Provider.clients.Count(x => members.Any(m => (CSteamID)m.Id == x.playerID.steamID));
-            sb.AppendLine($"Liczba graczy w drużynie: {members} ({onlineMembers} online)");
+            sb.AppendLine($"Liczba graczy w drużynie: {members.Count} ({onlineMembers} online)");
+            sb.AppendLine($"Członkowie drużyny: {string.Join(", ", members.Select(x => x.Name))}");
             return sb.ToString();
         }
     }

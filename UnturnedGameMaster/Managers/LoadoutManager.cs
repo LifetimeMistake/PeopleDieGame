@@ -15,9 +15,9 @@ namespace UnturnedGameMaster.Managers
     public class LoadoutManager : IManager
     {
         [InjectDependency]
-        private DataManager dataManager{ get; set; }
+        private DataManager dataManager { get; set; }
         [InjectDependency]
-        private LoadoutIdProvider loadoutIdProvider{ get; set; }
+        private LoadoutIdProvider loadoutIdProvider { get; set; }
 
         public event EventHandler<LoadoutAppliedEventArgs> OnLoadoutApplied;
         public event EventHandler<LoadoutEventArgs> OnLoadoutCreated;

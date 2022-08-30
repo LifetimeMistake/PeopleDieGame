@@ -10,7 +10,7 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.General
 {
     public class ResetBioCommand : IRocketCommand
     {
@@ -32,7 +32,7 @@ namespace UnturnedGameMaster.Commands
             PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
             if (playerData == null)
             {
-                UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                 return;
             }
 

@@ -54,7 +54,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
                 }
@@ -71,7 +71,6 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 loadoutManager.GiveLoadout(UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id), loadout);
                 UnturnedChat.Say(caller, "Nadano zestaw wyposażenia");
-
             }
             catch (Exception ex)
             {

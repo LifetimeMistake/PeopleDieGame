@@ -82,19 +82,15 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder();
+                UnturnedChat.Say(caller, $"ID: {loadout.Id}");
+                UnturnedChat.Say(caller, $"Nazwa: {loadout.Name}");
+                UnturnedChat.Say(caller, $"Opis: {loadout.Description}");
 
-                sb.AppendLine($"ID: {loadout.Id}");
-                sb.AppendLine($"Nazwa: {loadout.Name}");
-                sb.AppendLine($"Opis: {loadout.Description}");
-
-                sb.AppendLine($"Przedmioty:");
+                UnturnedChat.Say(caller, $"Przedmioty:");
                 foreach(KeyValuePair<int, int> item in loadout.GetItems())
                 {
-                    sb.AppendLine($"\t{item.Key} x{item.Value}");
+                    UnturnedChat.Say(caller, $"\t{item.Key} x{item.Value}");
                 }
-
-                UnturnedChat.Say(caller, sb.ToString());
             }
             catch (Exception ex)
             {

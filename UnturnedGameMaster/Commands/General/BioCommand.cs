@@ -10,7 +10,7 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.General
 {
     public class BioCommand : IRocketCommand
     {
@@ -33,7 +33,7 @@ namespace UnturnedGameMaster.Commands
 
             if(playerData == null)
             {
-                UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                 return;
             }
 

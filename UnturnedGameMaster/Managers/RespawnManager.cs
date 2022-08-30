@@ -48,7 +48,7 @@ namespace UnturnedGameMaster.Managers
             PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
             if (playerData == null)
             {
-                UnturnedChat.Say(player, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                UnturnedChat.Say(player, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
             }
 
             if((playerData.TeamId == null || gameManager.GetGameState() == GameState.InLobby) && worldRespawn != null)

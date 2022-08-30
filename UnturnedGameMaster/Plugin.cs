@@ -1,4 +1,5 @@
 ﻿using Rocket.Core.Plugins;
+using Rocket.Unturned.Chat;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,10 +30,14 @@ namespace UnturnedGameMaster
             {
                 manager.Init();
             }
+
+            UnturnedChat.Say("Game manager loaded!");
         }
 
         protected override void Unload()
         {
+            UnturnedChat.Say("Game manager unloading!");
+
             // Dispose all managers
             foreach (IDisposableManager manager in serviceLocator.LocateServicesOfType<IDisposableManager>())
             {

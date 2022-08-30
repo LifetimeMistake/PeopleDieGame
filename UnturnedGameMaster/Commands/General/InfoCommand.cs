@@ -13,7 +13,7 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
-namespace UnturnedGameMaster.Commands
+namespace UnturnedGameMaster.Commands.General
 {
     public class InfoCommand : IRocketCommand
     {
@@ -74,7 +74,7 @@ namespace UnturnedGameMaster.Commands
                     playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
                 }
@@ -89,7 +89,8 @@ namespace UnturnedGameMaster.Commands
                     }
                 }
 
-                UnturnedChat.Say(caller, playerDataManager.GetPlayerSummary(playerData));
+                foreach (string line in playerDataManager.GetPlayerSummary(playerData).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
+                    UnturnedChat.Say(caller, line);
             }
             catch(Exception ex)
             {
@@ -111,7 +112,7 @@ namespace UnturnedGameMaster.Commands
                     PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć akt gracza??)");
+                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
 
@@ -135,7 +136,8 @@ namespace UnturnedGameMaster.Commands
                     return;
                 }
 
-                UnturnedChat.Say(caller, teamManager.GetTeamSummary(team));
+                foreach (string line in teamManager.GetTeamSummary(team).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
+                    UnturnedChat.Say(caller, line);
             }
             catch(Exception ex)
             {
@@ -148,7 +150,8 @@ namespace UnturnedGameMaster.Commands
             try
             {
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
-                UnturnedChat.Say(caller, gameManager.GetGameSummary());
+                foreach(string line in gameManager.GetGameSummary().Split(new[] { Environment.NewLine }, StringSplitOptions.None))
+                    UnturnedChat.Say(caller, line);
             }
             catch(Exception ex)
             {
