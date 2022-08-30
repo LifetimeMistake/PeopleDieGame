@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
+        public string Syntax => "<list/inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -38,6 +38,9 @@ namespace UnturnedGameMaster.Commands.Admin
             string[] verbArgs = command.Skip(1).ToArray();
             switch (command[0].ToLowerInvariant())
             {
+                case "list":
+                    VerbList(caller, verbArgs);
+                    break;
                 case "inspect":
                     VerbInspect(caller, verbArgs);
                     break;
@@ -74,6 +77,27 @@ namespace UnturnedGameMaster.Commands.Admin
             UnturnedChat.Say(caller, $"/{Name} {Syntax}");
         }
 
+        private void VerbList(IRocketPlayer caller, string[] command)
+        {
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                StringBuilder sb = new StringBuilder();
+
+                sb.AppendLine($"Lista drużyn:");
+                foreach (Team team in teamManager.GetTeams().OrderBy(x => x.Id))
+                {
+                    sb.AppendLine($"ID: {team.Id} | Nazwa: {team.Name}");
+                }
+
+                UnturnedChat.Say(caller, sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o liście drużyn z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
         private void VerbInspect(IRocketPlayer caller, string[] command)
         {
             if (command.Length == 0)
@@ -96,8 +120,8 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                sb.Append($"Nazwa: {team.Name}");
                 sb.AppendLine($"ID: {team.Id}");
+                sb.AppendLine($"Nazwa: {team.Name}");
 
                 if (team.Description == "")
                 {
@@ -110,11 +134,11 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!team.DefaultLoadoutId.HasValue)
                 {
-                    sb.AppendLine("ID loadoutu drużyny: Brak");
+                    sb.AppendLine("ID wyposażenia drużyny: Brak");
                 }
                 else
                 {
-                    sb.AppendLine($"ID loadoutu drużyny: {team.DefaultLoadoutId}");
+                    sb.AppendLine($"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
                 }
 
                 //leader info
@@ -232,7 +256,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 StringBuilder sb = new StringBuilder();
-                sb.Append($"Respawn point drużyny \"{searchTerm}\":");
+                sb.AppendLine($"Respawn point drużyny \"{searchTerm}\":");
                 sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
                 sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
 

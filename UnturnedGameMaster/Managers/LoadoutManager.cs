@@ -59,9 +59,18 @@ namespace UnturnedGameMaster.Managers
 
         public bool DeleteLoadout(int id)
         {
+            TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
             Dictionary<int, Loadout> loadouts = dataManager.GameData.Loadouts;
             if (!loadouts.ContainsKey(id))
                 return false;
+
+            foreach (Team team in teamManager.GetTeams())
+            {
+                if (team.DefaultLoadoutId == id)
+                {
+                    team.SetDefaultLoadout(null);
+                }
+            }
 
             Loadout loadout = loadouts[id];
             loadouts.Remove(id);

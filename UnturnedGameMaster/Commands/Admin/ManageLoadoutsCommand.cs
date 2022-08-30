@@ -18,7 +18,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/create/remove/additem/removeitem> <loadout name/loadout id> [<item id>] [<item amount>]";
+        public string Syntax => "<inspect/create/remove/additems/removeitem> <loadout name/loadout id> [<item id>] [<item amount>]";
 
         public List<string> Aliases => new List<string>();
 
@@ -45,11 +45,11 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "remove":
                     VerbRemove(caller, verbArgs);
                     break;
-                case "additem":
-                    VerbAddItem(caller, verbArgs);
+                case "additems":
+                    VerbAddItems(caller, verbArgs);
                     break;
-                case "removeitem":
-                    VerbRemoveItem(caller, verbArgs);
+                case "removeitems":
+                    VerbRemoveItems(caller, verbArgs);
                     break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
@@ -65,7 +65,41 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public void VerbInspect(IRocketPlayer caller, string[] command)
         {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu");
+                return;
+            }
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                string searchTerm = string.Join(" ", command);
+                Loadout loadout = loadoutManager.ResolveLoadout(searchTerm, false);
 
+                if (loadout == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{searchTerm}\"");
+                    return;
+                }
+
+                StringBuilder sb = new StringBuilder();
+
+                sb.AppendLine($"ID: {loadout.Id}");
+                sb.AppendLine($"Nazwa: {loadout.Name}");
+                sb.AppendLine($"Opis: {loadout.Description}");
+
+                sb.AppendLine($"Przedmioty:");
+                foreach(KeyValuePair<int, int> item in loadout.GetItems())
+                {
+                    sb.AppendLine($"\t{item.Key} x{item.Value}");
+                }
+
+                UnturnedChat.Say(caller, sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o zestawie z powodu błędu serwera: {ex.Message}");
+            }
         }
 
         public void VerbCreate(IRocketPlayer caller, string[] command)
@@ -122,17 +156,121 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public void VerbRemove(IRocketPlayer caller, string[] command)
         {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu");
+                return;
+            }
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                string searchTerm = string.Join(" ", command);
+                Loadout loadout = loadoutManager.ResolveLoadout(searchTerm, false);
 
+                if (loadout == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono wyposażenia \"{searchTerm}\"");
+                    return;
+                }
+
+                loadoutManager.DeleteLoadout(loadout.Id);
+                UnturnedChat.Say(caller, "Usunięto wyposażenie");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się usunąć zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
+            }
         }
 
-        public void VerbAddItem(IRocketPlayer caller, string[] command)
+        public void VerbAddItems(IRocketPlayer caller, string[] command)
         {
+            if (command.Length < 2)
+            {
+                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
+                return;
+            }
 
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                Loadout loadout = loadoutManager.ResolveLoadout(command[0], false);
+
+                if (loadout == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    return;
+                }
+
+                foreach (string item in command.Skip(1))
+                {
+                    string itemIdString = item;
+                    int itemId;
+                    int amount = 1;
+                    if (item.Contains("/"))
+                    {
+                        string[] parts = item.Split('/');
+                        itemIdString = parts[0];
+
+                        if (!int.TryParse(parts[1], out amount))
+                        {
+                            UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć liczby przedmiotów \"{parts[1]}\", ustawianie wartości na 1.");
+                            amount = 1;
+                        }
+                    }
+
+                    if (!int.TryParse(itemIdString, out itemId))
+                    {
+                        UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{itemIdString}\", przedmiot pominięty.");
+                        continue; // failed to parse item Id
+                    }
+
+                    loadout.AddItem(itemId, amount);
+                }
+                UnturnedChat.Say(caller, "Dodano przedmioty do zestawu wyposażenia");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się dodać przedmiotu do zestawu z powodu błędu serwera: {ex.Message}");
+            }
         }
 
-        public void VerbRemoveItem(IRocketPlayer caller, string[] command)
+        public void VerbRemoveItems(IRocketPlayer caller, string[] command)
         {
+            if (command.Length < 2)
+            {
+                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
+                return;
+            }
 
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                Loadout loadout = loadoutManager.ResolveLoadout(command[0], false);
+
+                if (loadout == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    return;
+                }
+
+                foreach (string item in command.Skip(1))
+                {
+                    int itemId;
+
+                    if (!int.TryParse(item, out itemId))
+                    {
+                        UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{item}\", przedmiot pominięty.");
+                        continue; // failed to parse item Id
+                    }
+
+                    loadout.RemoveItem(itemId);
+                }
+                UnturnedChat.Say(caller, "Usunięto przedmioty z zestawu wyposażenia");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się usunąć przedmiotu z zestawu z powodu błędu serwera: {ex.Message}");
+            }
         }
     }
 }
