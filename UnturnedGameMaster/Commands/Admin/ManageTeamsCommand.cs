@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<list/inspect/create/remove/getSpawn/setSpawn/setName/setDescription/setLoadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
+        public string Syntax => "<list/inspect/create/remove/getspawn/setspawn/resetspawn/setname/setdescription/setloadout/resetloadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -56,6 +56,9 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "setspawn":
                     VerbSetSpawn(caller, verbArgs);
                     break;
+                case "resetspawn":
+                    VerbResetSpawn(caller, verbArgs);
+                    break;
                 case "setname":
                     VerbSetName(caller, verbArgs);
                     break;
@@ -64,6 +67,9 @@ namespace UnturnedGameMaster.Commands.Admin
                     break;
                 case "setloadout":
                     VerbSetLoadout(caller, verbArgs);
+                    break;
+                case "resetloadout":
+                    VerbResetLoadout(caller, verbArgs);
                     break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
@@ -141,11 +147,11 @@ namespace UnturnedGameMaster.Commands.Admin
                 RespawnPoint? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
-                    UnturnedChat.Say(caller, "Respawn point: Brak");
+                    UnturnedChat.Say(caller, "Punkt odradzania: Brak");
                 }
                 else
                 {
-                    UnturnedChat.Say(caller, "Respawn point:");
+                    UnturnedChat.Say(caller, "Punkt odradzania:");
                     UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
                     UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
                 }
@@ -251,7 +257,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać respawn pointu drużyny z powodu błędu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się pobrać punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -283,7 +289,36 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić respawn pointu z powodu błędu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbResetSpawn(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                string searchTerm = string.Join(" ", command);
+                Team team = teamManager.ResolveTeam(searchTerm, false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    return;
+                }
+
+                team.RespawnPoint = null;
+                UnturnedChat.Say(caller, "Zresetowano punkt odradzania drużyny");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -384,6 +419,35 @@ namespace UnturnedGameMaster.Commands.Admin
             catch(Exception ex)
             {
                 UnturnedChat.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbResetLoadout(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                string searchTerm = string.Join(" ", command);
+                Team team = teamManager.ResolveTeam(searchTerm, false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    return;
+                }
+
+                team.SetDefaultLoadout(null);
+                UnturnedChat.Say(caller, "Zresetowano zestaw wyposażenia drużyny");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
     }

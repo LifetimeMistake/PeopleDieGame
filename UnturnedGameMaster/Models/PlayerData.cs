@@ -12,13 +12,15 @@ namespace UnturnedGameMaster.Models
         public string Name { get; private set; }
         public string Bio { get; private set; }
         public int? TeamId { get; set; }
+        public double WalletFunds { get; private set; }
 
-        public PlayerData(ulong id, string name, string bio = "", int? teamId = null)
+        public PlayerData(ulong id, string name, string bio = "", int? teamId = null, double walletFunds = 0)
         {
             Id = id;
             Name = name;
             Bio = bio ?? throw new ArgumentNullException(nameof(bio));
             TeamId = teamId;
+            WalletFunds = walletFunds;
         }
 
         public void SetBio(string bio)
@@ -35,6 +37,21 @@ namespace UnturnedGameMaster.Models
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
+        }
+
+        public void SetWalletFunds(double amount)
+        {
+            WalletFunds = amount;
+        }
+
+        public void AddWalletFunds(double amount)
+        {
+            WalletFunds += amount;
+        }
+
+        public void RemoveWalletFunds(double amount)
+        {
+            WalletFunds = Math.Max(0, WalletFunds - amount);
         }
     }
 }
