@@ -47,6 +47,14 @@ namespace UnturnedGameMaster
                 Items.Add(itemId, amount);
         }
 
+        public void AddItemOrAddAmount(int itemId, int amount = 1)
+        {
+            if (Items.ContainsKey(itemId))
+                Items[itemId] += amount;
+            else
+                Items.Add(itemId, amount);
+        }
+
         public bool RemoveItem(int itemId)
         {
             return Items.Remove(itemId);

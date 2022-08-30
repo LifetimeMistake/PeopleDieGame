@@ -214,7 +214,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (teamManager.DeleteTeam(team.Id))
+                if (!teamManager.DeleteTeam(team.Id))
                 {
                     UnturnedChat.Say(caller, "Nie udało się usunąć drużyny");
                     return;
@@ -260,6 +260,8 @@ namespace UnturnedGameMaster.Commands.Admin
                 sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
                 sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
 
+                UnturnedChat.Say(caller, sb.ToString());
+
             }
             catch (Exception ex)
             {
@@ -291,6 +293,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 RespawnPoint? respawnPoint = new RespawnPoint(callerPlayer.Position, (byte)callerPlayer.Rotation);
                 team.RespawnPoint = respawnPoint;
+                UnturnedChat.Say(caller, "Ustawiono respawn point drużyny");
             }
             catch (Exception ex)
             {
@@ -319,6 +322,8 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 string name = string.Join(" ", command.Skip(1));
                 team.SetName(name);
+
+                UnturnedChat.Say(caller, $"Ustawiono nazwę drużyny na \"{name}\"");
             }
             catch (ArgumentException)
             {
@@ -351,6 +356,8 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 string desc = string.Join(" ", command.Skip(1));
                 team.SetDescription(desc);
+
+                UnturnedChat.Say(caller, $"Ustawiono opis drużyny na \"{desc}\"");
             }
             catch (Exception ex)
             {

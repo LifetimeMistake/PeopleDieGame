@@ -224,7 +224,7 @@ namespace UnturnedGameMaster.Commands.Admin
                         continue; // failed to parse item Id
                     }
 
-                    loadout.AddItem(itemId, amount);
+                    loadout.AddItemOrAddAmount(itemId, amount);
                 }
                 UnturnedChat.Say(caller, "Dodano przedmioty do zestawu wyposażenia");
             }

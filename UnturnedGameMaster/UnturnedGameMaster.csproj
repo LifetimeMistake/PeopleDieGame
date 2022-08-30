@@ -81,6 +81,7 @@
     <Compile Include="Autofac\ServiceLocator.cs" />
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
+    <Compile Include="Commands\Admin\ManageWorldSpawnCommand.cs" />
     <Compile Include="Commands\BioCommand.cs" />
     <Compile Include="Commands\InfoCommand.cs" />
     <Compile Include="Commands\Admin\ManageGameCommand.cs" />
