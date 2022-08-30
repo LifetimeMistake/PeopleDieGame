@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Models.Exception;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
@@ -69,13 +70,16 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
 
-                loadoutManager.GiveLoadout(UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id), loadout);
+                loadoutManager.GiveLoadout(playerData, loadout);
                 UnturnedChat.Say(caller, "Nadano zestaw wyposażenia");
+            }
+            catch (PlayerOfflineException)
+            {
+                UnturnedChat.Say(caller, "Gracz docelowy nie znajduje się obecnie na serwerze.");
             }
             catch (Exception ex)
             {
                 UnturnedChat.Say(caller, $"Nie udało się nadać zestawu z powodu błedu serwera: {ex.Message}");
-                return;
             }
         }
 

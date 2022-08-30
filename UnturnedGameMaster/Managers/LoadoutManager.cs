@@ -1,5 +1,6 @@
 ﻿using Rocket.API;
 using Rocket.Unturned.Player;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Commands.Admin;
+using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
+using UnturnedGameMaster.Models.Exception;
 using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
@@ -41,12 +44,11 @@ namespace UnturnedGameMaster.Managers
             return loadout;
         }
 
-        public void GiveLoadout(UnturnedPlayer player, Loadout loadout)
+        public void GiveLoadout(PlayerData playerData, Loadout loadout)
         {
+            UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
             if (player == null)
-                throw new ArgumentNullException(nameof(player));
-            if (loadout == null)
-                throw new ArgumentNullException(nameof(loadout));
+                throw new PlayerOfflineException(playerData.Name);
 
             foreach(KeyValuePair<int, int> item in loadout.Items)
             {
@@ -54,7 +56,7 @@ namespace UnturnedGameMaster.Managers
                     throw new Exception($"Failed to give item {item.Key} ({item.Value}x) to player");
             }
 
-            OnLoadoutApplied?.Invoke(this, new LoadoutAppliedEventArgs(player, loadout));
+            OnLoadoutApplied?.Invoke(this, new LoadoutAppliedEventArgs(playerData, loadout));
         }
 
         public bool DeleteLoadout(int id)

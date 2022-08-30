@@ -9,9 +9,9 @@ namespace UnturnedGameMaster.Models.EventArgs
 {
     public class PlayerEventArgs : System.EventArgs
     {
-        public UnturnedPlayer Player;
+        public PlayerData Player;
 
-        public PlayerEventArgs(UnturnedPlayer player)
+        public PlayerEventArgs(PlayerData player)
         {
             Player = player ?? throw new ArgumentNullException(nameof(player));
         }

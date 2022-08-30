@@ -66,7 +66,7 @@ namespace UnturnedGameMaster.Managers
             foreach (PlayerData data in playerDataManager.GetPlayers())
             {
                 if (data.TeamId == id)
-                    LeaveTeam(UnturnedPlayer.FromCSteamID((CSteamID)data.Id));
+                    LeaveTeam(data);
             }
 
             OnTeamRemoved?.Invoke(this, new TeamEventArgs(team));
@@ -107,34 +107,31 @@ namespace UnturnedGameMaster.Managers
             return playerCount;
         }
 
-        public bool JoinTeam(UnturnedPlayer player, Team team)
+        public bool JoinTeam(PlayerData player, Team team)
         {
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
-            if (playerData == null || playerData.TeamId != null) // player doesn't exist or is already in a team
+            if (player == null || player.TeamId != null) // player doesn't exist or is already in a team
                 return false;
 
-            playerData.TeamId = team.Id;
+            player.TeamId = team.Id;
             OnPlayerJoinedTeam?.Invoke(this, new TeamMembershipEventArgs(player, team));
             return true;
         }
 
-        public bool LeaveTeam(UnturnedPlayer player)
+        public bool LeaveTeam(PlayerData player)
         {
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
-            if (playerData == null || playerData.TeamId == null) // player doesn't exist or does not belong to a team
+            if (player == null || player.TeamId == null) // player doesn't exist or does not belong to a team
                 return false;
 
-            Team team = GetTeam(playerData.TeamId.Value);
-            playerData.TeamId = null;
+            Team team = GetTeam(player.TeamId.Value);
+            player.TeamId = null;
 
             OnPlayerLeftTeam?.Invoke(this, new TeamMembershipEventArgs(player, team));
             return true;
         }
 
-        public bool SetLeader(Team team, UnturnedPlayer player)
+        public bool SetLeader(Team team, PlayerData player)
         {
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
-            if (playerData == null || playerData.TeamId != team.Id) // player doesn't exist or does not belong to this team
+            if (player == null || player.TeamId != team.Id) // player doesn't exist or does not belong to this team
                 return false;
 
             team.SetTeamLeader(player);

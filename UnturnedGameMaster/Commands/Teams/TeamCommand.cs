@@ -118,12 +118,12 @@ namespace UnturnedGameMaster.Commands.Teams
                 }
 
                 Team team = teamManager.CreateTeam(teamName);
-                if (!teamManager.JoinTeam(player, team))
+                if (!teamManager.JoinTeam(playerData, team))
                 {
                     UnturnedChat.Say(caller, "Warn: Nie udało się dołączyć do utworzonej drużyny z powodu błędu systemu, poproś administratora o pomoc.");
                 }
 
-                if (!teamManager.SetLeader(team, player))
+                if (!teamManager.SetLeader(team, playerData))
                 {
                     UnturnedChat.Say(caller, "Warn: Nie udało się mianować Cię dowódcą drużyny z powodu błędu systemu, poproś administratora o pomoc.");
                 }
@@ -165,6 +165,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 }
 
                 Team team = teamManager.GetTeam(playerData.TeamId.Value);
+
                 if (!teamManager.DeleteTeam(team.Id))
                 {
                     UnturnedChat.Say("Nie udało się rozwiązać drużyny z powodu błędu systemu, poproś administratora o pomoc.");
@@ -181,37 +182,133 @@ namespace UnturnedGameMaster.Commands.Teams
 
         private void VerbInvite(IRocketPlayer caller, string[] command)
         {
-            
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say("Musisz podać nazwę gracza.");
+                return;
+            }
+
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say("Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say("Tylko lider drużyny może zapraszać innych graczy!");
+                    return;
+                }
+
+                string playerName = string.Join(" ", command);
+                PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
+                if (targetPlayerData == null)
+                {
+                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    return;
+                }
+
+                if (callerPlayerData == targetPlayerData)
+                {
+                    UnturnedChat.Say($"Nie możesz zaprosić samego siebie lmao");
+                    return;
+                }
+
+                if (targetPlayerData.TeamId != null)
+                {
+                    if (targetPlayerData.TeamId == team.Id)
+                        UnturnedChat.Say($"Gracz należy już do Twojej drużyny");
+                    else
+                        UnturnedChat.Say($"Gracz należy już do innej drużyny");
+                    
+                    return;
+                }
+
+
+            }
+            catch(Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbCancelInvite(IRocketPlayer caller, string[] command)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbKick(IRocketPlayer caller, string[] command)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbPromote(IRocketPlayer caller, string[] command)
         {
-            
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbName(IRocketPlayer caller, string[] command)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbDescription(IRocketPlayer caller, string[] command)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+            }
         }
 
         private void VerbLoadout(IRocketPlayer caller, string[] command)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+            }
         }
     }
 }

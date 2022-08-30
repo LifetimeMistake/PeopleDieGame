@@ -41,7 +41,6 @@ namespace UnturnedGameMaster.Managers
 
         private void UnturnedPlayerEvents_OnPlayerRevive(Rocket.Unturned.Player.UnturnedPlayer player, UnityEngine.Vector3 position, byte angle)
         {
-            PlayerEventArgs playerEventArgs = new PlayerEventArgs(player);
             UnturnedChat.Say(player, "Witaj w świecie żywych!");
             RespawnPoint? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
 
@@ -72,7 +71,14 @@ namespace UnturnedGameMaster.Managers
                     Loadout loadout = loadoutManager.GetLoadout(playerTeam.DefaultLoadoutId.Value);
                     if (loadout != null)
                     {
-                        loadoutManager.GiveLoadout(player, loadout);
+                        try
+                        {
+                            loadoutManager.GiveLoadout(playerData, loadout);
+                        }
+                        catch(Exception)
+                        {
+                            UnturnedChat.Say(player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
+                        }
                     }
                 }
             }
@@ -81,7 +87,7 @@ namespace UnturnedGameMaster.Managers
                 UnturnedChat.Say(player, "Budzisz się w szczerym polu.");
             }
 
-            OnRespawnFinished?.Invoke(this, playerEventArgs);
+            OnRespawnFinished?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
         public void SetWorldRespawnPoint(RespawnPoint? respawnPoint)

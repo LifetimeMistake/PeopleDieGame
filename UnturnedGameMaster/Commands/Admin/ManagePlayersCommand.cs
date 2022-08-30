@@ -123,7 +123,6 @@ namespace UnturnedGameMaster.Commands.Admin
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
                 Team team = teamManager.ResolveTeam(command[1], false);
 
                 if (playerData == null)
@@ -144,7 +143,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!teamManager.JoinTeam(player, team))
+                if (!teamManager.JoinTeam(playerData, team))
                 {
                     UnturnedChat.Say(caller, "Nie udało się dodać gracza do drużyny");
                     return;
@@ -172,26 +171,32 @@ namespace UnturnedGameMaster.Commands.Admin
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
 
                 if (playerData == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\".");
                     return;
                 }
 
                 if (!playerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say(caller, "Gracz nie jest w drużynie");
+                    UnturnedChat.Say(caller, "Gracz nie jest w drużynie.");
                     return;
                 }
 
-                if (!teamManager.LeaveTeam(player)) {
-                    UnturnedChat.Say(caller, "Nie udało się usunąć gracza z drużyny");
+                if (!teamManager.LeaveTeam(playerData)) 
+                {
+                    UnturnedChat.Say(caller, "Nie udało się usunąć gracza z drużyny.");
                     return;
                 }
 
-                UnturnedChat.Say(caller, "Usunięto gracza z drużyny");
+                UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
+                if (player != null)
+                {
+                    UnturnedChat.Say(player, $"Zostałeś wyrzucony z drużyny.");
+                }
+
+                UnturnedChat.Say(caller, "Usunięto gracza z drużyny.");
             }
             catch (Exception ex)
             {
@@ -213,7 +218,6 @@ namespace UnturnedGameMaster.Commands.Admin
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
                 Team team = teamManager.ResolveTeam(command[1], false);
 
                 if (playerData == null)
@@ -234,7 +238,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                team.SetTeamLeader(player);
+                team.SetTeamLeader(playerData);
                 UnturnedChat.Say(caller, "Awansowano gracza na lidera drużyny");
             }
             catch (Exception ex)

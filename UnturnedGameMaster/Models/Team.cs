@@ -20,6 +20,7 @@ namespace UnturnedGameMaster
         public int? DefaultLoadoutId { get; private set; }
         public ulong? LeaderId { get; private set; }
         public RespawnPoint? RespawnPoint { get; set; }
+        public List<TeamInvitation> Invitations { get; private set; }
 
         public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, RespawnPoint? respawnPoint = null)
         {
@@ -58,12 +59,37 @@ namespace UnturnedGameMaster
                 DefaultLoadoutId = loadout.Id;
         }
 
-        public void SetTeamLeader(UnturnedPlayer player)
+        public void SetTeamLeader(PlayerData player)
         {
             if (player == null)
                 LeaderId = null;
             else
-                LeaderId = (ulong)player.CSteamID;
+                LeaderId = player.Id;
+        }
+
+        public void AddInvitation(TeamInvitation teamInvitation)
+        {
+            if (teamInvitation == null)
+                throw new ArgumentNullException(nameof(teamInvitation));
+
+            if (teamInvitation.IsExpired())
+                throw new ArgumentOutOfRangeException("The invitation was expired.");
+
+            if (Invitations.Any(x => x.TargetId == teamInvitation.TargetId))
+                throw new ArgumentException("Invitation already exists.");
+
+            Invitations.Add(teamInvitation);
+        }
+
+        public bool RemoveInvitation(ulong targetPlayerId)
+        {
+            return Invitations.RemoveAll(x => x.TargetId == targetPlayerId) > 0;
+        }
+
+        public List<TeamInvitation> GetInvitations()
+        {
+            Invitations.RemoveAll(x => x.IsExpired());
+            return Invitations;
         }
     }
 }

@@ -104,12 +104,14 @@
     <Compile Include="Models\EventArgs\PlayerEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamMembershipEventArgs.cs" />
+    <Compile Include="Models\Exception\PlayerOfflineException.cs" />
     <Compile Include="Models\Loadout.cs" />
     <Compile Include="Models\PlayerData.cs" />
     <Compile Include="Models\Team.cs" />
     <Compile Include="Models\GameData.cs" />
     <Compile Include="Models\PluginConfig.cs" />
     <Compile Include="Models\RespawnPoint.cs" />
+    <Compile Include="Models\TeamInvitation.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\GameStateFriendlyNameProvider.cs" />
