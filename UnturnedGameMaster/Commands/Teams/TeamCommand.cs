@@ -125,11 +125,6 @@ namespace UnturnedGameMaster.Commands.Teams
                     UnturnedChat.Say(caller, "Warn: Nie udało się dołączyć do utworzonej drużyny z powodu błędu systemu, poproś administratora o pomoc.");
                 }
 
-                if (!teamManager.SetLeader(team, playerData))
-                {
-                    UnturnedChat.Say(caller, "Warn: Nie udało się mianować Cię dowódcą drużyny z powodu błędu systemu, poproś administratora o pomoc.");
-                }
-
                 UnturnedChat.Say(caller, $"Utworzono drużynę \"{teamName}\"! Zaproś nowych graczy przy użyciu polecenia /invite <nazwa gracza>");
             }
             catch (Exception ex)

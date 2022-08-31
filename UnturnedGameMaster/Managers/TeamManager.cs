@@ -122,6 +122,11 @@ namespace UnturnedGameMaster.Managers
 
             player.TeamId = team.Id;
             OnPlayerJoinedTeam?.Invoke(this, new TeamMembershipEventArgs(player, team));
+            if (!team.LeaderId.HasValue)
+            {
+                SetLeader(team, player);
+            }
+
             return true;
         }
 
@@ -132,6 +137,14 @@ namespace UnturnedGameMaster.Managers
 
             Team team = GetTeam(player.TeamId.Value);
             player.TeamId = null;
+
+            // Transfer leadership
+            if (team.LeaderId == player.Id)
+            {
+                PlayerData otherPlayer = playerDataManager.GetPlayers().FirstOrDefault(x => x.TeamId == team.Id);
+                if (otherPlayer != null)
+                    SetLeader(team, otherPlayer);
+            }
 
             OnPlayerLeftTeam?.Invoke(this, new TeamMembershipEventArgs(player, team));
             return true;

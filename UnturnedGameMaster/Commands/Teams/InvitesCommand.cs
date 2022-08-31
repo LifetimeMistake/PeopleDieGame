@@ -55,7 +55,11 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 Dictionary<Team, TeamInvitation> teamInvitations = new Dictionary<Team, TeamInvitation>();
                 foreach (Team team in teamManager.GetTeams())
-                    teamInvitations.Add(team, team.GetInvitations().FirstOrDefault(x => x.TargetId == callerPlayerData.Id));
+                {
+                    TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == callerPlayerData.Id);
+                    if (teamInvitation != null)
+                        teamInvitations.Add(team, teamInvitation);
+                }
 
                 if(teamInvitations.Count == 0)
                 {
@@ -71,7 +75,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zaakceptować zaproszenia z powodu błedu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się wyświetlić listy zaproszeń z powodu błedu serwera: {ex.Message}");
             }
         }
     }

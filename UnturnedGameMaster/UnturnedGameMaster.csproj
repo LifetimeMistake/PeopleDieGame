@@ -90,6 +90,7 @@
     <Compile Include="Commands\General\ResetBioCommand.cs" />
     <Compile Include="Commands\Teams\AcceptCommand.cs" />
     <Compile Include="Commands\Teams\InvitesCommand.cs" />
+    <Compile Include="Commands\Teams\LeaveTeamCommand.cs" />
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Enums\GameState.cs" />

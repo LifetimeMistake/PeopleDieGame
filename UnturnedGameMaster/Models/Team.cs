@@ -32,6 +32,7 @@ namespace UnturnedGameMaster
             LeaderId = leaderId;
             BankBalance = bankBalance;
             RespawnPoint = respawnPoint;
+            Invitations = new List<TeamInvitation>();
         }
 
         public void SetName(string name)
