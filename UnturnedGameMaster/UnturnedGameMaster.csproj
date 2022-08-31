@@ -88,6 +88,9 @@
     <Compile Include="Commands\General\BioCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />
+    <Compile Include="Commands\Teams\AcceptCommand.cs" />
+    <Compile Include="Commands\Teams\InvitesCommand.cs" />
+    <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Managers\DataManager.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />
     <Compile Include="Models\EventArgs\PlayerEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamInvitationEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamMembershipEventArgs.cs" />
     <Compile Include="Models\Exception\PlayerOfflineException.cs" />
     <Compile Include="Models\Loadout.cs" />
