@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<getTeam/joinTeam/leaveTeam/promotePlayer/setBio> <playerName/playerId> [<teamName/teamId/bio>]";
+        public string Syntax => "<getteam/jointeam/leaveteam/promoteplayer/setbio/getbalance/setbalance/deposit/withdraw> <playerName/playerId> [<teamName/teamId/bio/amount>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -53,8 +53,18 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "setbio":
                     VerbSetBio(caller, verbArgs);
                     break;
-
-
+                case "getbalance":
+                    VerbGetBalance(caller, verbArgs);
+                    break;
+                case "setbalance":
+                    VerbSetBalance(caller, verbArgs);
+                    break;
+                case "deposit":
+                    VerbDeposit(caller, verbArgs);
+                    break;
+                case "withdraw":
+                    VerbWithdraw(caller, verbArgs);
+                    break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
@@ -184,7 +194,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!teamManager.LeaveTeam(playerData)) 
+                if (!teamManager.LeaveTeam(playerData))
                 {
                     UnturnedChat.Say(caller, "Nie udało się usunąć gracza z drużyny.");
                     return;
@@ -268,7 +278,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 string bio = string.Join(" ", command.Skip(1));
                 playerData.SetBio(bio);
-                
+
                 if (bio == "")
                 {
                     UnturnedChat.Say(caller, "Zresetowano bio gracza");
@@ -280,6 +290,140 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 UnturnedChat.Say(caller, $"Nie udało się ustawić bio gracza z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbGetBalance(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID gracza");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
+
+                if (playerData == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
+                    return;
+                }
+
+                double amount = playerDataManager.GetPlayerBalance(playerData);
+                UnturnedChat.Say(caller, $"Gracz \"{command[0]}\" ma ${amount} w portfelu");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się pobrać ilości środków gracza z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetBalance(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID gracza");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
+
+                if (playerData == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do ustawienia");
+                    return;
+                }
+
+                playerDataManager.SetPlayerBalance(playerData, amount);
+                UnturnedChat.Say(caller, "Ustawiono ilość środków gracza");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się ustawić ilości środków gracza z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbDeposit(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID gracza");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
+
+                if (playerData == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do zdeponowania");
+                    return;
+                }
+
+                playerDataManager.DepositIntoWallet(playerData, amount);
+                UnturnedChat.Say(caller, "Zdeponowano środki do portfela gracza");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zdeponować środków do portfela gracza z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbWithdraw(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID gracza");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
+
+                if (playerData == null)
+                {
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do wypłacenia");
+                    return;
+                }
+
+                playerDataManager.WithdrawFromWallet(playerData, amount);
+                UnturnedChat.Say(caller, "Wypłacono środki z portfela gracza");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się wypłacić środków z portfela gracza z powodu błedu serwera: {ex.Message}");
             }
         }
     }

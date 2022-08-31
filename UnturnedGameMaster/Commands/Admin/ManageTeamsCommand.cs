@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<list/inspect/create/remove/getspawn/setspawn/resetspawn/setname/setdescription/setloadout/resetloadout> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId>]";
+        public string Syntax => "<list/inspect/create/remove/getspawn/setspawn/resetspawn/setname/setdescription/setloadout/resetloadout/getbalance/setbalance/deposit/withdraw> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId/amount>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -70,6 +70,18 @@ namespace UnturnedGameMaster.Commands.Admin
                     break;
                 case "resetloadout":
                     VerbResetLoadout(caller, verbArgs);
+                    break;
+                case "getbalance":
+                    VerbGetBalance(caller, verbArgs);
+                    break;
+                case "setbalance":
+                    VerbSetBalance(caller, verbArgs);
+                    break;
+                case "deposit":
+                    VerbDeposit(caller, verbArgs);
+                    break;
+                case "withdraw":
+                    VerbWithdraw(caller, verbArgs);
                     break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
@@ -448,6 +460,140 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 UnturnedChat.Say(caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbGetBalance(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team = teamManager.ResolveTeam(command[0], false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
+                }
+
+                double amount = teamManager.GetBankBalance(team);
+                UnturnedChat.Say(caller, $"Drużyna \"{command[0]}\" ma ${amount} w banku");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się pobrać ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetBalance(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team = teamManager.ResolveTeam(command[0], false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do ustawienia");
+                    return;
+                }
+
+                teamManager.SetBankBalance(team, amount);
+                UnturnedChat.Say(caller, "Ustawiono ilość środków drużyny");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się ustawić ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbDeposit(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team = teamManager.ResolveTeam(command[0], false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do zdeponowania");
+                    return;
+                }
+
+                teamManager.DepositIntoBank(team, amount);
+                UnturnedChat.Say(caller, "Zdeponowano środki do banku drużyny");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się zdeponować środków do banku drużyny z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbWithdraw(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ShowSyntax(caller);
+                return;
+            }
+
+            try
+            {
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team = teamManager.ResolveTeam(command[0], false);
+
+                if (team == null)
+                {
+                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    return;
+                }
+
+                if (!double.TryParse(command[1], out double amount))
+                {
+                    UnturnedChat.Say(caller, "Musisz podać ilość środków do zdeponowania");
+                    return;
+                }
+
+                teamManager.WithdrawFromBank(team, amount);
+                UnturnedChat.Say(caller, "Wypłacono środki z banku drużyny");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say(caller, $"Nie udało się wypłacić środków z banku drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
     }

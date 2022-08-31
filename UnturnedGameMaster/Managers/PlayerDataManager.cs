@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
@@ -19,6 +20,10 @@ namespace UnturnedGameMaster.Managers
         private DataManager dataManager{ get; set; }
         [InjectDependency]
         private TeamManager teamManager{ get; set; }
+
+        public event EventHandler<PlayerEventArgs> OnWalletBalanceChanged;
+        public event EventHandler<PlayerEventArgs> OnWalletDepositedInto;
+        public event EventHandler<PlayerEventArgs> OnWalletWithdrawnFrom;
 
         public void Init()
         {
@@ -106,6 +111,31 @@ namespace UnturnedGameMaster.Managers
                 sb.AppendLine($"Bio: \"{playerData.Bio}\"");
 
             return sb.ToString();
+        }
+
+        public double GetPlayerBalance(PlayerData playerData)
+        {
+            return playerData.WalletBalance;
+        }
+
+        public void SetPlayerBalance(PlayerData playerData, double amount)
+        {
+            playerData.SetBalance(amount);
+            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
+        }
+
+        public void DepositIntoWallet(PlayerData playerData, double amount)
+        {
+            playerData.Deposit(amount);
+            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
+            OnWalletDepositedInto?.Invoke(this, new PlayerEventArgs(playerData));
+        }
+
+        public void WithdrawFromWallet(PlayerData playerData, double amount)
+        {
+            playerData.Withdraw(amount);
+            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
+            OnWalletWithdrawnFrom?.Invoke(this, new PlayerEventArgs(playerData));
         }
     }
 }

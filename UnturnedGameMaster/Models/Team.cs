@@ -19,16 +19,18 @@ namespace UnturnedGameMaster
         public string Description { get; private set; }
         public int? DefaultLoadoutId { get; private set; }
         public ulong? LeaderId { get; private set; }
+        public double BankBalance { get; private set; }
         public RespawnPoint? RespawnPoint { get; set; }
         public List<TeamInvitation> Invitations { get; private set; }
 
-        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, RespawnPoint? respawnPoint = null)
+        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null,  RespawnPoint? respawnPoint = null, double bankBalance = 1000)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
             DefaultLoadoutId = defaultLoadoutId;
             LeaderId = leaderId;
+            BankBalance = bankBalance;
             RespawnPoint = respawnPoint;
         }
 
@@ -84,6 +86,21 @@ namespace UnturnedGameMaster
         public bool RemoveInvitation(ulong targetPlayerId)
         {
             return Invitations.RemoveAll(x => x.TargetId == targetPlayerId) > 0;
+        }
+
+        public void SetBalance(double amount)
+        {
+            BankBalance = amount;
+        }
+
+        public void Deposit(double amount)
+        {
+            BankBalance += amount;
+        }
+
+        public void Withdraw(double amount)
+        {
+            BankBalance = Math.Max(0, BankBalance - amount);
         }
 
         public List<TeamInvitation> GetInvitations()

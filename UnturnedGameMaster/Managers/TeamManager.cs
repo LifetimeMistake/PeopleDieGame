@@ -30,11 +30,14 @@ namespace UnturnedGameMaster.Managers
         public event EventHandler<TeamMembershipEventArgs> OnTeamLeaderChanged;
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
+        public event EventHandler<TeamEventArgs> OnBankBalanceChanged;
+        public event EventHandler<TeamEventArgs> OnBankDepositedInto;
+        public event EventHandler<TeamEventArgs> OnBankWithdrawnFrom;
 
         public void Init()
         { }
 
-        public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null)
+        public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null, double bankFunds = 1000)
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
             if (GetTeamByName(name) != null)
@@ -46,7 +49,7 @@ namespace UnturnedGameMaster.Managers
             if (defaultLoadout != null)
                 loadoutId = defaultLoadout.Id;
 
-            Team team = new Team(teamId, name, description, loadoutId, null, null);
+            Team team = new Team(teamId, name, description, loadoutId, null, null, bankFunds);
             teams.Add(teamId, team);
             OnTeamCreated?.Invoke(this, new TeamEventArgs(team));
 
@@ -185,6 +188,31 @@ namespace UnturnedGameMaster.Managers
             sb.AppendLine($"Liczba graczy w drużynie: {members.Count} ({onlineMembers} online)");
             sb.AppendLine($"Członkowie drużyny: {string.Join(", ", members.Select(x => x.Name))}");
             return sb.ToString();
+        }
+
+        public double GetBankBalance(Team team)
+        {
+            return team.BankBalance;
+        }
+
+        public void SetBankBalance(Team team, double amount)
+        {
+            team.SetBalance(amount);
+            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
+        }
+
+        public void DepositIntoBank(Team team, double amount)
+        {
+            team.Deposit(amount);
+            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
+            OnBankDepositedInto?.Invoke(this, new TeamEventArgs(team));
+        }
+
+        public void WithdrawFromBank(Team team, double amount)
+        {
+            team.Withdraw(amount);
+            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
+            OnBankWithdrawnFrom?.Invoke(this, new TeamEventArgs(team));
         }
     }
 }

@@ -112,7 +112,6 @@
     <Compile Include="Models\PluginConfig.cs" />
     <Compile Include="Models\RespawnPoint.cs" />
     <Compile Include="Models\TeamInvitation.cs" />
-    <Compile Include="Models\TeamBank.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\GameStateFriendlyNameProvider.cs" />
