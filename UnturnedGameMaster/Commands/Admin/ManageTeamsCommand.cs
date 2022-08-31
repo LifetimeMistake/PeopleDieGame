@@ -484,7 +484,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 double amount = teamManager.GetBankBalance(team);
-                UnturnedChat.Say(caller, $"Drużyna \"{command[0]}\" ma ${amount} w banku");
+                UnturnedChat.Say(caller, $"Drużyna \"{team.Name}\" ma ${amount} w banku");
             }
             catch (Exception ex)
             {

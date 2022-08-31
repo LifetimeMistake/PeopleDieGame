@@ -314,7 +314,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 double amount = playerDataManager.GetPlayerBalance(playerData);
-                UnturnedChat.Say(caller, $"Gracz \"{command[0]}\" ma ${amount} w portfelu");
+                UnturnedChat.Say(caller, $"Gracz \"{playerData.Name}\" ma ${amount} w portfelu");
             }
             catch (Exception ex)
             {
