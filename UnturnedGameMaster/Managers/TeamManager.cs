@@ -71,11 +71,7 @@ namespace UnturnedGameMaster.Managers
             teams.Remove(id);
 
             // Make sure all players leave the team prior to deletion.
-            foreach (PlayerData data in playerDataManager.GetPlayers())
-            {
-                if (data.TeamId == id)
-                    LeaveTeam(data);
-            }
+            GetTeamMembers(team).ForEach(x => LeaveTeam(x));
 
             OnTeamRemoved?.Invoke(this, new TeamEventArgs(team));
             return true;
@@ -97,22 +93,6 @@ namespace UnturnedGameMaster.Managers
                 return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
                 return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
-        }
-
-        public int GetTeamPlayerCount(int id)
-        {
-            Dictionary<int, Team> teams = dataManager.GameData.Teams;
-            if (!teams.ContainsKey(id))
-                return 0;
-
-            int playerCount = 0;
-            foreach(PlayerData playerData in playerDataManager.GetPlayers())
-            {
-                if(playerData.TeamId == id)
-                    playerCount++;
-            }
-
-            return playerCount;
         }
 
         public bool JoinTeam(PlayerData player, Team team)
@@ -141,7 +121,7 @@ namespace UnturnedGameMaster.Managers
             // Transfer leadership
             if (team.LeaderId == player.Id)
             {
-                PlayerData otherPlayer = playerDataManager.GetPlayers().FirstOrDefault(x => x.TeamId == team.Id);
+                PlayerData otherPlayer = GetTeamMembers(team).FirstOrDefault();
                 if (otherPlayer != null)
                     SetLeader(team, otherPlayer);
             }
@@ -168,6 +148,26 @@ namespace UnturnedGameMaster.Managers
         public int GetTeamCount()
         {
             return dataManager.GameData.Teams.Count;
+        }
+
+        public List<PlayerData> GetTeamMembers(Team team)
+        {
+            return playerDataManager.GetPlayers().Where(x => x.TeamId == team.Id).ToList();
+        }
+
+        public int GetTeamMemberCount(Team team)
+        {
+            return playerDataManager.GetPlayers().Count(x => x.TeamId == team.Id);
+        }
+
+        public int GetTeamMemberCount(int id)
+        {
+            Dictionary<int, Team> teams = dataManager.GameData.Teams;
+            if (!teams.ContainsKey(id))
+                return 0;
+
+            Team team = teams[id];
+            return GetTeamMemberCount(team);
         }
 
         public Team ResolveTeam(string teamNameOrId, bool exactMatch)
@@ -258,13 +258,7 @@ namespace UnturnedGameMaster.Managers
             else
                 sb.AppendLine("Opis: Brak opisu");
 
-            List<PlayerData> members = new List<PlayerData>();
-            foreach(PlayerData playerData in playerDataManager.GetPlayers())
-            {
-                if (playerData.TeamId == team.Id)
-                    members.Add(playerData);
-            }
-
+            List<PlayerData> members = GetTeamMembers(team);
             int onlineMembers = Provider.clients.Count(x => members.Any(m => (CSteamID)m.Id == x.playerID.steamID));
             sb.AppendLine($"Liczba graczy w drużynie: {members.Count} ({onlineMembers} online)");
             sb.AppendLine($"Członkowie drużyny: {string.Join(", ", members.Select(x => x.Name))}");

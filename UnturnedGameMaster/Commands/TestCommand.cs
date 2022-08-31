@@ -1,19 +1,20 @@
 ﻿using Rocket.API;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnturnedGameMaster.Commands.Teams
+namespace UnturnedGameMaster.Commands
 {
-    public class LeaveTeamCommand : IRocketCommand
+    public class TestCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "leaveteam";
+        public string Name => "test";
 
-        public string Help => "Opuszcza Twoją drużynę";
+        public string Help => "";
 
         public string Syntax => "";
 
@@ -23,7 +24,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

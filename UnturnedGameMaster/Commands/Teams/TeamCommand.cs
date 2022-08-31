@@ -22,7 +22,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
         public string Help => "Polecenie służące do zarządzania Twoją drużyną.";
 
-        public string Syntax => "<create/disband/invite/cancelInvite/kick/promote/name/description/loadout> [<team name/player name/new team name/new team description/new loadout name>]";
+        public string Syntax => "<create/disband/invite/cancelInvite/leave/kick/promote/name/description/loadout> [<team name/player name/new team name/new team description/new loadout name>]";
 
         public List<string> Aliases => new List<string>();
 
@@ -65,6 +65,9 @@ namespace UnturnedGameMaster.Commands.Teams
                     break;
                 case "loadout":
                     VerbLoadout(caller, verbArgs);
+                    break;
+                case "leave":
+                    VerbLeave(caller);
                     break;
                 default:
                     UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
@@ -635,6 +638,47 @@ namespace UnturnedGameMaster.Commands.Teams
             catch (Exception ex)
             {
                 UnturnedChat.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbLeave(IRocketPlayer caller)
+        {
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+
+                if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                {
+                    UnturnedChat.Say(caller, "Nie można opuszczać drużyn po rozpoczęciu gry!");
+                    return;
+                }
+
+                PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (playerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!playerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny!");
+                    return;
+                }
+
+                if (!teamManager.LeaveTeam(playerData))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się opuścić drużyny z powodu błedu systemu");
+                    return;
+                }
+
+                UnturnedChat.Say(caller, "Opuszczono drużynę.");
+            }
+            catch (Exception ex)
+            {
+                UnturnedChat.Say($"Nie udało się opuścić drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
     }
