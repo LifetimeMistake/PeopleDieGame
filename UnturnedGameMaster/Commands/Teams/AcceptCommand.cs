@@ -31,7 +31,7 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say("Musisz podać nazwę drużyny której zaproszenie chcesz przyjąć.");
+                UnturnedChat.Say(caller, "Musisz podać nazwę drużyny której zaproszenie chcesz przyjąć.");
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można przyjmować zaproszeń do drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można przyjmować zaproszeń do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -80,7 +80,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say("Zaakceptowano zaproszenie! Witaj na pokładzie!");
+                UnturnedChat.Say(caller, "Zaakceptowano zaproszenie! Witaj na pokładzie!");
             }
             catch(Exception ex)
             {

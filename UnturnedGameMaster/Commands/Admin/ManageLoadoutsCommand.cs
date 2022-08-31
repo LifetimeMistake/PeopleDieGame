@@ -148,7 +148,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     loadout.AddItem(itemId, amount);
                 }
 
-                UnturnedChat.Say($"Utworzono zestaw wyposażenia z ID {loadout.Id}");
+                UnturnedChat.Say(caller, $"Utworzono zestaw wyposażenia z ID {loadout.Id}");
             }
             catch (Exception ex)
             {

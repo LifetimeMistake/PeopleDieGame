@@ -16,9 +16,9 @@ namespace UnturnedGameMaster.Commands.Teams
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "accept";
+        public string Name => "invites";
 
-        public string Help => "Akceptuje oczekujące zaproszenia do drużyny.";
+        public string Help => "Pokazuje listę oczekujących zaproszeń do drużyn.";
 
         public string Syntax => "<team name/team id>";
 
@@ -36,7 +36,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można wyświetlać listy zaproszeń do drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można wyświetlać listy zaproszeń do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -59,14 +59,14 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if(teamInvitations.Count == 0)
                 {
-                    UnturnedChat.Say("Nie posiadasz żadnych oczekujących zaproszeń.");
+                    UnturnedChat.Say(caller, "Nie posiadasz żadnych oczekujących zaproszeń.");
                     return;
                 }
 
-                UnturnedChat.Say("Twoje oczekujące zaproszenia:");
+                UnturnedChat.Say(caller, "Twoje oczekujące zaproszenia:");
                 foreach (KeyValuePair<Team, TeamInvitation> kvp in teamInvitations)
                 {
-                    UnturnedChat.Say($"Zaproszenie do \"{kvp.Key.Name}\", wysłano {(DateTime.Now - kvp.Value.InviteDate).TotalSeconds}s temu, wygasa za {kvp.Value.GetTimeRemaining().TotalSeconds}s");
+                    UnturnedChat.Say(caller, $"Zaproszenie do \"{kvp.Key.Name}\", wysłano {(DateTime.Now - kvp.Value.InviteDate).TotalSeconds}s temu, wygasa za {kvp.Value.GetTimeRemaining().TotalSeconds}s");
                 }
             }
             catch (Exception ex)

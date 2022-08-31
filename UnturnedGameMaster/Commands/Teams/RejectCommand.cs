@@ -16,7 +16,7 @@ namespace UnturnedGameMaster.Commands.Teams
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "accept";
+        public string Name => "reject";
 
         public string Help => "Odrzuca oczekujące zaproszenie do drużyny.";
 
@@ -30,7 +30,7 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say("Musisz podać nazwę drużyny której zaproszenie chcesz odrzucić.");
+                UnturnedChat.Say(caller, "Musisz podać nazwę drużyny której zaproszenie chcesz odrzucić.");
                 return;
             }
 
@@ -42,7 +42,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można odrzucać zaproszeń do drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można odrzucać zaproszeń do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -79,7 +79,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say("Odrzucono zaproszenie.");
+                UnturnedChat.Say(caller, "Odrzucono zaproszenie.");
             }
             catch (Exception ex)
             {

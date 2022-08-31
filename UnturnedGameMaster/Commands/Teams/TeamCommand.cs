@@ -148,7 +148,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można rozwiązywać drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można rozwiązywać drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -198,7 +198,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -232,22 +232,22 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
                 if (targetPlayerData == null)
                 {
-                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{playerName}\"");
                     return;
                 }
 
                 if (callerPlayerData == targetPlayerData)
                 {
-                    UnturnedChat.Say($"Nie możesz zaprosić samego siebie lmao");
+                    UnturnedChat.Say(caller, $"Nie możesz zaprosić samego siebie lmao");
                     return;
                 }
 
                 if (targetPlayerData.TeamId != null)
                 {
                     if (targetPlayerData.TeamId == team.Id)
-                        UnturnedChat.Say($"Gracz należy już do Twojej drużyny");
+                        UnturnedChat.Say(caller, $"Gracz należy już do Twojej drużyny");
                     else
-                        UnturnedChat.Say($"Gracz należy już do innej drużyny");
+                        UnturnedChat.Say(caller, $"Gracz należy już do innej drużyny");
                     
                     return;
                 }
@@ -264,7 +264,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say($"Wysłano zaproszenie do \"{targetPlayerData.Name}\"!");
+                UnturnedChat.Say(caller, $"Wysłano zaproszenie do \"{targetPlayerData.Name}\"!");
             }
             catch(Exception ex)
             {
@@ -288,7 +288,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -322,7 +322,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
                 if (targetPlayerData == null)
                 {
-                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{playerName}\"");
                     return;
                 }
 
@@ -338,7 +338,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say($"Anulowano zaproszenie.");
+                UnturnedChat.Say(caller, $"Anulowano zaproszenie.");
             }
             catch (Exception ex)
             {
@@ -362,7 +362,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można wyrzucać graczy z drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można wyrzucać graczy z drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -396,7 +396,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
                 if (targetPlayerData == null)
                 {
-                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{playerName}\"");
                     return;
                 }
 
@@ -412,7 +412,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say($"Gracz \"{targetPlayerData.Name}\" został wyrzucony z drużyny.");
+                UnturnedChat.Say(caller, $"Gracz \"{targetPlayerData.Name}\" został wyrzucony z drużyny.");
             }
             catch (Exception ex)
             {
@@ -457,7 +457,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
                 if (targetPlayerData == null)
                 {
-                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{playerName}\"");
                     return;
                 }
 
@@ -473,7 +473,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
-                UnturnedChat.Say($"Gracz \"{targetPlayerData.Name}\" został awansowany do lidera drużyny.");
+                UnturnedChat.Say(caller, $"Gracz \"{targetPlayerData.Name}\" został awansowany do lidera drużyny.");
             }
             catch (Exception ex)
             {
@@ -517,7 +517,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 {
                     if (gameManager.GetGameState() != Enums.GameState.InLobby)
                     {
-                        UnturnedChat.Say("Nie można zmieniać nazw drużyn po rozpoczęciu gry!");
+                        UnturnedChat.Say(caller, "Nie można zmieniać nazw drużyn po rozpoczęciu gry!");
                         return;
                     }
 
@@ -568,7 +568,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 {
                     if (gameManager.GetGameState() != Enums.GameState.InLobby)
                     {
-                        UnturnedChat.Say("Nie można zmieniać opisów drużyn po rozpoczęciu gry!");
+                        UnturnedChat.Say(caller, "Nie można zmieniać opisów drużyn po rozpoczęciu gry!");
                         return;
                     }
 
@@ -621,7 +621,7 @@ namespace UnturnedGameMaster.Commands.Teams
                 {
                     if (gameManager.GetGameState() != Enums.GameState.InLobby)
                     {
-                        UnturnedChat.Say("Nie można zmieniać zestawów wyposażeń drużyn po rozpoczęciu gry!");
+                        UnturnedChat.Say(caller, "Nie można zmieniać zestawów wyposażeń drużyn po rozpoczęciu gry!");
                         return;
                     }
 
@@ -629,7 +629,7 @@ namespace UnturnedGameMaster.Commands.Teams
                     Loadout loadout = loadoutManager.ResolveLoadout(loadoutName, false);
                     if (loadout == null)
                     {
-                        UnturnedChat.Say($"Nie udało się znaleźć zestawu wyposażenia o nazwie \"{loadoutName}\"");
+                        UnturnedChat.Say(caller, $"Nie udało się znaleźć zestawu wyposażenia o nazwie \"{loadoutName}\"");
                         return;
                     }
 
