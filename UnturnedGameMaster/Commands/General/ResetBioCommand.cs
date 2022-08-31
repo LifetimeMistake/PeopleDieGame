@@ -37,7 +37,7 @@ namespace UnturnedGameMaster.Commands.General
             }
 
             playerData.SetBio("");
-            UnturnedChat.Say("Zresetowano twoje bio!");
+            UnturnedChat.Say(caller, "Zresetowano twoje bio!");
         }
     }
 }

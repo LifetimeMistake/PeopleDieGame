@@ -1,6 +1,7 @@
 ﻿using Rocket.API;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
+using static Rocket.Unturned.Events.UnturnedPlayerEvents;
 
 namespace UnturnedGameMaster.Commands.Teams
 {
@@ -92,7 +94,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say("Nie można tworzyć nowych drużyn po rozpoczęciu gry!");
+                    UnturnedChat.Say(caller, "Nie można tworzyć nowych drużyn po rozpoczęciu gry!");
                     return;
                 }
 
@@ -100,13 +102,13 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
                 if (playerData == null)
                 {
-                    UnturnedChat.Say("Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
                     return;
                 }
 
                 if (playerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say("Już należysz do drużyny! Użyj polecenia /leaveteam lub /disbandteam, aby ją opuścić");
+                    UnturnedChat.Say(caller, "Już należysz do drużyny! Użyj polecenia /leaveteam lub /disbandteam, aby ją opuścić");
                     return;
                 }
 
@@ -154,13 +156,13 @@ namespace UnturnedGameMaster.Commands.Teams
                 PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
                 if (playerData == null)
                 {
-                    UnturnedChat.Say("Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
                     return;
                 }
 
                 if (!playerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say("Nie należysz do drużyny!");
+                    UnturnedChat.Say(caller, "Nie należysz do drużyny!");
                     return;
                 }
 
@@ -168,7 +170,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (!teamManager.DeleteTeam(team.Id))
                 {
-                    UnturnedChat.Say("Nie udało się rozwiązać drużyny z powodu błędu systemu, poproś administratora o pomoc.");
+                    UnturnedChat.Say(caller, "Nie udało się rozwiązać drużyny z powodu błędu systemu, poproś administratora o pomoc.");
                     return;
                 }
 
@@ -184,7 +186,7 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say("Musisz podać nazwę gracza.");
+                UnturnedChat.Say(caller, "Musisz podać nazwę gracza.");
                 return;
             }
 
@@ -192,18 +194,37 @@ namespace UnturnedGameMaster.Commands.Teams
             {
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+
+                if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                {
+                    UnturnedChat.Say("Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
+                    return;
+                }
 
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
                 if (!callerPlayerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say("Nie należysz do żadnej drużyny.");
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
                     return;
                 }
 
                 Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
                 if (team.LeaderId != callerPlayerData.Id)
                 {
-                    UnturnedChat.Say("Tylko lider drużyny może zapraszać innych graczy!");
+                    UnturnedChat.Say(caller, "Tylko lider drużyny może zapraszać innych graczy!");
                     return;
                 }
 
@@ -231,7 +252,19 @@ namespace UnturnedGameMaster.Commands.Teams
                     return;
                 }
 
+                if (team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
+                {
+                    UnturnedChat.Say(caller, "Gracz posiada już oczekujące zaproszenie do tej drużyny.");
+                    return;
+                }
 
+                if (!teamManager.InvitePlayer(team, targetPlayerData))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się zaprosić gracza do Twojej drużyny z powodu błedu serwera");
+                    return;
+                }
+
+                UnturnedChat.Say($"Wysłano zaproszenie do \"{targetPlayerData.Name}\"!");
             }
             catch(Exception ex)
             {
@@ -241,9 +274,71 @@ namespace UnturnedGameMaster.Commands.Teams
 
         private void VerbCancelInvite(IRocketPlayer caller, string[] command)
         {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę gracza.");
+                return;
+            }
+
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
+                if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                {
+                    UnturnedChat.Say("Nie można zapraszać graczy do drużyn po rozpoczęciu gry!");
+                    return;
+                }
+
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider drużyny może anulować zaproszenia do drużyny!");
+                    return;
+                }
+
+                string playerName = string.Join(" ", command);
+                PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
+                if (targetPlayerData == null)
+                {
+                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    return;
+                }
+
+                if (!team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
+                {
+                    UnturnedChat.Say(caller, "Ten gracz nie ma oczekującego zaproszenia do Twojej drużyny.");
+                    return;
+                }
+
+                if (!teamManager.CancelInvitation(team, targetPlayerData))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się anulować zaproszenia z powodu błedu serwera");
+                    return;
+                }
+
+                UnturnedChat.Say($"Anulowano zaproszenie.");
             }
             catch (Exception ex)
             {
@@ -253,9 +348,71 @@ namespace UnturnedGameMaster.Commands.Teams
 
         private void VerbKick(IRocketPlayer caller, string[] command)
         {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę gracza.");
+                return;
+            }
+
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
+                if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                {
+                    UnturnedChat.Say("Nie można wyrzucać graczy z drużyn po rozpoczęciu gry!");
+                    return;
+                }
+
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider drużyny może wyrzucać graczy z drużyny!");
+                    return;
+                }
+
+                string playerName = string.Join(" ", command);
+                PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
+                if (targetPlayerData == null)
+                {
+                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    return;
+                }
+
+                if (targetPlayerData.TeamId != team.Id)
+                {
+                    UnturnedChat.Say(caller, "Gracz nie znajduje się w Twojej drużynie.");
+                    return;
+                }
+
+                if (!teamManager.LeaveTeam(targetPlayerData))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się wyrzucić gracza z powodu błedu serwera.");
+                    return;
+                }
+
+                UnturnedChat.Say($"Gracz \"{targetPlayerData.Name}\" został wyrzucony z drużyny.");
             }
             catch (Exception ex)
             {
@@ -265,13 +422,62 @@ namespace UnturnedGameMaster.Commands.Teams
 
         private void VerbPromote(IRocketPlayer caller, string[] command)
         {
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(caller, "Musisz podać nazwę gracza.");
+                return;
+            }
+
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
 
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider drużyny może przekazać rolę przywódcy innym!");
+                    return;
+                }
+
+                string playerName = string.Join(" ", command);
+                PlayerData targetPlayerData = playerDataManager.ResolvePlayer(playerName, false);
+                if (targetPlayerData == null)
+                {
+                    UnturnedChat.Say($"Nie znaleziono gracza \"{playerName}\"");
+                    return;
+                }
+
+                if (targetPlayerData.TeamId != team.Id)
+                {
+                    UnturnedChat.Say(caller, "Gracz nie znajduje się w Twojej drużynie.");
+                    return;
+                }
+
+                if (!teamManager.SetLeader(team, targetPlayerData))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się zmienić przywódcy z powodu błedu serwera.");
+                    return;
+                }
+
+                UnturnedChat.Say($"Gracz \"{targetPlayerData.Name}\" został awansowany do lidera drużyny.");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się awansować gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -279,11 +485,50 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider może zmieniać nazwę drużyny!");
+                    return;
+                }
+
+                if (command.Length == 0)
+                {
+                    UnturnedChat.Say(caller, $"Nazwa Twojej drużyny: \"{team.Name}\"");
+                }
+                else
+                {
+                    if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                    {
+                        UnturnedChat.Say("Nie można zmieniać nazw drużyn po rozpoczęciu gry!");
+                        return;
+                    }
+
+                    string teamName = string.Join(" ", command);
+                    team.SetName(teamName);
+                    UnturnedChat.Say(caller, $"Ustawiono nazwę Twojej drużyny na: \"{teamName}\"");
+                }
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -291,7 +536,46 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider może zmieniać opis drużyny!");
+                    return;
+                }
+
+                if (command.Length == 0)
+                {
+                    UnturnedChat.Say(caller, $"Opis Twojej drużyny: \"{team.Description}\"");
+                }
+                else
+                {
+                    if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                    {
+                        UnturnedChat.Say("Nie można zmieniać opisów drużyn po rozpoczęciu gry!");
+                        return;
+                    }
+
+                    string teamDescription = string.Join(" ", command);
+                    team.SetDescription(teamDescription);
+                    UnturnedChat.Say(caller, $"Ustawiono opis Twojej drużyny na: \"{teamDescription}\"");
+                }
             }
             catch (Exception ex)
             {
@@ -303,7 +587,55 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             try
             {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
 
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (callerPlayerData == null)
+                {
+                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    return;
+                }
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Nie należysz do żadnej drużyny.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    UnturnedChat.Say(caller, "Tylko lider może zmieniać zestaw wyposażenia drużyny!");
+                    return;
+                }
+
+                if (command.Length == 0)
+                {
+                    UnturnedChat.Say(caller, $"Zestaw Twojej drużyny: {(team.DefaultLoadoutId.HasValue ? $"\"{loadoutManager.GetLoadout(team.DefaultLoadoutId.Value).Name}\"" : "Brak")}");
+                    return;
+                }
+                else
+                {
+                    if (gameManager.GetGameState() != Enums.GameState.InLobby)
+                    {
+                        UnturnedChat.Say("Nie można zmieniać zestawów wyposażeń drużyn po rozpoczęciu gry!");
+                        return;
+                    }
+
+                    string loadoutName = string.Join(" ", command);
+                    Loadout loadout = loadoutManager.ResolveLoadout(loadoutName, false);
+                    if (loadout == null)
+                    {
+                        UnturnedChat.Say($"Nie udało się znaleźć zestawu wyposażenia o nazwie \"{loadoutName}\"");
+                        return;
+                    }
+
+                    team.SetDefaultLoadout(loadout);
+                    UnturnedChat.Say(caller, $"Ustawiono zestaw Twojej drużyny na: \"{loadout.Name}\"");
+                }
             }
             catch (Exception ex)
             {

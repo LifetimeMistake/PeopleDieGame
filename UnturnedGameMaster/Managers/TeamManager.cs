@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
@@ -30,6 +31,10 @@ namespace UnturnedGameMaster.Managers
         public event EventHandler<TeamMembershipEventArgs> OnTeamLeaderChanged;
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
+        public event EventHandler<TeamInvitationEventArgs> OnPlayerInvited;
+        public event EventHandler<TeamInvitationEventArgs> OnInvitationCancelled;
+        public event EventHandler<TeamInvitationEventArgs> OnInvitationAccepted;
+        public event EventHandler<TeamInvitationEventArgs> OnInvitationRejected;
 
         public void Init()
         { }
@@ -162,6 +167,69 @@ namespace UnturnedGameMaster.Managers
 
             // otherwise try matching by name
             return GetTeamByName(teamNameOrId, exactMatch);
+        }
+
+        public bool InvitePlayer(Team team, PlayerData targetPlayerData, int invitationTTL = 30)
+        {
+            if (!team.LeaderId.HasValue)
+                return false;
+
+            PlayerData callerPlayerData = playerDataManager.GetPlayer(team.LeaderId.Value);
+            if (callerPlayerData == null)
+                return false; // failed to get team leader
+
+            if (targetPlayerData.TeamId.HasValue) // player already belongs to a team
+                return false;
+
+            if (team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
+                return false; // player already has a pending invitation
+
+            TeamInvitation teamInvitation = new TeamInvitation(callerPlayerData.Id, targetPlayerData.Id, DateTime.Now, TimeSpan.FromSeconds(invitationTTL));
+            team.Invitations.Add(teamInvitation);
+            OnPlayerInvited?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
+            return true;
+        }
+
+        public bool CancelInvitation(Team team, PlayerData targetPlayerData)
+        {
+            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
+            if (teamInvitation != null)
+            {
+                team.RemoveInvitation(targetPlayerData.Id);
+                OnInvitationCancelled?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool AcceptInvitation(Team team, PlayerData targetPlayerData)
+        {
+            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
+            if (teamInvitation != null)
+            {
+                if (!JoinTeam(targetPlayerData, team))
+                    return false;
+
+                team.RemoveInvitation(targetPlayerData.Id);
+                OnInvitationAccepted?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RejectInvitation(Team team, PlayerData targetPlayerData)
+        {
+            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
+            if (teamInvitation != null)
+            {
+                team.RemoveInvitation(targetPlayerData.Id);
+                OnInvitationRejected?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
+                return true;
+            }
+
+            return false;
         }
 
         public string GetTeamSummary(Team team)
