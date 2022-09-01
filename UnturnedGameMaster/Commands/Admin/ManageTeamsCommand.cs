@@ -134,7 +134,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 UnturnedChat.Say(caller, $"ID: {team.Id}");
-                UnturnedChat.Say(caller, $"Nazwa: {team.Name}");
+                UnturnedChat.Say(caller, $"Nazwa: \"{team.Name}\"");
 
                 if (team.Description == "")
                 {
@@ -167,6 +167,8 @@ namespace UnturnedGameMaster.Commands.Admin
                     UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
                     UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
                 }
+
+                UnturnedChat.Say(caller, $"Stan konta: ${team.BankBalance}");
             }
             catch (Exception ex)
             {

@@ -92,7 +92,7 @@ namespace UnturnedGameMaster.Managers
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"Nazwa: \"{shopItem.Name}\" | ID: {shopItem.UnturnedItemId}");
             sb.AppendLine($"Opis: \"{shopItem.Description}\"");
-            sb.AppendLine($"Cena: \"{shopItem.Price}\"");
+            sb.AppendLine($"Cena: ${shopItem.Price}");
 
             return sb.ToString();
         }
@@ -100,11 +100,16 @@ namespace UnturnedGameMaster.Managers
         public bool BuyItem(ShopItem shopItem, PlayerData buyer, byte amount)
         {
             if (amount < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            }
+
+            if (!buyer.TeamId.HasValue)
+                throw new Exception($"Gracz \"{buyer.Name}\"");
 
             Team team = teamManager.GetTeam(buyer.TeamId.Value);
+
+            if (team == null)
+                throw new Exception($"Nie znaleziono drużyny gracza \"{buyer.Name}\"");
+
             UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)buyer.Id);
 
             double finalPrice = shopItem.Price * amount;

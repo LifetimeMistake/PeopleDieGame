@@ -69,7 +69,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: {item.Price}");
+                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
@@ -88,7 +88,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 double price;
                 if (!double.TryParse(command[1], out price))
@@ -150,7 +150,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 if (shopItem == null)
                 {
@@ -185,7 +185,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 if (shopItem == null)
                 {
@@ -194,6 +194,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 shopManager.SetItemPrice(shopItem, price);
+                UnturnedChat.Say(caller, "Ustawiono cenę przedmiotu");
             }
             catch (ArgumentOutOfRangeException)
             {

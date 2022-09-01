@@ -64,7 +64,7 @@ namespace UnturnedGameMaster.Commands.Shop
                 UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: {item.Price}");
+                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace UnturnedGameMaster.Commands.Shop
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 if (shopItem == null)
                 {
@@ -119,7 +119,7 @@ namespace UnturnedGameMaster.Commands.Shop
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
 
