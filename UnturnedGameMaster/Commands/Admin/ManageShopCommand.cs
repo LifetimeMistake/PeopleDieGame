@@ -90,6 +90,13 @@ namespace UnturnedGameMaster.Commands.Admin
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
                 ShopItem shopItem = shopManager.ResolveItem(command[0], true);
 
+                double price;
+                if (!double.TryParse(command[1], out price))
+                {
+                    UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                    return;
+                }
+
                 if (shopItem != null)
                 {
                     UnturnedChat.Say(caller, $"Przedmiot {command[0]} znajduje się już w sklepie");
