@@ -116,10 +116,10 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
                 else // find item by name
                 {
-                    item = Assets.find(EAssetType.ITEM).FirstOrDefault(x => x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
+                    item = Assets.find(EAssetType.ITEM).FirstOrDefault(x => x.FriendlyName != null && x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
                     if (item == null)
                     {
-                        UnturnedChat.Say(caller, $"Przedmiot o nazwie {command[1]} nie istnieje");
+                        UnturnedChat.Say(caller, $"Przedmiot o nazwie {command[0]} nie istnieje");
                         return;
                     }
                 }
@@ -129,7 +129,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex}");
             }
         }
 
