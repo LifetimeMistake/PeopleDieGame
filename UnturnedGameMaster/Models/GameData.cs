@@ -14,6 +14,7 @@ namespace UnturnedGameMaster.Models
     {
         public Dictionary<int, Team> Teams { get; set; }
         public Dictionary<int, Loadout> Loadouts { get; set; }
+        public Dictionary<ushort, ShopItem> ShopItems { get; set; }
         public List<PlayerData> PlayerData { get; set; }
         public int LastLoadoutId { get; set; }
         public int LastTeamId { get; set; }
@@ -24,6 +25,7 @@ namespace UnturnedGameMaster.Models
         {
             Teams = new Dictionary<int, Team>();
             Loadouts = new Dictionary<int, Loadout>();
+            ShopItems = new Dictionary<ushort, ShopItem>();
             PlayerData = new List<PlayerData>();
             LastLoadoutId = 0;
             LastTeamId = 0;
