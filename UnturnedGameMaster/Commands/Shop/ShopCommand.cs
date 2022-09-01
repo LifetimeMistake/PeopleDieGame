@@ -103,13 +103,18 @@ namespace UnturnedGameMaster.Commands.Shop
 
         private void VerbBuy(IRocketPlayer caller, string[] command)
         {
-            if (command.Length == 0)
+            if (command.Length < 2)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu i (opcjonalnie) jego ilość");
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu i jego ilość");
                 return;
             }
 
-            byte amount = command.Length == 1 ? amount=1 : amount=byte.Parse(command[1]);
+            byte amount;
+            if (!byte.TryParse(command[1], out amount))
+            {
+                UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                return;
+            }
 
             try
             {
@@ -130,7 +135,7 @@ namespace UnturnedGameMaster.Commands.Shop
                     return;
                 }
 
-                UnturnedChat.Say(caller, $"Zakupiono {shopItem.Name} (x{command[1]})");
+                UnturnedChat.Say(caller, $"Zakupiono {shopItem.Name} (x{amount})");
             }
             catch (Exception ex)
             {

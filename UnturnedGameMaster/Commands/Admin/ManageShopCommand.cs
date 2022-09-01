@@ -124,7 +124,13 @@ namespace UnturnedGameMaster.Commands.Admin
                     }
                 }
 
-                shopItem = shopManager.AddItem(item.id, double.Parse(command[1]));
+                shopItem = shopManager.AddItem(item.id, price);
+                if (shopItem == null)
+                {
+                    UnturnedChat.Say(caller, "Nie udało się dodać przedmiotu do sklepu");
+                    return;
+                }
+
                 UnturnedChat.Say(caller, $"Dodano przedmiot z ID: {shopItem.UnturnedItemId}, cena: ${shopItem.Price}");
             }
             catch (Exception ex)
@@ -169,6 +175,13 @@ namespace UnturnedGameMaster.Commands.Admin
                 return;
             }
 
+            double price;
+            if (!double.TryParse(command[1], out price))
+            {
+                UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                return;
+            }
+
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
@@ -180,7 +193,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                shopManager.SetItemPrice(shopItem, double.Parse(command[1]));
+                shopManager.SetItemPrice(shopItem, price);
             }
             catch (ArgumentOutOfRangeException)
             {
