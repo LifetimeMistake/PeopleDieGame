@@ -84,7 +84,7 @@ namespace UnturnedGameMaster.Commands.Shop
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 if (shopItem == null)
                 {

@@ -91,7 +91,7 @@ namespace UnturnedGameMaster.Managers
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"Nazwa: \"{shopItem.Name}\" | ID: {shopItem.UnturnedItemId}");
             sb.AppendLine($"Opis: \"{shopItem.Description}\"");
-            sb.AppendLine($"Cena: \"{shopItem.Price}\"");
+            sb.AppendLine($"Cena: ${shopItem.Price}");
 
             return sb.ToString();
         }
