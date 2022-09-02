@@ -64,7 +64,7 @@ namespace UnturnedGameMaster.Commands.Shop
                 UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: {item.Price}");
+                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
@@ -103,24 +103,29 @@ namespace UnturnedGameMaster.Commands.Shop
 
         private void VerbBuy(IRocketPlayer caller, string[] command)
         {
-            if (command.Length < 2)
+            if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu i jego ilość");
-                return;
-            }
-
-            byte amount;
-            if (!byte.TryParse(command[1], out amount))
-            {
-                UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu");
                 return;
             }
 
             try
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+
+                byte amount;
+                if (command.Length == 1)
+                {
+                    amount = 1;
+                }
+                else if (!byte.TryParse(command[1], out amount))
+                {
+                    UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                    return;
+                }
+
+                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
 
                 if (shopItem == null)
@@ -129,9 +134,15 @@ namespace UnturnedGameMaster.Commands.Shop
                     return;
                 }
 
-                if (!shopManager.BuyItem(shopItem, callerPlayerData, amount))
+                if (!shopManager.CanBuyItem(shopItem, callerPlayerData, amount))
                 {
                     UnturnedChat.Say(caller, "Bank twojej drużyny posiada niewystarczającą ilość środków by zakupić przedmiot(y)");
+                    return;
+                }
+
+                if (!shopManager.BuyItem(shopItem, callerPlayerData, amount))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się zakupić przedmiotu/ów z powodu błędu systemu.");
                     return;
                 }
 
@@ -139,7 +150,7 @@ namespace UnturnedGameMaster.Commands.Shop
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zakupić przedmiotu z powodu błędu serwera: {ex.Message}");
+                UnturnedChat.Say(caller, $"Nie udało się zakupić przedmiotu z powodu błędu serwera: {ex}");
             }
         }
     }

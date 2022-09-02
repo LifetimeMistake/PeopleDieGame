@@ -43,8 +43,7 @@ namespace UnturnedGameMaster.Managers
             if (!shopItems.ContainsKey(unturnedItemId))
                 return false;
 
-            shopItems.Remove(unturnedItemId);
-            return true;
+            return shopItems.Remove(unturnedItemId);
         }
 
         public ShopItem GetItem(ushort unturnedItemId)
@@ -97,25 +96,37 @@ namespace UnturnedGameMaster.Managers
             return sb.ToString();
         }
 
+        public bool CanBuyItem(ShopItem shopItem, PlayerData buyer, byte amount)
+        {
+            if (amount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            if (!buyer.TeamId.HasValue)
+                return false;
+
+            Team team = teamManager.GetTeam(buyer.TeamId.Value);
+            double finalPrice = shopItem.Price * amount;
+            return team.BankBalance >= finalPrice;
+        }
+
         public bool BuyItem(ShopItem shopItem, PlayerData buyer, byte amount)
         {
-            if (amount < 0)
-            {
+            if (amount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            }
+
+            if (!buyer.TeamId.HasValue)
+                return false;
+
+            if (!CanBuyItem(shopItem, buyer, amount))
+                return false;
 
             Team team = teamManager.GetTeam(buyer.TeamId.Value);
             UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)buyer.Id);
 
-            double finalPrice = shopItem.Price * amount;
-
-            if (teamManager.GetBankBalance(team) < finalPrice)
-                return false;
-
             if (!player.GiveItem(shopItem.UnturnedItemId, amount))
                 throw new Exception($"Nie udało się dodać {shopItem.Name} (x{amount}) do ekwipunku gracza, konto nieobciążone");
-            teamManager.WithdrawFromBank(team, finalPrice);
-                
+
+            teamManager.WithdrawFromBank(team, shopItem.Price * amount);    
             return true;
         }
     }

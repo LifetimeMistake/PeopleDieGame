@@ -69,7 +69,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: {item.Name} | Cena: {item.Price}");
+                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name} | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
@@ -79,7 +79,7 @@ namespace UnturnedGameMaster.Commands.Admin
         }
         private void VerbAddItem(IRocketPlayer caller, string[] command)
         {
-            if (command.Length < 2)
+            if (command.Length != 2)
             {
                 UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
                 return;
@@ -99,7 +99,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem != null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot {command[0]} znajduje się już w sklepie");
+                    UnturnedChat.Say(caller, $"Przedmiot \"{shopItem.Name}\" znajduje się już w sklepie");
                     return;
                 }
 
@@ -119,7 +119,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     item = Assets.find(EAssetType.ITEM).FirstOrDefault(x => x.FriendlyName != null && x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
                     if (item == null)
                     {
-                        UnturnedChat.Say(caller, $"Przedmiot o nazwie {command[0]} nie istnieje");
+                        UnturnedChat.Say(caller, $"Przedmiot o nazwie \"{command[0]}\" nie istnieje");
                         return;
                     }
                 }
@@ -154,11 +154,16 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot {command[0]} nie znajduje się w sklepie lub nie istnieje");
+                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
-                shopManager.RemoveItem(shopItem.UnturnedItemId);
+                if(!shopManager.RemoveItem(shopItem.UnturnedItemId))
+                {
+                    UnturnedChat.Say(caller, "Nie udało się usunąć przedmiotu z sklepu z powodu błedu systemu");
+                    return;
+                }
+
                 UnturnedChat.Say(caller, "Usunięto przedmiot ze sklepu");
             }
             catch (Exception ex)
@@ -169,7 +174,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void VerbSetPrice(IRocketPlayer caller, string[] command)
         {
-            if (command.Length < 2)
+            if (command.Length != 2)
             {
                 UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
                 return;
@@ -189,7 +194,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot {command[0]} nie znajduje się w sklepie lub nie istnieje");
+                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
@@ -220,7 +225,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot {command[0]} nie znajduje się w sklepie lub nie istnieje");
+                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
