@@ -113,6 +113,13 @@ namespace UnturnedGameMaster.Commands.Shop
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+
+                if (gameManager.GetGameState() == Enums.GameState.InLobby)
+                {
+                    UnturnedChat.Say(caller, "Nie można korzystać z sklepu w poczekalni!");
+                    return;
+                }
 
                 byte amount;
                 if (command.Length == 1)
@@ -125,8 +132,14 @@ namespace UnturnedGameMaster.Commands.Shop
                     return;
                 }
 
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Musisz należeć do drużyny, by korzystać z sklepu.");
+                    return;
+                }
+
+                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
 
                 if (shopItem == null)
                 {

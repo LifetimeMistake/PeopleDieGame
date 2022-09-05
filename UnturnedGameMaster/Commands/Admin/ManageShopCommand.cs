@@ -69,7 +69,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name} | Cena: ${item.Price}");
+                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
