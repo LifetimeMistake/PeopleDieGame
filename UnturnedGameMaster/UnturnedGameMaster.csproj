@@ -99,6 +99,7 @@
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Commands\TestCommand.cs" />
+    <Compile Include="Controllers\IBossController.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\GameManager.cs" />
@@ -110,6 +111,8 @@
     <Compile Include="Managers\IDisposableManager.cs" />
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
+    <Compile Include="Models\Bosses\Boss.cs" />
+    <Compile Include="Models\BossArena.cs" />
     <Compile Include="Models\ShopItem.cs" />
     <Compile Include="Models\EventArgs\LoadoutAppliedEventArgs.cs" />
     <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />
@@ -138,6 +141,8 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Commands\Arena\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

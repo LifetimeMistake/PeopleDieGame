@@ -16,6 +16,7 @@ namespace UnturnedGameMaster.Models
         public Dictionary<int, Loadout> Loadouts { get; set; }
         public Dictionary<ushort, ShopItem> ShopItems { get; set; }
         public List<PlayerData> PlayerData { get; set; }
+        public List<BossArena> Arenas { get; set; }
         public int LastLoadoutId { get; set; }
         public int LastTeamId { get; set; }
         public RespawnPoint? DefaultRespawnPoint { get; set; }
@@ -27,6 +28,7 @@ namespace UnturnedGameMaster.Models
             Loadouts = new Dictionary<int, Loadout>();
             ShopItems = new Dictionary<ushort, ShopItem>();
             PlayerData = new List<PlayerData>();
+            Arenas = new List<BossArena>();
             LastLoadoutId = 0;
             LastTeamId = 0;
             DefaultRespawnPoint = null;
