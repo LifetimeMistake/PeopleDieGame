@@ -34,24 +34,54 @@ namespace UnturnedGameMaster.Managers
             PlayerData victimData = playerDataManager.GetPlayer((ulong)player.CSteamID);
             PlayerData killerData = playerDataManager.GetPlayer((ulong)murderer);
 
-            if (cause == SDG.Unturned.EDeathCause.KILL)
-            {
-                UnturnedChat.Say("player kill :)");
-                //if (victimData == null || killerData == null)
-                //    return;
+            if (victimData == null)
+                return;
 
-                //PlayerKill(victimData, killerData);
-            }
-            else
+            if (killerData == null)
             {
-                UnturnedChat.Say("not player kill :(");
-                //victimData.SetBalance(Math.Round(victimData.WalletBalance / 2));
+                RandomDeath(victimData);
+                return;
+            }
+
+            switch (cause)
+            {
+                case SDG.Unturned.EDeathCause.GUN:
+                    PlayerKill(victimData, killerData);
+                    break;
+                case SDG.Unturned.EDeathCause.MELEE:
+                    PlayerKill(victimData, killerData);
+                    break;
+                case SDG.Unturned.EDeathCause.PUNCH:
+                    PlayerKill(victimData, killerData);
+                    break;
+                case SDG.Unturned.EDeathCause.ROADKILL:
+                    PlayerKill(victimData, killerData);
+                    break;
+                case SDG.Unturned.EDeathCause.GRENADE:
+                    if (player.CSteamID == murderer)
+                    {
+                        RandomDeath(victimData);
+                        break;
+                    }
+                    PlayerKill(victimData, killerData);
+                    break;
+                case SDG.Unturned.EDeathCause.MISSILE:
+                    if (player.CSteamID == murderer)
+                    {
+                        RandomDeath(victimData);
+                        break;
+                    }
+                    PlayerKill(victimData, killerData);
+                    break;
+                default:
+                    RandomDeath(victimData);
+                    break;
             }
         }
 
         private void UnturnedPlayerEvents_OnPlayerUpdateStat(UnturnedPlayer player, SDG.Unturned.EPlayerStat stat)
         {
-            if (stat != SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_NORMAL || stat != SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_MEGA)
+            if (stat != SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_NORMAL)
                 return;
 
             PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
@@ -59,14 +89,7 @@ namespace UnturnedGameMaster.Managers
             if (playerData == null)
                 return;
 
-            bool isMega;
-
-            if (stat == SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_MEGA)
-                isMega = true;
-            else
-                isMega = false;
-
-            ZombieKill(playerData, isMega);
+            ZombieKill(playerData);
         }
 
         public void PlayerKill(PlayerData victim, PlayerData killer)
@@ -83,16 +106,19 @@ namespace UnturnedGameMaster.Managers
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }
 
-        public void ZombieKill(PlayerData player, bool isMega)
+        public void ZombieKill(PlayerData player)
         {
             double reward;
-            if (isMega)
-                reward = dataManager.GameData.MegaZombieKillReward;
-            else
-                reward = dataManager.GameData.ZombieKillReward;
+            reward = dataManager.GameData.ZombieKillReward;
 
             player.Deposit(reward);
             OnPlayerReceiveZombieReward?.Invoke(this, new PlayerEventArgs(player));
+        }
+
+        public void RandomDeath(PlayerData player)
+        {
+            player.SetBalance(Math.Round(player.WalletBalance / 2));
+            OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(player));
         }
     }
 }

@@ -111,6 +111,7 @@
     <Compile Include="Managers\IDisposableManager.cs" />
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
+    <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
     <Compile Include="Models\ShopItem.cs" />
     <Compile Include="Models\EventArgs\LoadoutAppliedEventArgs.cs" />
     <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />
