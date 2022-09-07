@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
@@ -18,6 +19,11 @@ namespace UnturnedGameMaster.Managers
         private DataManager dataManager { get; set; }
         [InjectDependency]
         private TeamManager teamManager { get; set; }
+
+        public event EventHandler<ShopItemEventArgs> OnShopItemAdded;
+        public event EventHandler<ShopItemEventArgs> OnShopItemRemoved;
+        public event EventHandler<ShopItemEventArgs> OnShopItemBought;
+        public event EventHandler<ShopItemEventArgs> OnShopItemPriceChanged;
         public void Init()
         { }
 
@@ -34,6 +40,7 @@ namespace UnturnedGameMaster.Managers
             ShopItem shopItem = new ShopItem(unturnedItemId, price);
             shopItems.Add(unturnedItemId, shopItem);
 
+            OnShopItemAdded?.Invoke(this, new ShopItemEventArgs(shopItem));
             return shopItem;
         }
 
@@ -43,6 +50,9 @@ namespace UnturnedGameMaster.Managers
             if (!shopItems.ContainsKey(unturnedItemId))
                 return false;
 
+            ShopItem shopItem = shopItems[unturnedItemId];
+
+            OnShopItemRemoved?.Invoke(this, new ShopItemEventArgs(shopItem));
             return shopItems.Remove(unturnedItemId);
         }
 
@@ -69,6 +79,11 @@ namespace UnturnedGameMaster.Managers
             return dataManager.GameData.ShopItems.Values.ToArray();
         }
 
+        public int GetItemCount()
+        {
+            return dataManager.GameData.ShopItems.Count();
+        }
+
         public ShopItem ResolveItem(string shopItemNameOrId, bool exactMatch)
         {
             ushort unturnedItemId;
@@ -84,6 +99,7 @@ namespace UnturnedGameMaster.Managers
         public void SetItemPrice(ShopItem shopItem, double price)
         {
             shopItem.SetPrice(price);
+            OnShopItemPriceChanged?.Invoke(this, new ShopItemEventArgs(shopItem));
         }
 
         public string GetItemSummary(ShopItem shopItem)
@@ -126,7 +142,8 @@ namespace UnturnedGameMaster.Managers
             if (!player.GiveItem(shopItem.UnturnedItemId, amount))
                 throw new Exception($"Nie udało się dodać {shopItem.Name} (x{amount}) do ekwipunku gracza, konto nieobciążone");
 
-            teamManager.WithdrawFromBank(team, shopItem.Price * amount);    
+            teamManager.WithdrawFromBank(team, shopItem.Price * amount);
+            OnShopItemBought?.Invoke(this, new ShopItemEventArgs(shopItem));
             return true;
         }
     }
