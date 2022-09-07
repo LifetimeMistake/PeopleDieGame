@@ -30,6 +30,7 @@ namespace UnturnedGameMaster.Autofac
             builder.RegisterType<TeamManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<PlayerDataManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<ShopManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<RewardManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
 
             builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
