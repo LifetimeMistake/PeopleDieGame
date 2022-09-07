@@ -100,6 +100,7 @@
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Enums\GameState.cs" />
+    <Compile Include="Managers\RewardManager.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\GameManager.cs" />
     <Compile Include="Managers\PlayerDataManager.cs" />

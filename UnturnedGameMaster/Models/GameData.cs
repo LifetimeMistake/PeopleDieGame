@@ -20,6 +20,10 @@ namespace UnturnedGameMaster.Models
         public int LastTeamId { get; set; }
         public RespawnPoint? DefaultRespawnPoint { get; set; }
         public GameState State { get; set; }
+        public double PlayerKillReward { get; set; }
+        public double ZombieKillReward { get; set; }
+        public double MegaZombieKillReward { get; set; }
+        public double Bounty { get; set; }
 
         public GameData()
         {
@@ -31,6 +35,10 @@ namespace UnturnedGameMaster.Models
             LastTeamId = 0;
             DefaultRespawnPoint = null;
             State = GameState.InLobby;
+            PlayerKillReward = 100;
+            ZombieKillReward = 10;
+            MegaZombieKillReward = 150;
+            Bounty = 100;
         }
     }
 }
