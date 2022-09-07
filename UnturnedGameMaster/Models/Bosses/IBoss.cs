@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace UnturnedGameMaster.Models
 {
-    public class Boss
+    public interface IBoss
     {
         string Name { get; set; }
         double Health { get; set; }
@@ -16,16 +16,5 @@ namespace UnturnedGameMaster.Models
         byte ShirtId { get; set; }
         byte PantsId { get; set; }
         byte GearId { get; set; }
-
-        public Boss(string name, double health, EZombieSpeciality attributes, byte hatId, byte shirtId, byte pantsId, byte gearId)
-        {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Health = health;
-            Attributes = attributes;
-            HatId = hatId;
-            ShirtId = shirtId;
-            PantsId = pantsId;
-            GearId = gearId;
-        }
     }
 }

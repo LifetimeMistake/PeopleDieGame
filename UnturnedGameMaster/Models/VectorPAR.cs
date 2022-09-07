@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,12 +8,12 @@ using UnityEngine;
 
 namespace UnturnedGameMaster.Models
 {
-    public struct RespawnPoint
+    public struct VectorPAR
     {
-        public Vector3 Position;
-        public byte Rotation;
+        public Vector3 Position { get; set; }
+        public byte Rotation { get; set; }
 
-        public RespawnPoint(Vector3 position, byte rotation)
+        public VectorPAR(Vector3 position, byte rotation)
         {
             Position = position;
             Rotation = rotation;

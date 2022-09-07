@@ -15,7 +15,7 @@ namespace UnturnedGameMaster.Controllers
         bool IsBossDefeated();
         double GetRemainingHealth();
         bool Update();
-        Boss GetBoss();
+        IBoss GetBoss();
         Zombie GetZombie();
     }
 }

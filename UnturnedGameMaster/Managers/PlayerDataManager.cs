@@ -37,14 +37,14 @@ namespace UnturnedGameMaster.Managers
 
         private void Instance_OnPlayerConnected(Rocket.Unturned.Player.UnturnedPlayer player)
         {
-            List<PlayerData> playerList = dataManager.GameData.PlayerData;
-            PlayerData playerData = playerList.FirstOrDefault(x => x.Id == (ulong)player.CSteamID);
+            Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
+            PlayerData playerData = GetPlayer((ulong)player.CSteamID);
 
             if(playerData == null)
             {
                 // register a new player
                 playerData = new PlayerData((ulong)player.CSteamID, player.CharacterName);
-                playerList.Add(playerData);
+                players.Add(playerData.Id, playerData);
             }
             else
             {
@@ -54,22 +54,25 @@ namespace UnturnedGameMaster.Managers
 
         public PlayerData GetPlayer(ulong id)
         {
-            List<PlayerData> playerList = dataManager.GameData.PlayerData;
-            return playerList.FirstOrDefault(x => x.Id == id);
+            Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
+            if (!players.ContainsKey(id))
+                return null;
+
+            return players[id];
         }
 
         public PlayerData GetPlayerByName(string name, bool exactMatch = true)
         {
-            List<PlayerData> playerList = dataManager.GameData.PlayerData;
+            Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
             if (exactMatch)
-                return playerList.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
+                return players.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
-                return playerList.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+                return players.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
         public PlayerData[] GetPlayers()
         {
-            return dataManager.GameData.PlayerData.ToArray();
+            return dataManager.GameData.PlayerData.Values.ToArray();
         }
 
         public int GetPlayerCount()

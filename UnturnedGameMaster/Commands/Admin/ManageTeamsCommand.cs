@@ -154,9 +154,16 @@ namespace UnturnedGameMaster.Commands.Admin
                     UnturnedChat.Say(caller, $"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
                 }
 
-                //leader info
+                if (!team.LeaderId.HasValue)
+                {
+                    UnturnedChat.Say(caller, "Lider drużyny: Brak");
+                }
+                else
+                {
+                    UnturnedChat.Say(caller, $"Lider drużyny: {team.LeaderId.Value}");
+                }
 
-                RespawnPoint? teamRespawnPoint = team.RespawnPoint;
+                VectorPAR? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
                     UnturnedChat.Say(caller, "Punkt odradzania: Brak");
@@ -258,7 +265,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                RespawnPoint? teamRespawnPoint = team.RespawnPoint;
+                VectorPAR? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
                     UnturnedChat.Say(caller, "Drużyna nie posiada respawn pointu");
@@ -297,7 +304,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                RespawnPoint? respawnPoint = new RespawnPoint(callerPlayer.Position, (byte)callerPlayer.Rotation);
+                VectorPAR? respawnPoint = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
                 team.RespawnPoint = respawnPoint;
                 UnturnedChat.Say(caller, "Ustawiono respawn point drużyny");
             }

@@ -62,7 +62,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID(((UnturnedPlayer)caller).CSteamID);
                 RespawnManager respawnManager = ServiceLocator.Instance.LocateService<RespawnManager>();
 
-                RespawnPoint? respawnPoint = new RespawnPoint(callerPlayer.Position, (byte)callerPlayer.Rotation);
+                VectorPAR? respawnPoint = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
                 respawnManager.SetWorldRespawnPoint(respawnPoint);
 
                 UnturnedChat.Say(caller, "Ustawiono spawn świata");

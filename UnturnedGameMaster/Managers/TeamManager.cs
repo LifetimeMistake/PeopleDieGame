@@ -22,8 +22,6 @@ namespace UnturnedGameMaster.Managers
         [InjectDependency]
         private PlayerDataManager playerDataManager { get; set; }
         [InjectDependency]
-        private LoadoutManager loadoutManager { get; set; }
-        [InjectDependency]
         private TeamIdProvider teamIdProvider { get; set; }
 
         public event EventHandler<TeamMembershipEventArgs> OnPlayerJoinedTeam;
@@ -64,15 +62,14 @@ namespace UnturnedGameMaster.Managers
         public bool DeleteTeam(int id)
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
-            if (!teams.ContainsKey(id))
+            Team team = GetTeam(id);
+            if (team == null)
                 return false;
-
-            Team team = teams[id];
-            teams.Remove(id);
 
             // Make sure all players leave the team prior to deletion.
             GetTeamMembers(team).ForEach(x => LeaveTeam(x));
 
+            teams.Remove(id);
             OnTeamRemoved?.Invoke(this, new TeamEventArgs(team));
             return true;
         }
@@ -257,6 +254,15 @@ namespace UnturnedGameMaster.Managers
                 sb.AppendLine($"Opis: \"{team.Description}\"");
             else
                 sb.AppendLine("Opis: Brak opisu");
+
+            if (team.LeaderId.HasValue)
+            {
+                PlayerData leaderData = playerDataManager.GetPlayer(team.LeaderId.Value);
+                sb.AppendLine($"Lider: \"{leaderData.Name}\"");
+            }
+            else
+                sb.AppendLine("Lider: Brak");
+
 
             List<PlayerData> members = GetTeamMembers(team);
             int onlineMembers = Provider.clients.Count(x => members.Any(m => (CSteamID)m.Id == x.playerID.steamID));

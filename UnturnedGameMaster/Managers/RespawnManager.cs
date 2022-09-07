@@ -42,7 +42,7 @@ namespace UnturnedGameMaster.Managers
         private void UnturnedPlayerEvents_OnPlayerRevive(Rocket.Unturned.Player.UnturnedPlayer player, UnityEngine.Vector3 position, byte angle)
         {
             UnturnedChat.Say(player, "Witaj w świecie żywych!");
-            RespawnPoint? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
+            VectorPAR? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
 
             PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
             if (playerData == null)
@@ -58,7 +58,7 @@ namespace UnturnedGameMaster.Managers
             else if (playerData.TeamId != null && (gameManager.GetGameState() == GameState.Intermission || gameManager.GetGameState() == GameState.InGame))
             {
                 Team playerTeam = teamManager.GetTeam(playerData.TeamId.Value);
-                RespawnPoint? teamRespawn = playerTeam.RespawnPoint;
+                VectorPAR? teamRespawn = playerTeam.RespawnPoint;
 
                 if (teamRespawn != null)
                 {
@@ -90,7 +90,7 @@ namespace UnturnedGameMaster.Managers
             OnRespawnFinished?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public void SetWorldRespawnPoint(RespawnPoint? respawnPoint)
+        public void SetWorldRespawnPoint(VectorPAR? respawnPoint)
         {
             dataManager.GameData.DefaultRespawnPoint = respawnPoint;
         }

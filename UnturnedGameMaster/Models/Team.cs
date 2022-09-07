@@ -20,10 +20,10 @@ namespace UnturnedGameMaster
         public int? DefaultLoadoutId { get; private set; }
         public ulong? LeaderId { get; private set; }
         public double BankBalance { get; private set; }
-        public RespawnPoint? RespawnPoint { get; set; }
+        public VectorPAR? RespawnPoint { get; set; }
         public List<TeamInvitation> Invitations { get; private set; }
 
-        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null,  RespawnPoint? respawnPoint = null, double bankBalance = 1000)
+        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, VectorPAR? respawnPoint = null, double bankBalance = 1000)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));

@@ -15,11 +15,12 @@ namespace UnturnedGameMaster.Models
         public Dictionary<int, Team> Teams { get; set; }
         public Dictionary<int, Loadout> Loadouts { get; set; }
         public Dictionary<ushort, ShopItem> ShopItems { get; set; }
-        public List<PlayerData> PlayerData { get; set; }
-        public List<BossArena> Arenas { get; set; }
+        public Dictionary<ulong, PlayerData> PlayerData { get; set; }
+        public Dictionary<int, BossArena> Arenas { get; set; }
         public int LastLoadoutId { get; set; }
         public int LastTeamId { get; set; }
-        public RespawnPoint? DefaultRespawnPoint { get; set; }
+        public int LastArenaId { get; set; }
+        public VectorPAR? DefaultRespawnPoint { get; set; }
         public GameState State { get; set; }
         public double PlayerKillReward { get; set; }
         public double ZombieKillReward { get; set; }
@@ -31,10 +32,11 @@ namespace UnturnedGameMaster.Models
             Teams = new Dictionary<int, Team>();
             Loadouts = new Dictionary<int, Loadout>();
             ShopItems = new Dictionary<ushort, ShopItem>();
-            PlayerData = new List<PlayerData>();
-            Arenas = new List<BossArena>();
+            PlayerData = new Dictionary<ulong, PlayerData>();
+            Arenas = new Dictionary<int, BossArena>();
             LastLoadoutId = 0;
             LastTeamId = 0;
+            LastArenaId = 0;
             DefaultRespawnPoint = null;
             State = GameState.InLobby;
             PlayerKillReward = 100;
