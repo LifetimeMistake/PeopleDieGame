@@ -152,9 +152,19 @@ namespace UnturnedGameMaster.Managers
             return playerDataManager.GetPlayers().Where(x => x.TeamId == team.Id).ToList();
         }
 
+        public List<PlayerData> GetOnlineTeamMembers(Team team)
+        {
+            return GetTeamMembers(team).Where(x => Provider.clients.Any(y => (ulong)y.playerID.steamID == x.Id)).ToList();
+        }
+
         public int GetTeamMemberCount(Team team)
         {
-            return playerDataManager.GetPlayers().Count(x => x.TeamId == team.Id);
+            return GetTeamMembers(team).Count;
+        }
+
+        public int GetOnlineTeamMemberCount(Team team)
+        {
+            return GetOnlineTeamMembers(team).Count;
         }
 
         public int GetTeamMemberCount(int id)
