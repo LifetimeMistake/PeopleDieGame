@@ -105,6 +105,19 @@ namespace UnturnedGameMaster.Managers
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
+        public BossArena ResolveArena(string arenaNameOrId, bool exactMatch)
+        {
+            int id;
+            if (int.TryParse(arenaNameOrId, out id))
+            {
+                BossArena arena = GetArena(id);
+                if (arena != null)
+                    return arena;
+            }
+
+            return GetArenaByName(arenaNameOrId, exactMatch);
+        }
+
         public BossFight CreateBossFight(BossArena bossArena, Team team)
         {
             if (ongoingBossFights.Any(x => x.Arena == bossArena))
