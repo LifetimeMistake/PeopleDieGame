@@ -22,13 +22,12 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void ShopManager_OnShopItemBought(object sender, Models.EventArgs.BuyItemEventArgs e)
         {
-            ChatHelper.Say(e.PlayerData, $"Zakupiono {e.ShopItem.Name} (x{e.Amount}) za ${e.Price}");
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
-                if (player == e.PlayerData)
+                if (player == e.Player)
                     continue;
 
-                ChatHelper.Say(player, $"Gracz {e.PlayerData.Name} zakupił {e.ShopItem.Name} (x{e.Amount}) za ${e.Price}");
+                ChatHelper.Say(player, $"Gracz {e.Player.Name} zakupił {e.ShopItem.Name} (x{e.Amount}) za ${e.Price}");
             }
         }
     }

@@ -105,6 +105,7 @@
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Managers\ArenaManager.cs" />
+    <Compile Include="Managers\EventMessageManagers\RewardEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\ShopEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\TeamEventMessageManager.cs" />
     <Compile Include="Managers\RewardManager.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
     <Compile Include="Models\EventArgs\BuyItemEventArgs.cs" />
+    <Compile Include="Models\EventArgs\RewardEventArgs.cs" />
     <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
     <Compile Include="Models\ArenaBossFight.cs" />
     <Compile Include="Models\Bosses\IBoss.cs" />

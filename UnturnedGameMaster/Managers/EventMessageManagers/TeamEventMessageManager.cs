@@ -32,7 +32,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void TeamManager_OnBankWithdrawnFrom(object sender, Models.EventArgs.TeamBankEventArgs e)
         {
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 ChatHelper.Say(player, $"Z konta bankowego twojej drużyny zostało wypłacone ${e.Amount}");
             }
@@ -40,7 +40,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void TeamManager_OnBankBalanceChanged(object sender, Models.EventArgs.TeamBankEventArgs e)
         {
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 ChatHelper.Say(player, $"Nowy stan konta bankowego twojej drużyny: ${e.Amount}");
             }
@@ -48,7 +48,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void TeamManager_OnBankDepositedInto(object sender, Models.EventArgs.TeamBankEventArgs e)
         {
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 ChatHelper.Say(player, $"Do konta bankowego twojej drużyny zostało wpłacone ${e.Amount}");
             }
@@ -57,7 +57,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
         private void TeamManager_OnTeamLeaderChanged(object sender, Models.EventArgs.TeamMembershipEventArgs e)
         {
             ChatHelper.Say(e.Player, $"Zostałeś nowym liderem drużyny {e.Team.Name}");
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 if (player == e.Player)
                     continue;
@@ -68,7 +68,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void TeamManager_OnPlayerLeftTeam(object sender, Models.EventArgs.TeamMembershipEventArgs e)
         {
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 ChatHelper.Say(player, $"Gracz {e.Player.Name} wyszedł z twojej drużyny");
             }
@@ -76,7 +76,7 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
 
         private void TeamManager_OnPlayerJoinedTeam(object sender, Models.EventArgs.TeamMembershipEventArgs e)
         {
-            foreach (PlayerData player in teamManager.GetTeamMembers(e.Team))
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 if (player == e.Player)
                     continue;

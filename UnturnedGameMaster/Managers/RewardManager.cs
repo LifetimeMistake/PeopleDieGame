@@ -19,8 +19,8 @@ namespace UnturnedGameMaster.Managers
         [InjectDependency]
         private DataManager dataManager { get; set; }
 
-        public event EventHandler<PlayerEventArgs> OnPlayerReceivePlayerReward;
-        public event EventHandler<PlayerEventArgs> OnPlayerReceiveZombieReward;
+        public event EventHandler<RewardEventArgs> OnPlayerReceivePlayerReward;
+        public event EventHandler<RewardEventArgs> OnPlayerReceiveZombieReward;
         public event EventHandler<PlayerEventArgs> OnPlayerReceiveDeathPenalty;
 
         public void Init()
@@ -90,13 +90,14 @@ namespace UnturnedGameMaster.Managers
         {
             double reward = dataManager.GameData.PlayerKillReward;
             double bounty = dataManager.GameData.Bounty;
+            double total = reward + victim.Bounty;
 
             killer.AddBounty(bounty);
-            killer.Deposit(reward + victim.Bounty);
+            killer.Deposit(total);
 
             victim.ResetBounty();
             victim.SetBalance(Math.Round(victim.WalletBalance/2));
-            OnPlayerReceivePlayerReward?.Invoke(this, new PlayerEventArgs(killer));
+            OnPlayerReceivePlayerReward?.Invoke(this, new RewardEventArgs(killer, total));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }
 
@@ -106,7 +107,7 @@ namespace UnturnedGameMaster.Managers
             reward = dataManager.GameData.ZombieKillReward;
 
             player.Deposit(reward);
-            OnPlayerReceiveZombieReward?.Invoke(this, new PlayerEventArgs(player));
+            OnPlayerReceiveZombieReward?.Invoke(this, new RewardEventArgs(player, reward));
         }
 
         public void RandomDeath(PlayerData player)

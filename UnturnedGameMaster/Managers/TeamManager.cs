@@ -295,15 +295,15 @@ namespace UnturnedGameMaster.Managers
         public void DepositIntoBank(Team team, double amount)
         {
             team.Deposit(amount);
-            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
             OnBankDepositedInto?.Invoke(this, new TeamBankEventArgs(team, amount));
+            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
         public void WithdrawFromBank(Team team, double amount)
         {
             team.Withdraw(amount);
-            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
             OnBankWithdrawnFrom?.Invoke(this, new TeamBankEventArgs(team, amount));
+            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
     }
 }

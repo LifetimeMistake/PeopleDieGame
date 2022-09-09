@@ -8,6 +8,7 @@ using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Providers;
 using UnturnedGameMaster.Managers.EventMessageManagers;
+using System.Reflection;
 
 namespace UnturnedGameMaster.Autofac
 {
@@ -23,17 +24,13 @@ namespace UnturnedGameMaster.Autofac
         public void RegisterComponents(ContainerBuilder builder)
         {
             AutowirePropertySelector autowirePropertySelector = new AutowirePropertySelector();
-            builder.RegisterType<GameManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<LoadoutManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<DataManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<TimerManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<RespawnManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<TeamManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<PlayerDataManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<ShopManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<RewardManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<ArenaManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<TeamEventMessageManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            IEnumerable<Type> managers = Assembly.GetCallingAssembly()
+                .GetTypes().Where(x => typeof(IManager).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
+
+            foreach (Type managerType in managers)
+            {
+                builder.RegisterType(managerType).InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            }
 
             builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
