@@ -115,8 +115,9 @@
     <Compile Include="Managers\IDisposableManager.cs" />
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
+    <Compile Include="Models\EventArgs\BossFightEventArgs.cs" />
     <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
-    <Compile Include="Models\ArenaBossFight.cs" />
+    <Compile Include="Models\BossFight.cs" />
     <Compile Include="Models\Bosses\IBoss.cs" />
     <Compile Include="Models\BossArena.cs" />
     <Compile Include="Models\EventArgs\ArenaEventArgs.cs" />

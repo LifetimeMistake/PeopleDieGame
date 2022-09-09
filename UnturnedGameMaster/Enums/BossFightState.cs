@@ -10,6 +10,9 @@ namespace UnturnedGameMaster.Enums
     {
         Idle,
         Ongoing,
-        BossDefeated
+        BossDefeated,
+        AttackersDefeated,
+        Abandoned,
+        Cancelled
     }
 }

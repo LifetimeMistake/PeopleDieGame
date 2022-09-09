@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using UnityEngine;
 using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster
@@ -17,6 +17,7 @@ namespace UnturnedGameMaster
         private double deactivationDistance;
         private double completionBounty;
         private double completionReward;
+        private Vector3 activationPoint;
         private VectorPAR bossSpawnpoint;
         private VectorPAR rewardSpawnpoint;
         private IBoss bossModel;
@@ -61,6 +62,11 @@ namespace UnturnedGameMaster
             completionBounty = bounty;
         }
 
+        public void SetBossSpawnPoint(Vector3 point)
+        {
+            activationPoint = point;
+        }
+
         public void SetBossSpawnPoint(VectorPAR spawnpoint)
         {
             bossSpawnpoint = spawnpoint;
@@ -85,6 +91,7 @@ namespace UnturnedGameMaster
                 arenaName,
                 false,
                 bossModel,
+                activationPoint,
                 bossSpawnpoint,
                 rewardSpawnpoint,
                 activationDistance,

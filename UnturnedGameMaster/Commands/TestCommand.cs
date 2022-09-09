@@ -31,13 +31,19 @@ namespace UnturnedGameMaster.Commands
             Player player = ((UnturnedPlayer)caller).Player;
             RaycastHit hit;
             Ray ray = new Ray(player.look.aim.position, player.look.aim.forward);
-            if (!Physics.Raycast(ray, out hit, 100, RayMasks.LARGE))
+            if (!Physics.Raycast(ray, out hit, 100, RayMasks.GROUND))
             {
                 UnturnedChat.Say("no luck");
                 return;
             }
 
-            UnturnedChat.Say($"transform at {hit.transform.position}");
+            byte boundId;
+
+            if (!LevelNavigation.tryGetBounds(hit.point, out boundId))
+            {
+                UnturnedChat.Say("hwhat");
+                return;
+            }
         }
     }
 }

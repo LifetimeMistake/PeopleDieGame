@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace UnturnedGameMaster.Models
 {
@@ -13,6 +13,7 @@ namespace UnturnedGameMaster.Models
         public string Name { get; private set; }
         public bool Conquered { get; set; }
         public IBoss BossModel { get; private set; }
+        public Vector3 ActivationPoint { get; private set; }
         public VectorPAR BossSpawnPoint { get; set; }
         public VectorPAR RewardSpawnPoint { get; set; }
         public double ActivationDistance { get; private set; }
@@ -20,12 +21,13 @@ namespace UnturnedGameMaster.Models
         public double CompletionBounty { get; private set; }
         public double CompletionReward { get; private set; }
 
-        public BossArena(int id, string name, bool conquered, IBoss bossModel, VectorPAR bossSpawnPoint, VectorPAR rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward)
+        public BossArena(int id, string name, bool conquered, IBoss bossModel, Vector3 activationPoint, VectorPAR bossSpawnPoint, VectorPAR rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Conquered = conquered;
             BossModel = bossModel ?? throw new ArgumentNullException(nameof(bossModel));
+            ActivationPoint = activationPoint;
             BossSpawnPoint = bossSpawnPoint;
             RewardSpawnPoint = rewardSpawnPoint;
             ActivationDistance = activationDistance;

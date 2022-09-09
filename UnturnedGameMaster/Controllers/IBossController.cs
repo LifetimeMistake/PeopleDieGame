@@ -10,12 +10,11 @@ namespace UnturnedGameMaster.Controllers
 {
     public interface IBossController
     {
-        bool SpawnBoss();
-        bool DeleteBoss();
+        bool StartFight();
+        bool EndFight();
         bool IsBossDefeated();
-        double GetRemainingHealth();
+        double GetBossHealthPercentage();
         bool Update();
-        IBoss GetBoss();
-        Zombie GetZombie();
+        IBoss GetBossBase();
     }
 }
