@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -30,7 +31,7 @@ namespace UnturnedGameMaster.Commands.Teams
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę drużyny której zaproszenie chcesz odrzucić.");
+                ChatHelper.Say(caller, "Musisz podać nazwę drużyny której zaproszenie chcesz odrzucić.");
                 return;
             }
 
@@ -42,20 +43,20 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say(caller, "Nie można odrzucać zaproszeń do drużyn po rozpoczęciu gry!");
+                    ChatHelper.Say(caller, "Nie można odrzucać zaproszeń do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
-                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                     return;
                 }
 
                 if (callerPlayerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say(caller, "Już należysz do drużyny!");
+                    ChatHelper.Say(caller, "Już należysz do drużyny!");
                     return;
                 }
 
@@ -63,27 +64,27 @@ namespace UnturnedGameMaster.Commands.Teams
                 Team team = teamManager.ResolveTeam(teamName, false);
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Taka drużyna nie istnieje!");
+                    ChatHelper.Say(caller, "Taka drużyna nie istnieje!");
                     return;
                 }
 
                 if (!team.GetInvitations().Any(x => x.TargetId == callerPlayerData.Id))
                 {
-                    UnturnedChat.Say(caller, "Nie posiadasz oczekującego zaproszenia od tej drużyny.");
+                    ChatHelper.Say(caller, "Nie posiadasz oczekującego zaproszenia od tej drużyny.");
                     return;
                 }
 
                 if (!teamManager.RejectInvitation(team, callerPlayerData))
                 {
-                    UnturnedChat.Say(caller, "Nie udało się odrzucić zaproszenia z powodu błedu systemu.");
+                    ChatHelper.Say(caller, "Nie udało się odrzucić zaproszenia z powodu błedu systemu.");
                     return;
                 }
 
-                UnturnedChat.Say(caller, "Odrzucono zaproszenie.");
+                ChatHelper.Say(caller, "Odrzucono zaproszenie.");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się odrzucić zaproszenia z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się odrzucić zaproszenia z powodu błedu serwera: {ex.Message}");
             }
         }
     }

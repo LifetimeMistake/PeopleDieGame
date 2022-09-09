@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
@@ -41,19 +42,19 @@ namespace UnturnedGameMaster.Managers
 
         private void UnturnedPlayerEvents_OnPlayerRevive(Rocket.Unturned.Player.UnturnedPlayer player, UnityEngine.Vector3 position, byte angle)
         {
-            UnturnedChat.Say(player, "Witaj w świecie żywych!");
+            ChatHelper.Say(player, "Witaj w świecie żywych!");
             VectorPAR? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
 
             PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
             if (playerData == null)
             {
-                UnturnedChat.Say(player, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                ChatHelper.Say(player, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
             }
 
             if((playerData.TeamId == null || gameManager.GetGameState() == GameState.InLobby) && worldRespawn != null)
             {
                 player.Teleport(worldRespawn.Value.Position, worldRespawn.Value.Rotation);
-                UnturnedChat.Say(player, "Budzisz się w globalnym punkcie zbiórki.");
+                ChatHelper.Say(player, "Budzisz się w globalnym punkcie zbiórki.");
             }
             else if (playerData.TeamId != null && (gameManager.GetGameState() == GameState.Intermission || gameManager.GetGameState() == GameState.InGame))
             {
@@ -63,7 +64,7 @@ namespace UnturnedGameMaster.Managers
                 if (teamRespawn != null)
                 {
                     player.Teleport(teamRespawn.Value.Position, teamRespawn.Value.Rotation);
-                    UnturnedChat.Say(player, "Budzisz się w punkcie zbiórki twojej drużyny.");
+                    ChatHelper.Say(player, "Budzisz się w punkcie zbiórki twojej drużyny.");
                 }
 
                 if (playerTeam.DefaultLoadoutId != null)
@@ -77,14 +78,14 @@ namespace UnturnedGameMaster.Managers
                         }
                         catch(Exception)
                         {
-                            UnturnedChat.Say(player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
+                            ChatHelper.Say(player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
                         }
                     }
                 }
             }
             else
             {
-                UnturnedChat.Say(player, "Budzisz się w szczerym polu.");
+                ChatHelper.Say(player, "Budzisz się w szczerym polu.");
             }
 
             OnRespawnFinished?.Invoke(this, new PlayerEventArgs(playerData));

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -30,7 +31,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -84,7 +85,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     VerbWithdraw(caller, verbArgs);
                     break;
                 default:
-                    UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
+                    ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
             }
@@ -92,7 +93,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         private void VerbList(IRocketPlayer caller, string[] command)
@@ -101,15 +102,17 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
 
-                UnturnedChat.Say(caller, $"Lista drużyn:");
+                StringBuilder sb = new StringBuilder();
+                ChatHelper.Say(caller, $"Lista drużyn:");
                 foreach (Team team in teamManager.GetTeams().OrderBy(x => x.Id))
                 {
-                    UnturnedChat.Say(caller, $"ID: {team.Id} | Nazwa: {team.Name}");
+                    sb.AppendLine($"ID: {team.Id} | Nazwa: {team.Name}");
                 }
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o liście drużyn z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o liście drużyn z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -117,7 +120,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -129,57 +132,61 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
-                UnturnedChat.Say(caller, $"ID: {team.Id}");
-                UnturnedChat.Say(caller, $"Nazwa: \"{team.Name}\"");
+                StringBuilder sb = new StringBuilder();
+
+                sb.AppendLine($"ID: {team.Id}");
+                sb.AppendLine($"Nazwa: \"{team.Name}\"");
 
                 if (team.Description == "")
                 {
-                    UnturnedChat.Say(caller, "Opis: Brak");
+                    sb.AppendLine("Opis: Brak");
                 }
                 else
                 {
-                    UnturnedChat.Say(caller, $"Opis: \"{team.Description}\"");
+                    sb.AppendLine($"Opis: \"{team.Description}\"");
                 }
 
                 if (!team.DefaultLoadoutId.HasValue)
                 {
-                    UnturnedChat.Say(caller, "ID wyposażenia drużyny: Brak");
+                    sb.AppendLine("ID wyposażenia drużyny: Brak");
                 }
                 else
                 {
-                    UnturnedChat.Say(caller, $"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
+                    sb.AppendLine($"ID wyposażenia drużyny: {team.DefaultLoadoutId}");
                 }
 
                 if (!team.LeaderId.HasValue)
                 {
-                    UnturnedChat.Say(caller, "Lider drużyny: Brak");
+                    sb.AppendLine("Lider drużyny: Brak");
                 }
                 else
                 {
-                    UnturnedChat.Say(caller, $"Lider drużyny: {team.LeaderId.Value}");
+                    sb.AppendLine($"Lider drużyny: {team.LeaderId.Value}");
                 }
 
                 VectorPAR? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
-                    UnturnedChat.Say(caller, "Punkt odradzania: Brak");
+                    sb.AppendLine("Punkt odradzania: Brak");
                 }
                 else
                 {
-                    UnturnedChat.Say(caller, "Punkt odradzania:");
-                    UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
-                    UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
+                    sb.AppendLine("Punkt odradzania:");
+                    sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
+                    sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
                 }
 
-                UnturnedChat.Say(caller, $"Stan konta: ${team.BankBalance}");
+                sb.AppendLine($"Stan konta: ${team.BankBalance}");
+
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o drużynie z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o drużynie z powodu błędu serwera: {ex.Message}");
             }
 
         }
@@ -188,7 +195,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę drużyny");
                 return;
             }
 
@@ -198,16 +205,16 @@ namespace UnturnedGameMaster.Commands.Admin
                 string name = string.Join(" ", command);
                 if (teamManager.GetTeamByName(name) != null)
                 {
-                    UnturnedChat.Say(caller, "Drużyna o tej nazwie już istnieje");
+                    ChatHelper.Say(caller, "Drużyna o tej nazwie już istnieje");
                     return;
                 }
 
                 Team team = teamManager.CreateTeam(name);
-                UnturnedChat.Say(caller, $"Utworzono drużynę o ID {team.Id}");
+                ChatHelper.Say(caller, $"Utworzono drużynę o ID {team.Id}");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się utworzyć drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się utworzyć drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -215,7 +222,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -227,21 +234,21 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
                 if (!teamManager.DeleteTeam(team.Id))
                 {
-                    UnturnedChat.Say(caller, "Nie udało się usunąć drużyny");
+                    ChatHelper.Say(caller, "Nie udało się usunąć drużyny");
                     return;
                 }
 
-                UnturnedChat.Say(caller, "Usunięto drużynę");
+                ChatHelper.Say(caller, "Usunięto drużynę");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się usunąć drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się usunąć drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -249,7 +256,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -261,24 +268,26 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
                 VectorPAR? teamRespawnPoint = team.RespawnPoint;
                 if (teamRespawnPoint == null)
                 {
-                    UnturnedChat.Say(caller, "Drużyna nie posiada respawn pointu");
+                    ChatHelper.Say(caller, "Drużyna nie posiada respawn pointu");
                     return;
                 }
 
-                UnturnedChat.Say(caller, $"Respawn point drużyny \"{searchTerm}\":");
-                UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Position}");
-                UnturnedChat.Say(caller, $"\t{teamRespawnPoint.Value.Rotation}");
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"Respawn point drużyny \"{searchTerm}\":");
+                sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
+                sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -286,7 +295,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -300,17 +309,17 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
                 VectorPAR? respawnPoint = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
                 team.RespawnPoint = respawnPoint;
-                UnturnedChat.Say(caller, "Ustawiono respawn point drużyny");
+                ChatHelper.Say(caller, "Ustawiono respawn point drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -318,7 +327,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -330,16 +339,16 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
                 team.RespawnPoint = null;
-                UnturnedChat.Say(caller, "Zresetowano punkt odradzania drużyny");
+                ChatHelper.Say(caller, "Zresetowano punkt odradzania drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -347,7 +356,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -358,22 +367,22 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 string name = string.Join(" ", command.Skip(1));
                 team.SetName(name);
 
-                UnturnedChat.Say(caller, $"Ustawiono nazwę drużyny na \"{name}\"");
+                ChatHelper.Say(caller, $"Ustawiono nazwę drużyny na \"{name}\"");
             }
             catch (ArgumentException)
             {
-                UnturnedChat.Say(caller, "Nazwa drużyny nie może być pusta");
+                ChatHelper.Say(caller, "Nazwa drużyny nie może być pusta");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić nazwy drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -381,7 +390,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -392,18 +401,18 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 string desc = string.Join(" ", command.Skip(1));
                 team.SetDescription(desc);
 
-                UnturnedChat.Say(caller, $"Ustawiono opis drużyny na \"{desc}\"");
+                ChatHelper.Say(caller, $"Ustawiono opis drużyny na \"{desc}\"");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić opisu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić opisu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -411,7 +420,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length != 2)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny i nazwę lub ID zestawu wyposażenia.");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny i nazwę lub ID zestawu wyposażenia.");
                 return;
             }
 
@@ -423,23 +432,23 @@ namespace UnturnedGameMaster.Commands.Admin
                 Team team = teamManager.ResolveTeam(command[0], false);
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 Loadout loadout = loadoutManager.ResolveLoadout(command[1], false);
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono zestawu wyposażenia");
+                    ChatHelper.Say(caller, "Nie znaleziono zestawu wyposażenia");
                     return;
                 }
 
                 team.SetDefaultLoadout(loadout);
-                UnturnedChat.Say(caller, "Ustawiono nowy zestaw wyposażenia!");
+                ChatHelper.Say(caller, "Ustawiono nowy zestaw wyposażenia!");
             }
             catch(Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -447,7 +456,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 return;
             }
 
@@ -459,16 +468,16 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
                 team.SetDefaultLoadout(null);
-                UnturnedChat.Say(caller, "Zresetowano zestaw wyposażenia drużyny");
+                ChatHelper.Say(caller, "Zresetowano zestaw wyposażenia drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -476,7 +485,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 ShowSyntax(caller);
                 return;
             }
@@ -488,16 +497,16 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 double amount = teamManager.GetBankBalance(team);
-                UnturnedChat.Say(caller, $"Drużyna \"{team.Name}\" ma ${amount} w banku");
+                ChatHelper.Say(caller, $"Drużyna \"{team.Name}\" ma ${amount} w banku");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać ilości środków drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -505,7 +514,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 ShowSyntax(caller);
                 return;
             }
@@ -517,22 +526,22 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 if (!double.TryParse(command[1], out double amount))
                 {
-                    UnturnedChat.Say(caller, "Musisz podać ilość środków do ustawienia");
+                    ChatHelper.Say(caller, "Musisz podać ilość środków do ustawienia");
                     return;
                 }
 
                 teamManager.SetBankBalance(team, amount);
-                UnturnedChat.Say(caller, "Ustawiono ilość środków drużyny");
+                ChatHelper.Say(caller, "Ustawiono ilość środków drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić ilości środków drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -540,7 +549,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 ShowSyntax(caller);
                 return;
             }
@@ -552,22 +561,22 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 if (!double.TryParse(command[1], out double amount))
                 {
-                    UnturnedChat.Say(caller, "Musisz podać ilość środków do zdeponowania");
+                    ChatHelper.Say(caller, "Musisz podać ilość środków do zdeponowania");
                     return;
                 }
 
                 teamManager.DepositIntoBank(team, amount);
-                UnturnedChat.Say(caller, "Zdeponowano środki do banku drużyny");
+                ChatHelper.Say(caller, "Zdeponowano środki do banku drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zdeponować środków do banku drużyny z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zdeponować środków do banku drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -575,7 +584,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
                 ShowSyntax(caller);
                 return;
             }
@@ -587,22 +596,22 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, "Nie znaleziono drużyny");
                     return;
                 }
 
                 if (!double.TryParse(command[1], out double amount))
                 {
-                    UnturnedChat.Say(caller, "Musisz podać ilość środków do zdeponowania");
+                    ChatHelper.Say(caller, "Musisz podać ilość środków do zdeponowania");
                     return;
                 }
 
                 teamManager.WithdrawFromBank(team, amount);
-                UnturnedChat.Say(caller, "Wypłacono środki z banku drużyny");
+                ChatHelper.Say(caller, "Wypłacono środki z banku drużyny");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się wypłacić środków z banku drużyny z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się wypłacić środków z banku drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
     }

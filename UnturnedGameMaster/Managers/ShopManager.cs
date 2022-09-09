@@ -22,7 +22,7 @@ namespace UnturnedGameMaster.Managers
 
         public event EventHandler<ShopItemEventArgs> OnShopItemAdded;
         public event EventHandler<ShopItemEventArgs> OnShopItemRemoved;
-        public event EventHandler<ShopItemEventArgs> OnShopItemBought;
+        public event EventHandler<BuyItemEventArgs> OnShopItemBought;
         public event EventHandler<ShopItemEventArgs> OnShopItemPriceChanged;
         public void Init()
         { }
@@ -143,7 +143,8 @@ namespace UnturnedGameMaster.Managers
                 throw new Exception($"Nie udało się dodać {shopItem.Name} (x{amount}) do ekwipunku gracza, konto nieobciążone");
 
             teamManager.WithdrawFromBank(team, shopItem.Price * amount);
-            OnShopItemBought?.Invoke(this, new ShopItemEventArgs(shopItem));
+
+            OnShopItemBought?.Invoke(this, new BuyItemEventArgs(shopItem, buyer, team, amount, shopItem.Price*amount));
             return true;
         }
     }

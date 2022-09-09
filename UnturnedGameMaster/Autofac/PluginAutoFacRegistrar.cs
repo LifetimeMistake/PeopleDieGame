@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Providers;
+using UnturnedGameMaster.Managers.EventMessageManagers;
 
 namespace UnturnedGameMaster.Autofac
 {
@@ -32,6 +33,7 @@ namespace UnturnedGameMaster.Autofac
             builder.RegisterType<ShopManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<RewardManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<ArenaManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            builder.RegisterType<TeamEventMessageManager>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
 
             builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);

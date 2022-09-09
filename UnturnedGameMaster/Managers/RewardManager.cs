@@ -46,14 +46,8 @@ namespace UnturnedGameMaster.Managers
             switch (cause)
             {
                 case SDG.Unturned.EDeathCause.GUN:
-                    PlayerKill(victimData, killerData);
-                    break;
                 case SDG.Unturned.EDeathCause.MELEE:
-                    PlayerKill(victimData, killerData);
-                    break;
                 case SDG.Unturned.EDeathCause.PUNCH:
-                    PlayerKill(victimData, killerData);
-                    break;
                 case SDG.Unturned.EDeathCause.ROADKILL:
                     PlayerKill(victimData, killerData);
                     break;

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Providers;
 
@@ -30,7 +31,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if(command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -50,7 +51,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     VerbSetState(caller, command.Skip(1).ToArray());
                     break;
                 default:
-                    UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
+                    ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
             }
@@ -58,7 +59,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         private void VerbStartGame(IRocketPlayer caller)
@@ -67,11 +68,11 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 gameManager.StartGame();
-                UnturnedChat.Say(caller, "Rozpoczęto grę.");
+                ChatHelper.Say(caller, "Rozpoczęto grę.");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się rozpocząć gry z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się rozpocząć gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -81,11 +82,11 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 gameManager.EndGame();
-                UnturnedChat.Say(caller, "Zakończono grę.");
+                ChatHelper.Say(caller, "Zakończono grę.");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zakończyć gry z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zakończyć gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -96,11 +97,11 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 GameState state = gameManager.GetGameState();
                 string stateName = $"[{state}] {GameStateFriendlyNameProvider.GetFriendlyName(state)}";
-                UnturnedChat.Say(caller, $"Aktualny stan gry: {stateName}");
+                ChatHelper.Say(caller, $"Aktualny stan gry: {stateName}");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się odczytać stanu gry z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się odczytać stanu gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -108,7 +109,7 @@ namespace UnturnedGameMaster.Commands.Admin
         { 
             if(command.Length != 1)
             {
-                UnturnedChat.Say(caller, "Musisz podać stan gry.");
+                ChatHelper.Say(caller, "Musisz podać stan gry.");
                 ShowSyntax(caller);
                 return;
             }
@@ -121,15 +122,15 @@ namespace UnturnedGameMaster.Commands.Admin
                     throw new ArgumentException(nameof(command));
 
                 gameManager.SetGameState(gameState);
-                UnturnedChat.Say(caller, "Ustawiono nowy stan gry.");
+                ChatHelper.Say(caller, "Ustawiono nowy stan gry.");
             }
             catch(ArgumentException)
             {
-                UnturnedChat.Say(caller, $"Niepoprawny stan gry, dozwolone wartości: {string.Join(", ", Enum.GetNames(typeof(GameState)))}");
+                ChatHelper.Say(caller, $"Niepoprawny stan gry, dozwolone wartości: {string.Join(", ", Enum.GetNames(typeof(GameState)))}");
             }
             catch(Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić stanu gry z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić stanu gry z powodu błedu serwera: {ex.Message}");
             }
         }
     }
