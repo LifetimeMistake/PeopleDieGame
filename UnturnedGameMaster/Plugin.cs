@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Providers;
@@ -31,12 +32,12 @@ namespace UnturnedGameMaster
                 manager.Init();
             }
 
-            UnturnedChat.Say("Game manager loaded!");
+            ChatHelper.Say("Game manager loaded!");
         }
 
         protected override void Unload()
         {
-            UnturnedChat.Say("Game manager unloading!");
+            ChatHelper.Say("Game manager unloading!");
 
             // Dispose all managers
             foreach (IDisposableManager manager in serviceLocator.LocateServicesOfType<IDisposableManager>())

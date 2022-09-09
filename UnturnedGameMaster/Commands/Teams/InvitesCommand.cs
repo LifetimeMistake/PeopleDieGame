@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -36,20 +37,20 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if (gameManager.GetGameState() != Enums.GameState.InLobby)
                 {
-                    UnturnedChat.Say(caller, "Nie można wyświetlać listy zaproszeń do drużyn po rozpoczęciu gry!");
+                    ChatHelper.Say(caller, "Nie można wyświetlać listy zaproszeń do drużyn po rozpoczęciu gry!");
                     return;
                 }
 
                 PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
-                    UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                    ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                     return;
                 }
 
                 if (callerPlayerData.TeamId.HasValue)
                 {
-                    UnturnedChat.Say(caller, "Już należysz do drużyny!");
+                    ChatHelper.Say(caller, "Już należysz do drużyny!");
                     return;
                 }
 
@@ -63,19 +64,21 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 if(teamInvitations.Count == 0)
                 {
-                    UnturnedChat.Say(caller, "Nie posiadasz żadnych oczekujących zaproszeń.");
+                    ChatHelper.Say(caller, "Nie posiadasz żadnych oczekujących zaproszeń.");
                     return;
                 }
 
-                UnturnedChat.Say(caller, "Twoje oczekujące zaproszenia:");
+                StringBuilder sb = new StringBuilder();
+                ChatHelper.Say(caller, "Twoje oczekujące zaproszenia:");
                 foreach (KeyValuePair<Team, TeamInvitation> kvp in teamInvitations)
                 {
-                    UnturnedChat.Say(caller, $"Zaproszenie do \"{kvp.Key.Name}\", wysłano {(DateTime.Now - kvp.Value.InviteDate).TotalSeconds}s temu, wygasa za {kvp.Value.GetTimeRemaining().TotalSeconds}s");
+                    sb.AppendLine($"Zaproszenie do \"{kvp.Key.Name}\", wysłano {(DateTime.Now - kvp.Value.InviteDate).TotalSeconds}s temu, wygasa za {kvp.Value.GetTimeRemaining().TotalSeconds}s");
                 }
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się wyświetlić listy zaproszeń z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się wyświetlić listy zaproszeń z powodu błedu serwera: {ex.Message}");
             }
         }
     }

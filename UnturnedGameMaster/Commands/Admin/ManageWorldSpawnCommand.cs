@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -30,7 +31,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -44,7 +45,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     VerbReset(caller);
                     break;
                 default:
-                    UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
+                    ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
             }
@@ -52,7 +53,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         private void VerbSet(IRocketPlayer caller)
@@ -65,11 +66,11 @@ namespace UnturnedGameMaster.Commands.Admin
                 VectorPAR? respawnPoint = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
                 respawnManager.SetWorldRespawnPoint(respawnPoint);
 
-                UnturnedChat.Say(caller, "Ustawiono spawn świata");
+                ChatHelper.Say(caller, "Ustawiono spawn świata");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić spawn świata z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić spawn świata z powodu błedu serwera: {ex.Message}");
                 return;
             }
         }
@@ -81,11 +82,11 @@ namespace UnturnedGameMaster.Commands.Admin
                 RespawnManager respawnManager = ServiceLocator.Instance.LocateService<RespawnManager>();
                 respawnManager.SetWorldRespawnPoint(null);
 
-                UnturnedChat.Say(caller, "Zresetowano spawn świata");
+                ChatHelper.Say(caller, "Zresetowano spawn świata");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się zresetować spawn świata z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się zresetować spawn świata z powodu błedu serwera: {ex.Message}");
                 return;
             }
         }

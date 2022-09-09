@@ -103,7 +103,11 @@
     <Compile Include="Controllers\IBossController.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
+    <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Managers\ArenaManager.cs" />
+    <Compile Include="Managers\EventMessageManagers\RewardEventMessageManager.cs" />
+    <Compile Include="Managers\EventMessageManagers\ShopEventMessageManager.cs" />
+    <Compile Include="Managers\EventMessageManagers\TeamEventMessageManager.cs" />
     <Compile Include="Managers\RewardManager.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\GameManager.cs" />
@@ -116,11 +120,14 @@
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
     <Compile Include="Models\EventArgs\BossFightEventArgs.cs" />
+    <Compile Include="Models\EventArgs\BuyItemEventArgs.cs" />
+    <Compile Include="Models\EventArgs\RewardEventArgs.cs" />
     <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
     <Compile Include="Models\BossFight.cs" />
     <Compile Include="Models\Bosses\IBoss.cs" />
     <Compile Include="Models\BossArena.cs" />
     <Compile Include="Models\EventArgs\ArenaEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamBankEventArgs.cs" />
     <Compile Include="Models\ShopItem.cs" />
     <Compile Include="Models\EventArgs\LoadoutAppliedEventArgs.cs" />
     <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />

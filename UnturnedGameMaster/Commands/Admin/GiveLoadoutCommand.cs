@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.Exception;
@@ -32,7 +33,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -46,7 +47,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 Loadout loadout = loadoutManager.ResolveLoadout(command[0], false);
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, "Nie znaleziono zestawu");
+                    ChatHelper.Say(caller, "Nie znaleziono zestawu");
                     return;
                 }
 
@@ -55,7 +56,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                        ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
                 }
@@ -64,28 +65,28 @@ namespace UnturnedGameMaster.Commands.Admin
                     playerData = playerDataManager.ResolvePlayer(command[1], false);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{command[1]}\"");
+                        ChatHelper.Say(caller, $"Nie znaleziono gracza \"{command[1]}\"");
                         return;
                     }
                 }
 
 
                 loadoutManager.GiveLoadout(playerData, loadout);
-                UnturnedChat.Say(caller, "Nadano zestaw wyposażenia");
+                ChatHelper.Say(caller, "Nadano zestaw wyposażenia");
             }
             catch (PlayerOfflineException)
             {
-                UnturnedChat.Say(caller, "Gracz docelowy nie znajduje się obecnie na serwerze.");
+                ChatHelper.Say(caller, "Gracz docelowy nie znajduje się obecnie na serwerze.");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się nadać zestawu z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się nadać zestawu z powodu błedu serwera: {ex.Message}");
             }
         }
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
     }
 }

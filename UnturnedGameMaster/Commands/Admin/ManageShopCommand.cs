@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -29,7 +30,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -57,7 +58,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         private void VerbList(IRocketPlayer caller, string[] command)
@@ -66,22 +67,22 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
 
-                UnturnedChat.Say(caller, "Lista przedmiotów w sklepie:");
+                ChatHelper.Say(caller, "Lista przedmiotów w sklepie:");
                 foreach (ShopItem item in shopManager.GetItemList())
                 {
-                    UnturnedChat.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
+                    ChatHelper.Say(caller, $"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
                 }
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
             }
         }
         private void VerbAddItem(IRocketPlayer caller, string[] command)
         {
             if (command.Length != 2)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
                 return;
             }
 
@@ -93,13 +94,13 @@ namespace UnturnedGameMaster.Commands.Admin
                 double price;
                 if (!double.TryParse(command[1], out price))
                 {
-                    UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                    ChatHelper.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
                     return;
                 }
 
                 if (shopItem != null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot \"{shopItem.Name}\" znajduje się już w sklepie");
+                    ChatHelper.Say(caller, $"Przedmiot \"{shopItem.Name}\" znajduje się już w sklepie");
                     return;
                 }
 
@@ -110,7 +111,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     item = Assets.find(EAssetType.ITEM, id) as ItemAsset;
                     if (item == null)
                     {
-                        UnturnedChat.Say(caller, $"Przedmiot z ID {id} nie istnieje");
+                        ChatHelper.Say(caller, $"Przedmiot z ID {id} nie istnieje");
                         return;
                     }
                 }
@@ -119,7 +120,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     item = Assets.find(EAssetType.ITEM).FirstOrDefault(x => x.FriendlyName != null && x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
                     if (item == null)
                     {
-                        UnturnedChat.Say(caller, $"Przedmiot o nazwie \"{command[0]}\" nie istnieje");
+                        ChatHelper.Say(caller, $"Przedmiot o nazwie \"{command[0]}\" nie istnieje");
                         return;
                     }
                 }
@@ -127,15 +128,15 @@ namespace UnturnedGameMaster.Commands.Admin
                 shopItem = shopManager.AddItem(item.id, price);
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, "Nie udało się dodać przedmiotu do sklepu");
+                    ChatHelper.Say(caller, "Nie udało się dodać przedmiotu do sklepu");
                     return;
                 }
 
-                UnturnedChat.Say(caller, $"Dodano przedmiot z ID: {shopItem.UnturnedItemId}, cena: ${shopItem.Price}");
+                ChatHelper.Say(caller, $"Dodano przedmiot z ID: {shopItem.UnturnedItemId}, cena: ${shopItem.Price}");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex}");
+                ChatHelper.Say(caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex}");
             }
         }
 
@@ -143,7 +144,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID przedmiotu");
                 return;
             }
 
@@ -154,21 +155,21 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
+                    ChatHelper.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
                 if(!shopManager.RemoveItem(shopItem.UnturnedItemId))
                 {
-                    UnturnedChat.Say(caller, "Nie udało się usunąć przedmiotu z sklepu z powodu błedu systemu");
+                    ChatHelper.Say(caller, "Nie udało się usunąć przedmiotu z sklepu z powodu błedu systemu");
                     return;
                 }
 
-                UnturnedChat.Say(caller, "Usunięto przedmiot ze sklepu");
+                ChatHelper.Say(caller, "Usunięto przedmiot ze sklepu");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się usunąć przedmiotu ze sklepu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się usunąć przedmiotu ze sklepu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -176,14 +177,14 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length != 2)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID przedmiotu oraz jego cenę");
                 return;
             }
 
             double price;
             if (!double.TryParse(command[1], out price))
             {
-                UnturnedChat.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
+                ChatHelper.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
                 return;
             }
 
@@ -194,20 +195,20 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
+                    ChatHelper.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
                 shopManager.SetItemPrice(shopItem, price);
-                UnturnedChat.Say(caller, "Ustawiono cenę przedmiotu");
+                ChatHelper.Say(caller, "Ustawiono cenę przedmiotu");
             }
             catch (ArgumentOutOfRangeException)
             {
-                UnturnedChat.Say(caller, "Cena przedmiotu nie może być ujemna");
+                ChatHelper.Say(caller, "Cena przedmiotu nie może być ujemna");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić ceny przedmiotu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić ceny przedmiotu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -215,7 +216,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID przedmiotu");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID przedmiotu");
                 return;
             }
 
@@ -226,16 +227,18 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (shopItem == null)
                 {
-                    UnturnedChat.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
+                    ChatHelper.Say(caller, $"Przedmiot \"{command[0]}\" nie znajduje się w sklepie lub nie istnieje");
                     return;
                 }
 
+                StringBuilder sb = new StringBuilder();
                 foreach (string line in shopManager.GetItemSummary(shopItem).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    UnturnedChat.Say(caller, line);
+                    sb.AppendLine(line);
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
             }
         }
     }

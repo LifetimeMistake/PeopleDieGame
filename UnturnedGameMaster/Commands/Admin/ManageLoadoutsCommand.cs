@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
@@ -28,7 +29,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -58,7 +59,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     VerbSetDescription(caller, verbArgs);
                     break;
                 default:
-                    UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
+                    ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
             }
@@ -66,14 +67,14 @@ namespace UnturnedGameMaster.Commands.Admin
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         public void VerbInspect(IRocketPlayer caller, string[] command)
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID zestawu");
                 return;
             }
             try
@@ -84,23 +85,27 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu \"{searchTerm}\"");
                     return;
                 }
 
-                UnturnedChat.Say(caller, $"ID: {loadout.Id}");
-                UnturnedChat.Say(caller, $"Nazwa: {loadout.Name}");
-                UnturnedChat.Say(caller, $"Opis: {loadout.Description}");
+                StringBuilder sb = new StringBuilder();
 
-                UnturnedChat.Say(caller, $"Przedmioty:");
+                sb.AppendLine($"ID: {loadout.Id}");
+                sb.AppendLine($"Nazwa: {loadout.Name}");
+                sb.AppendLine($"Opis: {loadout.Description}");
+
+                sb.AppendLine($"Przedmioty:");
                 foreach (KeyValuePair<int, int> item in loadout.GetItems())
                 {
-                    UnturnedChat.Say(caller, $"\t{item.Key} x{item.Value}");
+                    sb.AppendLine($"\t{item.Key} x{item.Value}");
                 }
+
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się pobrać informacji o zestawie z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o zestawie z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -108,7 +113,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać nazwę zestawu");
+                ChatHelper.Say(caller, $"Musisz podać nazwę zestawu");
                 return;
             }
 
@@ -117,7 +122,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
                 if (loadoutManager.GetLoadoutByName(command[0]) != null)
                 {
-                    UnturnedChat.Say(caller, "Zestaw wyposażenia o tej nazwie już istnieje!");
+                    ChatHelper.Say(caller, "Zestaw wyposażenia o tej nazwie już istnieje!");
                     return;
                 }
 
@@ -134,25 +139,25 @@ namespace UnturnedGameMaster.Commands.Admin
 
                         if (!int.TryParse(parts[1], out amount))
                         {
-                            UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć liczby przedmiotów \"{parts[1]}\", ustawianie wartości na 1.");
+                            ChatHelper.Say(caller, $"Warn: Nie udało się przetworzyć liczby przedmiotów \"{parts[1]}\", ustawianie wartości na 1.");
                             amount = 1;
                         }
                     }
 
                     if (!int.TryParse(itemIdString, out itemId))
                     {
-                        UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{itemIdString}\", przedmiot pominięty.");
+                        ChatHelper.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{itemIdString}\", przedmiot pominięty.");
                         continue; // failed to parse item Id
                     }
 
                     loadout.AddItem(itemId, amount);
                 }
 
-                UnturnedChat.Say(caller, $"Utworzono zestaw wyposażenia z ID {loadout.Id}");
+                ChatHelper.Say(caller, $"Utworzono zestaw wyposażenia z ID {loadout.Id}");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się utworzyć zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się utworzyć zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -160,7 +165,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID zestawu");
                 return;
             }
             try
@@ -171,16 +176,16 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono wyposażenia \"{searchTerm}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono wyposażenia \"{searchTerm}\"");
                     return;
                 }
 
                 loadoutManager.DeleteLoadout(loadout.Id);
-                UnturnedChat.Say(caller, "Usunięto wyposażenie");
+                ChatHelper.Say(caller, "Usunięto wyposażenie");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się usunąć zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się usunąć zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -188,7 +193,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length < 2)
             {
-                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
                 return;
             }
 
@@ -199,7 +204,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
                     return;
                 }
 
@@ -215,24 +220,24 @@ namespace UnturnedGameMaster.Commands.Admin
 
                         if (!int.TryParse(parts[1], out amount))
                         {
-                            UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć liczby przedmiotów \"{parts[1]}\", ustawianie wartości na 1.");
+                            ChatHelper.Say(caller, $"Warn: Nie udało się przetworzyć liczby przedmiotów \"{parts[1]}\", ustawianie wartości na 1.");
                             amount = 1;
                         }
                     }
 
                     if (!int.TryParse(itemIdString, out itemId))
                     {
-                        UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{itemIdString}\", przedmiot pominięty.");
+                        ChatHelper.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{itemIdString}\", przedmiot pominięty.");
                         continue; // failed to parse item Id
                     }
 
                     loadout.AddItemOrAddAmount(itemId, amount);
                 }
-                UnturnedChat.Say(caller, "Dodano przedmioty do zestawu wyposażenia");
+                ChatHelper.Say(caller, "Dodano przedmioty do zestawu wyposażenia");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się dodać przedmiotu do zestawu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się dodać przedmiotu do zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -240,7 +245,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length < 2)
             {
-                UnturnedChat.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID zestawu oraz ID przedmiotu");
                 return;
             }
 
@@ -251,7 +256,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
                     return;
                 }
 
@@ -261,17 +266,17 @@ namespace UnturnedGameMaster.Commands.Admin
 
                     if (!int.TryParse(item, out itemId))
                     {
-                        UnturnedChat.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{item}\", przedmiot pominięty.");
+                        ChatHelper.Say(caller, $"Warn: Nie udało się przetworzyć przedmiotu o Id \"{item}\", przedmiot pominięty.");
                         continue; // failed to parse item Id
                     }
 
                     loadout.RemoveItem(itemId);
                 }
-                UnturnedChat.Say(caller, "Usunięto przedmioty z zestawu wyposażenia");
+                ChatHelper.Say(caller, "Usunięto przedmioty z zestawu wyposażenia");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się usunąć przedmiotu z zestawu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się usunąć przedmiotu z zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -279,7 +284,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID zestawu");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID zestawu");
                 return;
             }
 
@@ -290,22 +295,22 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
                     return;
                 }
 
                 string name = string.Join(" ", command.Skip(1));
                 loadout.SetName(name);
 
-                UnturnedChat.Say(caller, $"Ustawiono nazwę zestawu na \"{name}\"");
+                ChatHelper.Say(caller, $"Ustawiono nazwę zestawu na \"{name}\"");
             }
             catch (ArgumentException)
             {
-                UnturnedChat.Say(caller, "Nazwa zestawu nie może być pusta");
+                ChatHelper.Say(caller, "Nazwa zestawu nie może być pusta");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić nazwy zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -313,7 +318,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, "Musisz podać nazwę lub ID zestawu");
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID zestawu");
                 return;
             }
 
@@ -324,18 +329,18 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (loadout == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu \"{command[0]}\"");
                     return;
                 }
 
                 string desc = string.Join(" ", command.Skip(1));
                 loadout.SetDescription(desc);
 
-                UnturnedChat.Say(caller, $"Ustawiono opis zestawu na \"{desc}\"");
+                ChatHelper.Say(caller, $"Ustawiono opis zestawu na \"{desc}\"");
             }
             catch (Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się ustawić opisu zestawu z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się ustawić opisu zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
     }

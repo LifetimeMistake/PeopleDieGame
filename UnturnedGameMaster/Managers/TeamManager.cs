@@ -33,9 +33,9 @@ namespace UnturnedGameMaster.Managers
         public event EventHandler<TeamInvitationEventArgs> OnInvitationCancelled;
         public event EventHandler<TeamInvitationEventArgs> OnInvitationAccepted;
         public event EventHandler<TeamInvitationEventArgs> OnInvitationRejected;
-        public event EventHandler<TeamEventArgs> OnBankBalanceChanged;
-        public event EventHandler<TeamEventArgs> OnBankDepositedInto;
-        public event EventHandler<TeamEventArgs> OnBankWithdrawnFrom;
+        public event EventHandler<TeamBankEventArgs> OnBankBalanceChanged;
+        public event EventHandler<TeamBankEventArgs> OnBankDepositedInto;
+        public event EventHandler<TeamBankEventArgs> OnBankWithdrawnFrom;
 
         public void Init()
         { }
@@ -289,21 +289,21 @@ namespace UnturnedGameMaster.Managers
         public void SetBankBalance(Team team, double amount)
         {
             team.SetBalance(amount);
-            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
+            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
         public void DepositIntoBank(Team team, double amount)
         {
             team.Deposit(amount);
-            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
-            OnBankDepositedInto?.Invoke(this, new TeamEventArgs(team));
+            OnBankDepositedInto?.Invoke(this, new TeamBankEventArgs(team, amount));
+            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
         public void WithdrawFromBank(Team team, double amount)
         {
             team.Withdraw(amount);
-            OnBankBalanceChanged?.Invoke(this, new TeamEventArgs(team));
-            OnBankWithdrawnFrom?.Invoke(this, new TeamEventArgs(team));
+            OnBankWithdrawnFrom?.Invoke(this, new TeamBankEventArgs(team, amount));
+            OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
     }
 }

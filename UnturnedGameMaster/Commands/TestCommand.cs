@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnturnedGameMaster.Helpers;
 
 namespace UnturnedGameMaster.Commands
 {
@@ -33,7 +34,7 @@ namespace UnturnedGameMaster.Commands
             Ray ray = new Ray(player.look.aim.position, player.look.aim.forward);
             if (!Physics.Raycast(ray, out hit, 100, RayMasks.GROUND))
             {
-                UnturnedChat.Say("no luck");
+                ChatHelper.Say("no luck");
                 return;
             }
 

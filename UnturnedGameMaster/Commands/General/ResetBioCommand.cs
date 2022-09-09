@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -32,12 +33,12 @@ namespace UnturnedGameMaster.Commands.General
             PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
             if (playerData == null)
             {
-                UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                 return;
             }
 
             playerData.SetBio("");
-            UnturnedChat.Say(caller, "Zresetowano twoje bio!");
+            ChatHelper.Say(caller, "Zresetowano twoje bio!");
         }
     }
 }

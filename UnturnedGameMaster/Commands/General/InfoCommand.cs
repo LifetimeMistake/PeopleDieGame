@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
@@ -33,7 +34,7 @@ namespace UnturnedGameMaster.Commands.General
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, $"Musisz podać argument.");
+                ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
                 return;
             }
@@ -51,7 +52,7 @@ namespace UnturnedGameMaster.Commands.General
                     VerbGameInfo(caller);
                     break;
                 default:
-                    UnturnedChat.Say(caller, $"Nieprawidłowy argument.");
+                    ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
             }
@@ -59,7 +60,7 @@ namespace UnturnedGameMaster.Commands.General
 
         private void ShowSyntax(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, $"/{Name} {Syntax}");
+            ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
         private void VerbPlayerInfo(IRocketPlayer caller, string[] command)
@@ -74,7 +75,7 @@ namespace UnturnedGameMaster.Commands.General
                     playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                        ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
                 }
@@ -84,17 +85,19 @@ namespace UnturnedGameMaster.Commands.General
                     playerData = playerDataManager.ResolvePlayer(searchTerm, false);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, $"Nie znaleziono gracza \"{searchTerm}\"");
+                        ChatHelper.Say(caller, $"Nie znaleziono gracza \"{searchTerm}\"");
                         return;
                     }
                 }
 
+                StringBuilder sb = new StringBuilder();
                 foreach (string line in playerDataManager.GetPlayerSummary(playerData).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    UnturnedChat.Say(caller, line);
+                    sb.AppendLine(line);
+                ChatHelper.Say(caller, sb);
             }
             catch(Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się odnaleźć danych gracza z powodu błedu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się odnaleźć danych gracza z powodu błedu serwera: {ex.Message}");
                 return;
             }
         }
@@ -112,13 +115,13 @@ namespace UnturnedGameMaster.Commands.General
                     PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
-                        UnturnedChat.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
+                        ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                         return;
                     }
 
                     if (!playerData.TeamId.HasValue)
                     {
-                        UnturnedChat.Say(caller, "Nie należysz do żadnej z drużyn.");
+                        ChatHelper.Say(caller, "Nie należysz do żadnej z drużyn.");
                         return;
                     }
 
@@ -132,16 +135,18 @@ namespace UnturnedGameMaster.Commands.General
 
                 if (team == null)
                 {
-                    UnturnedChat.Say(caller, $"Nie znaleziono drużyny");
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny");
                     return;
                 }
 
+                StringBuilder sb = new StringBuilder();
                 foreach (string line in teamManager.GetTeamSummary(team).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    UnturnedChat.Say(caller, line);
+                    sb.AppendLine(line);
+                ChatHelper.Say(caller, sb);
             }
             catch(Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -150,12 +155,14 @@ namespace UnturnedGameMaster.Commands.General
             try
             {
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
-                foreach(string line in gameManager.GetGameSummary().Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    UnturnedChat.Say(caller, line);
+                StringBuilder sb = new StringBuilder();
+                foreach (string line in gameManager.GetGameSummary().Split(new[] { Environment.NewLine }, StringSplitOptions.None))
+                    sb.AppendLine(line);
+                ChatHelper.Say(caller, sb);
             }
             catch(Exception ex)
             {
-                UnturnedChat.Say(caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
             }
         }
     }
