@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UnturnedGameMaster.Models
@@ -46,10 +42,7 @@ namespace UnturnedGameMaster.Models
 
         public void SetBoss(IBoss model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-
-            BossModel = model;
+            BossModel = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public void SetActivationDistance(double distance)

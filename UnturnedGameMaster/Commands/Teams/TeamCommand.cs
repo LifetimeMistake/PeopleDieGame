@@ -1,17 +1,12 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
-using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
-using static Rocket.Unturned.Events.UnturnedPlayerEvents;
 
 namespace UnturnedGameMaster.Commands.Teams
 {
@@ -247,7 +242,7 @@ namespace UnturnedGameMaster.Commands.Teams
                         ChatHelper.Say(caller, $"Gracz należy już do Twojej drużyny");
                     else
                         ChatHelper.Say(caller, $"Gracz należy już do innej drużyny");
-                    
+
                     return;
                 }
 
@@ -265,7 +260,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 ChatHelper.Say(caller, $"Wysłano zaproszenie do \"{targetPlayerData.Name}\"!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }

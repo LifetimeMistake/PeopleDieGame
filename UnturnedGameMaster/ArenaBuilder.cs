@@ -1,10 +1,4 @@
-﻿using Steamworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System;
 using UnityEngine;
 using UnturnedGameMaster.Models;
 
@@ -79,10 +73,7 @@ namespace UnturnedGameMaster
 
         public void SetBoss(IBoss model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-
-            bossModel = model;
+            bossModel = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public BossArena ToArena(int arenaId)

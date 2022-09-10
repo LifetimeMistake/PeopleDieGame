@@ -1,11 +1,9 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -62,7 +60,7 @@ namespace UnturnedGameMaster.Commands.Teams
                         teamInvitations.Add(team, teamInvitation);
                 }
 
-                if(teamInvitations.Count == 0)
+                if (teamInvitations.Count == 0)
                 {
                     ChatHelper.Say(caller, "Nie posiadasz żadnych oczekujących zaproszeń.");
                     return;

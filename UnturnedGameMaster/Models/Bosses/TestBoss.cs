@@ -1,9 +1,4 @@
 ﻿using SDG.Unturned;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnturnedGameMaster.Models.Bosses
 {
@@ -11,18 +6,10 @@ namespace UnturnedGameMaster.Models.Bosses
     {
         public string Name { get; } = "gamingu";
         public double Health { get; } = 1000;
-        public EZombieSpeciality Attributes { get; } = EZombieSpeciality.MEGA | EZombieSpeciality.BOSS_FIRE;
-        public byte HatId { get; }
-        public byte ShirtId { get; }
-        public byte PantsId { get; }
-        public byte GearId { get; }
-
-        public TestBoss(byte hatId, byte shirtId, byte pantsId, byte gearId)
-        {
-            HatId = hatId;
-            ShirtId = shirtId;
-            PantsId = pantsId;
-            GearId = gearId;
-        }
+        public EZombieSpeciality Attributes { get; } = EZombieSpeciality.MEGA;
+        public byte HatId { get; } = 0;
+        public byte ShirtId { get; } = 0;
+        public byte PantsId { get; } = 0;
+        public byte GearId { get; } = 0;
     }
 }

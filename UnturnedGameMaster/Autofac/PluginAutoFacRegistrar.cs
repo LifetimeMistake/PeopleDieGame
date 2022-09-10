@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnturnedGameMaster.Models;
-using UnturnedGameMaster.Managers;
-using UnturnedGameMaster.Providers;
-using UnturnedGameMaster.Managers.EventMessageManagers;
 using System.Reflection;
+using UnturnedGameMaster.Managers;
+using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Autofac
 {

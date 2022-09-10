@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnturnedGameMaster.Models
 {
@@ -27,10 +23,7 @@ namespace UnturnedGameMaster.Models
 
         public void SetBio(string bio)
         {
-            if (bio == null)
-                throw new ArgumentNullException(nameof(bio));
-
-            Bio = bio;
+            Bio = bio ?? throw new ArgumentNullException(nameof(bio));
         }
 
         public void SetName(string name)

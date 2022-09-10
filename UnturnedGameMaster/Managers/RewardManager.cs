@@ -1,18 +1,13 @@
-﻿using Rocket.Unturned.Chat;
-using Rocket.Unturned.Events;
+﻿using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
 
 namespace UnturnedGameMaster.Managers
 {
-    public class RewardManager : IManager
+    public class RewardManager : IDisposableManager
     {
         [InjectDependency]
         private PlayerDataManager playerDataManager { get; set; }
@@ -27,6 +22,12 @@ namespace UnturnedGameMaster.Managers
         {
             UnturnedPlayerEvents.OnPlayerDeath += UnturnedPlayerEvents_OnPlayerDeath;
             UnturnedPlayerEvents.OnPlayerUpdateStat += UnturnedPlayerEvents_OnPlayerUpdateStat;
+        }
+
+        public void Dispose()
+        {
+            UnturnedPlayerEvents.OnPlayerDeath -= UnturnedPlayerEvents_OnPlayerDeath;
+            UnturnedPlayerEvents.OnPlayerUpdateStat -= UnturnedPlayerEvents_OnPlayerUpdateStat;
         }
 
         private void UnturnedPlayerEvents_OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, Steamworks.CSteamID murderer)
@@ -96,7 +97,7 @@ namespace UnturnedGameMaster.Managers
             killer.Deposit(total);
 
             victim.ResetBounty();
-            victim.SetBalance(Math.Round(victim.WalletBalance/2));
+            victim.SetBalance(Math.Round(victim.WalletBalance / 2));
             OnPlayerReceivePlayerReward?.Invoke(this, new RewardEventArgs(killer, total));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }

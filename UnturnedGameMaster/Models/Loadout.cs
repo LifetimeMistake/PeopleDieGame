@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace UnturnedGameMaster
 {
@@ -84,7 +80,7 @@ namespace UnturnedGameMaster
 
         public void SetName(string name)
         {
-            if(name == null)
+            if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
             if (string.IsNullOrWhiteSpace(name))
@@ -95,10 +91,7 @@ namespace UnturnedGameMaster
 
         public void SetDescription(string description)
         {
-            if (description == null)
-                throw new ArgumentNullException(nameof(description));
-
-            Description = description;
+            Description = description ?? throw new ArgumentNullException(nameof(description));
         }
     }
 }

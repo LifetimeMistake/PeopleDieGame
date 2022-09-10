@@ -1,11 +1,6 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -32,13 +27,13 @@ namespace UnturnedGameMaster.Commands.General
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
             PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
 
-            if(playerData == null)
+            if (playerData == null)
             {
                 ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                 return;
             }
 
-            if(command.Length == 0)
+            if (command.Length == 0)
             {
                 ChatHelper.Say(caller, $"Twoje publiczne bio: \"{playerData.Bio}\"");
                 return;

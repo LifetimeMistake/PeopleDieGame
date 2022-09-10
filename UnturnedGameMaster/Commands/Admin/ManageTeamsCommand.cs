@@ -1,12 +1,9 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -446,7 +443,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 team.SetDefaultLoadout(loadout);
                 ChatHelper.Say(caller, "Ustawiono nowy zestaw wyposażenia!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }

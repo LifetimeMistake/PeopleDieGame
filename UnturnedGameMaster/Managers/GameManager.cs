@@ -1,10 +1,6 @@
 ﻿using SDG.Unturned;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Providers;
@@ -14,11 +10,11 @@ namespace UnturnedGameMaster.Managers
     public class GameManager : IManager
     {
         [InjectDependency]
-        private DataManager dataManager{ get; set; }
+        private DataManager dataManager { get; set; }
         [InjectDependency]
-        private TeamManager teamManager{ get; set; }
+        private TeamManager teamManager { get; set; }
         [InjectDependency]
-        private PlayerDataManager playerDataManager{ get; set; }
+        private PlayerDataManager playerDataManager { get; set; }
 
         public event EventHandler OnGameStateChanged;
 

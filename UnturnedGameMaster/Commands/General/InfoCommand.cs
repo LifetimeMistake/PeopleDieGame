@@ -1,14 +1,9 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
-using Rocket.Unturned.Serialisation;
-using SDG.Unturned;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -40,7 +35,7 @@ namespace UnturnedGameMaster.Commands.General
             }
 
             string[] verbArgs = command.Skip(1).ToArray();
-            switch(command[0].ToLowerInvariant())
+            switch (command[0].ToLowerInvariant())
             {
                 case "player":
                     VerbPlayerInfo(caller, verbArgs);
@@ -95,7 +90,7 @@ namespace UnturnedGameMaster.Commands.General
                     sb.AppendLine(line);
                 ChatHelper.Say(caller, sb);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się odnaleźć danych gracza z powodu błedu serwera: {ex.Message}");
                 return;
@@ -144,7 +139,7 @@ namespace UnturnedGameMaster.Commands.General
                     sb.AppendLine(line);
                 ChatHelper.Say(caller, sb);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
             }
@@ -160,7 +155,7 @@ namespace UnturnedGameMaster.Commands.General
                     sb.AppendLine(line);
                 ChatHelper.Say(caller, sb);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
             }

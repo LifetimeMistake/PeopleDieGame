@@ -1,5 +1,4 @@
-﻿using Rocket.Core.Steam;
-using Rocket.Unturned.Chat;
+﻿using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
@@ -7,9 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Controllers;
@@ -34,7 +30,7 @@ namespace UnturnedGameMaster.Managers
         [InjectDependency]
         private TimerManager timerManager { get; set; }
 
-        private List<BossFight> ongoingBossFights;
+        private List<BossFight> ongoingBossFights = new List<BossFight>();
 
         public event EventHandler<ArenaEventArgs> OnArenaCreated;
         public event EventHandler<ArenaEventArgs> OnArenaRemoved;
@@ -42,17 +38,18 @@ namespace UnturnedGameMaster.Managers
         public event EventHandler<BossFightEventArgs> OnBossFightRemoved;
         public event EventHandler<BossFightEventArgs> OnBossFightCompleted;
         public event EventHandler<BossFightEventArgs> OnBossFightFailed;
+        public event EventHandler<BossFightDominationEventArgs> OnBossFightDominantTeamChanged;
 
         public void Init()
         {
-            ongoingBossFights = new List<BossFight>();
-            timerManager.Register(ProcessFightStartConditions, 30);
-            timerManager.Register(ProcessFightEndConditions, 30);
+            timerManager.Register(ProcessFightStartConditions, 60);
+            timerManager.Register(ProcessFightEndConditions, 60);
+            timerManager.Register(UpdateDominantTeams, 60);
             timerManager.Register(UpdateFights, 1);
 
             ArenaBuilder arenaBuilder = new ArenaBuilder();
             arenaBuilder.SetName("augh");
-            arenaBuilder.SetBoss(new TestBoss(0, 0, 0, 0));
+            arenaBuilder.SetBoss(new TestBoss());
             arenaBuilder.SetBossSpawnPoint(new VectorPAR(new Vector3(10, 20, 30), 0));
             arenaBuilder.SetActivationPoint(new Vector3(50, 30, 50));
             arenaBuilder.SetActivationDistance(10);
@@ -68,6 +65,7 @@ namespace UnturnedGameMaster.Managers
             timerManager.Unregister(ProcessFightStartConditions);
             timerManager.Unregister(ProcessFightEndConditions);
             timerManager.Unregister(UpdateFights);
+            timerManager.Unregister(UpdateDominantTeams);
         }
 
         public BossArena CreateArena(ArenaBuilder arenaBuilder)
@@ -147,8 +145,8 @@ namespace UnturnedGameMaster.Managers
 
             Type bossController = Assembly.GetCallingAssembly()
                 .GetTypes()
-                .Where(x => typeof(IBossController).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract)
-                .FirstOrDefault(x => x.GetGenericTypeDefinition().BaseType == bossArena.BossModel.GetType());
+                .Where(x => typeof(BossController<>).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract)
+                .FirstOrDefault(x => x.GetGenericTypeDefinition() == bossArena.BossModel.GetType());
 
             UnturnedChat.Say($"augh {bossController}");
             return null;
@@ -179,7 +177,7 @@ namespace UnturnedGameMaster.Managers
         private void ProcessFightStartConditions()
         {
             List<BossArena> arenas = dataManager.GameData.Arenas.Values.ToList();
-            foreach(UnturnedPlayer player in Provider.clients.Select(x => UnturnedPlayer.FromPlayer(x.player)))
+            foreach (UnturnedPlayer player in Provider.clients.Select(x => UnturnedPlayer.FromSteamPlayer(x)))
             {
                 // Get the arena which the player stepped into
                 BossArena activatedArena = arenas.Where(x => !x.Conquered && !ongoingBossFights.Any(y => y.Arena == x))
@@ -199,7 +197,7 @@ namespace UnturnedGameMaster.Managers
 
         private void ProcessFightEndConditions()
         {
-            foreach (BossFight bossFight in ongoingBossFights)
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing))
             {
                 double deactivationDistance = bossFight.Arena.DeactivationDistance;
 
@@ -228,7 +226,7 @@ namespace UnturnedGameMaster.Managers
 
         private void UpdateFights()
         {
-            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing))
             {
                 if (!bossFight.FightController.Update())
                 {
@@ -240,6 +238,46 @@ namespace UnturnedGameMaster.Managers
                 {
                     EndBossFight(bossFight, BossFightState.BossDefeated);
                     continue;
+                }
+            }
+        }
+
+        private void UpdateDominantTeams()
+        {
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
+            {
+                double deactivationDistance = bossFight.Arena.DeactivationDistance;
+
+                // Find players inside arena
+                Dictionary<int, int> attackerGroups = Provider.clients
+                .Select(x => UnturnedPlayer.FromSteamPlayer(x))
+                .Where(x =>
+                {
+                    return Vector3.Distance(bossFight.Arena.ActivationPoint, x.Position) <= deactivationDistance
+                     || Vector3.Distance(bossFight.Arena.BossSpawnPoint.Position, x.Position) <= deactivationDistance;
+                })
+                // Count the number of attackers from each team
+                .Select(x => playerDataManager.GetPlayer((ulong)x.CSteamID))
+                .Where(x => x != null && x.TeamId.HasValue)
+                .GroupBy(x => x.TeamId)
+                .ToDictionary(x => x.Key.Value, x => x.Count());
+
+                if (attackerGroups.Count != 0 && attackerGroups.ContainsKey(bossFight.DominantTeam.Id))
+                {
+                    KeyValuePair<int, int> dominantKvp = attackerGroups.OrderByDescending(x => x.Value).First();
+                    KeyValuePair<int, int> currentKvp = attackerGroups.First(x => x.Key == bossFight.DominantTeam.Id);
+
+                    if (dominantKvp.Key != currentKvp.Key && dominantKvp.Value > currentKvp.Value)
+                    {
+                        Team dominantTeam = teamManager.GetTeam(dominantKvp.Key);
+                        Team oldTeam = bossFight.DominantTeam;
+
+                        if (dominantTeam != null)
+                        {
+                            bossFight.DominantTeam = dominantTeam;
+                            OnBossFightDominantTeamChanged?.Invoke(this, new BossFightDominationEventArgs(oldTeam, dominantTeam));
+                        }
+                    }
                 }
             }
         }

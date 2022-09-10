@@ -1,10 +1,6 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,13 +11,11 @@ namespace UnturnedGameMaster.Managers
         public delegate void TimerAction();
         private GameObject tickGameObject;
         private GameTickProvider gameTickProvider;
-        private ulong tickCounter;
-        private Dictionary<TimerAction, ulong> timers;
+        private ulong tickCounter = 0;
+        private Dictionary<TimerAction, ulong> timers = new Dictionary<TimerAction, ulong>();
 
         public void Init()
         {
-            timers = new Dictionary<TimerAction, ulong>();
-            tickCounter = 0;
             SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
             InitTickProvider();
         }
@@ -86,7 +80,7 @@ namespace UnturnedGameMaster.Managers
 
         private void GameTickProvider_OnFixedUpdate(object sender, EventArgs e)
         {
-            foreach(KeyValuePair<TimerAction, ulong> kvp in timers)
+            foreach (KeyValuePair<TimerAction, ulong> kvp in timers)
             {
                 if (tickCounter % kvp.Value == 0)
                 {

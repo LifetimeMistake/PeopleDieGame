@@ -1,25 +1,20 @@
 ﻿using Rocket.Unturned.Events;
-using Rocket.Unturned.Player;
-using SDG.Unturned;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
-using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
 {
     public class PlayerDataManager : IDisposableManager
     {
         [InjectDependency]
-        private DataManager dataManager{ get; set; }
+        private DataManager dataManager { get; set; }
         [InjectDependency]
-        private TeamManager teamManager{ get; set; }
+        private TeamManager teamManager { get; set; }
 
         public event EventHandler<PlayerEventArgs> OnWalletBalanceChanged;
         public event EventHandler<PlayerEventArgs> OnWalletDepositedInto;
@@ -40,7 +35,7 @@ namespace UnturnedGameMaster.Managers
             Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
             PlayerData playerData = GetPlayer((ulong)player.CSteamID);
 
-            if(playerData == null)
+            if (playerData == null)
             {
                 // register a new player
                 playerData = new PlayerData((ulong)player.CSteamID, player.CharacterName);
@@ -92,9 +87,9 @@ namespace UnturnedGameMaster.Managers
             }
 
             // otherwise try matching by name
-            return GetPlayerByName(playerNameOrId, exactMatch); 
+            return GetPlayerByName(playerNameOrId, exactMatch);
         }
-        
+
         public string GetPlayerSummary(PlayerData playerData)
         {
             StringBuilder sb = new StringBuilder();

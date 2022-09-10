@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
-using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
 {
@@ -144,7 +142,7 @@ namespace UnturnedGameMaster.Managers
 
             teamManager.WithdrawFromBank(team, shopItem.Price * amount);
 
-            OnShopItemBought?.Invoke(this, new BuyItemEventArgs(shopItem, buyer, team, amount, shopItem.Price*amount));
+            OnShopItemBought?.Invoke(this, new BuyItemEventArgs(shopItem, buyer, team, amount, shopItem.Price * amount));
             return true;
         }
     }

@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UnturnedGameMaster.Providers
@@ -30,7 +25,7 @@ namespace UnturnedGameMaster.Providers
 
         private bool Read()
         {
-            if(!File.Exists(path))
+            if (!File.Exists(path))
                 return false;
 
             Debug.Log($"Loading database from {Path.GetFullPath(path)}");

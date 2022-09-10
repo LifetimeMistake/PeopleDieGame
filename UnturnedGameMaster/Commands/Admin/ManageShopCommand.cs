@@ -1,11 +1,9 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -159,7 +157,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if(!shopManager.RemoveItem(shopItem.UnturnedItemId))
+                if (!shopManager.RemoveItem(shopItem.UnturnedItemId))
                 {
                     ChatHelper.Say(caller, "Nie udało się usunąć przedmiotu z sklepu z powodu błedu systemu");
                     return;

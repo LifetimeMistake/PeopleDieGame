@@ -1,32 +1,25 @@
-﻿using Rocket.Unturned.Chat;
-using Rocket.Unturned.Events;
+﻿using Rocket.Unturned.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
-using UnturnedGameMaster.Providers;
 
 namespace UnturnedGameMaster.Managers
 {
     public class RespawnManager : IDisposableManager
     {
         [InjectDependency]
-        private DataManager dataManager{ get; set; }
+        private DataManager dataManager { get; set; }
         [InjectDependency]
-        private LoadoutManager loadoutManager{ get; set; }
+        private LoadoutManager loadoutManager { get; set; }
         [InjectDependency]
-        private PlayerDataManager playerDataManager{ get; set; }
+        private PlayerDataManager playerDataManager { get; set; }
         [InjectDependency]
-        private TeamManager teamManager{ get; set; }
+        private TeamManager teamManager { get; set; }
         [InjectDependency]
-        private GameManager gameManager{ get; set; }
+        private GameManager gameManager { get; set; }
 
         public event EventHandler<PlayerEventArgs> OnRespawnFinished;
 
@@ -51,7 +44,7 @@ namespace UnturnedGameMaster.Managers
                 ChatHelper.Say(player, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
             }
 
-            if((playerData.TeamId == null || gameManager.GetGameState() == GameState.InLobby) && worldRespawn != null)
+            if ((playerData.TeamId == null || gameManager.GetGameState() == GameState.InLobby) && worldRespawn != null)
             {
                 player.Teleport(worldRespawn.Value.Position, worldRespawn.Value.Rotation);
                 ChatHelper.Say(player, "Budzisz się w globalnym punkcie zbiórki.");
@@ -76,7 +69,7 @@ namespace UnturnedGameMaster.Managers
                         {
                             loadoutManager.GiveLoadout(playerData, loadout);
                         }
-                        catch(Exception)
+                        catch (Exception)
                         {
                             ChatHelper.Say(player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
                         }

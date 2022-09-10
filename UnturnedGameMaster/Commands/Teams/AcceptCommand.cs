@@ -1,16 +1,12 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
-using static Rocket.Unturned.Events.UnturnedPlayerEvents;
 
 namespace UnturnedGameMaster.Commands.Teams
 {
@@ -83,7 +79,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
                 ChatHelper.Say(caller, "Zaakceptowano zaproszenie! Witaj na pokładzie!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się zaakceptować zaproszenia z powodu błedu serwera: {ex.Message}");
             }

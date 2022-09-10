@@ -1,10 +1,7 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Helpers;
@@ -29,7 +26,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            if(command.Length == 0)
+            if (command.Length == 0)
             {
                 ChatHelper.Say(caller, $"Musisz podać argument.");
                 ShowSyntax(caller);
@@ -106,8 +103,8 @@ namespace UnturnedGameMaster.Commands.Admin
         }
 
         private void VerbSetState(IRocketPlayer caller, string[] command)
-        { 
-            if(command.Length != 1)
+        {
+            if (command.Length != 1)
             {
                 ChatHelper.Say(caller, "Musisz podać stan gry.");
                 ShowSyntax(caller);
@@ -124,11 +121,11 @@ namespace UnturnedGameMaster.Commands.Admin
                 gameManager.SetGameState(gameState);
                 ChatHelper.Say(caller, "Ustawiono nowy stan gry.");
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 ChatHelper.Say(caller, $"Niepoprawny stan gry, dozwolone wartości: {string.Join(", ", Enum.GetNames(typeof(GameState)))}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się ustawić stanu gry z powodu błedu serwera: {ex.Message}");
             }
