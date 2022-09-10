@@ -13,10 +13,10 @@ namespace UnturnedGameMaster
     public class ArenaBuilder
     {
         private string arenaName;
-        private double activationDistance;
-        private double deactivationDistance;
-        private double completionBounty;
-        private double completionReward;
+        private double activationDistance = 0;
+        private double deactivationDistance = 0;
+        private double completionBounty = 0;
+        private double completionReward = 0;
         private Vector3 activationPoint;
         private VectorPAR bossSpawnpoint;
         private VectorPAR rewardSpawnpoint;
@@ -62,7 +62,7 @@ namespace UnturnedGameMaster
             completionBounty = bounty;
         }
 
-        public void SetBossSpawnPoint(Vector3 point)
+        public void SetActivationPoint(Vector3 point)
         {
             activationPoint = point;
         }

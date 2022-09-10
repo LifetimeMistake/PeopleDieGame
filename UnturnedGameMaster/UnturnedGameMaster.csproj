@@ -100,7 +100,9 @@
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Commands\TestCommand.cs" />
+    <Compile Include="Controllers\BossController.cs" />
     <Compile Include="Controllers\IBossController.cs" />
+    <Compile Include="Controllers\TestBossController.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Managers\IDisposableManager.cs" />
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
+    <Compile Include="Models\Bosses\TestBoss.cs" />
     <Compile Include="Models\EventArgs\BossFightEventArgs.cs" />
     <Compile Include="Models\EventArgs\BuyItemEventArgs.cs" />
     <Compile Include="Models\EventArgs\RewardEventArgs.cs" />

@@ -15,6 +15,7 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Controllers;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Models.Bosses;
 using UnturnedGameMaster.Models.EventArgs;
 using UnturnedGameMaster.Providers;
 
@@ -48,6 +49,18 @@ namespace UnturnedGameMaster.Managers
             timerManager.Register(ProcessFightStartConditions, 30);
             timerManager.Register(ProcessFightEndConditions, 30);
             timerManager.Register(UpdateFights, 1);
+
+            ArenaBuilder arenaBuilder = new ArenaBuilder();
+            arenaBuilder.SetName("augh");
+            arenaBuilder.SetBoss(new TestBoss(0, 0, 0, 0));
+            arenaBuilder.SetBossSpawnPoint(new VectorPAR(new Vector3(10, 20, 30), 0));
+            arenaBuilder.SetActivationPoint(new Vector3(50, 30, 50));
+            arenaBuilder.SetActivationDistance(10);
+            arenaBuilder.SetDeactivationDistance(20);
+            arenaBuilder.SetCompletionReward(100);
+            arenaBuilder.SetCompletionBounty(500);
+
+            BossArena arena = CreateArena(arenaBuilder);
         }
 
         public void Dispose()
@@ -103,6 +116,20 @@ namespace UnturnedGameMaster.Managers
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+        }
+
+        public BossArena ResolveArena(string arenaNameOrId, bool exactMatch)
+        {
+            int id;
+            if (int.TryParse(arenaNameOrId, out id))
+            {
+                BossArena arena = GetArena(id);
+                if (arena != null)
+                    return arena;
+            }
+
+            // otherwise try matching by name
+            return GetArenaByName(arenaNameOrId, exactMatch);
         }
 
         public BossFight CreateBossFight(BossArena bossArena, Team team)
