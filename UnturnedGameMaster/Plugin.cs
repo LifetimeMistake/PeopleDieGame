@@ -1,5 +1,8 @@
-﻿using Rocket.Core.Plugins;
+﻿using HarmonyLib;
+using Rocket.Core.Plugins;
 using System.IO;
+using System.Linq;
+using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
@@ -11,8 +14,13 @@ namespace UnturnedGameMaster
     public class Plugin : RocketPlugin<PluginConfig>
     {
         private ServiceLocator serviceLocator;
+        private Harmony harmony;
         protected override void Load()
         {
+            harmony = new Harmony("UnturnedGameMaster");
+            harmony.PatchAll();
+            Debug.Log($"Patched {harmony.GetPatchedMethods().Count()} game methods");
+
             IDatabaseProvider<GameData> databaseProvider = InitDatabase();
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar(databaseProvider);
             serviceLocator = new ServiceLocator();
@@ -37,6 +45,8 @@ namespace UnturnedGameMaster
             {
                 manager.Dispose();
             }
+
+            harmony.UnpatchAll();
         }
 
         private IDatabaseProvider<GameData> InitDatabase()
