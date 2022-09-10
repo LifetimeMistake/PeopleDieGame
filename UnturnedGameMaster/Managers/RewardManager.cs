@@ -12,7 +12,12 @@ namespace UnturnedGameMaster.Managers
         [InjectDependency]
         private PlayerDataManager playerDataManager { get; set; }
         [InjectDependency]
+        private ArenaManager arenaManager { get; set; }
+        [InjectDependency]
+        private TeamManager teamManager { get; set; }
+        [InjectDependency]
         private DataManager dataManager { get; set; }
+        
 
         public event EventHandler<RewardEventArgs> OnPlayerReceivePlayerReward;
         public event EventHandler<RewardEventArgs> OnPlayerReceiveZombieReward;
@@ -22,12 +27,27 @@ namespace UnturnedGameMaster.Managers
         {
             UnturnedPlayerEvents.OnPlayerDeath += UnturnedPlayerEvents_OnPlayerDeath;
             UnturnedPlayerEvents.OnPlayerUpdateStat += UnturnedPlayerEvents_OnPlayerUpdateStat;
+            arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
         }
 
         public void Dispose()
         {
             UnturnedPlayerEvents.OnPlayerDeath -= UnturnedPlayerEvents_OnPlayerDeath;
             UnturnedPlayerEvents.OnPlayerUpdateStat -= UnturnedPlayerEvents_OnPlayerUpdateStat;
+            arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
+        }
+
+        private void ArenaManager_OnBossFightCompleted(object sender, BossFightEventArgs e)
+        {
+            Team team = e.BossFight.DominantTeam;
+            BossArena arena = e.BossFight.Arena;
+
+            foreach (UnturnedPlayer player in arenaManager.GetPlayersInsideArena(arena, team))
+            {
+                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                playerDataManager.DepositIntoWallet(playerData, arena.CompletionReward);
+                playerDataManager.AddBounty(playerData, arena.CompletionBounty);
+            }
         }
 
         private void UnturnedPlayerEvents_OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, Steamworks.CSteamID murderer)
@@ -93,11 +113,11 @@ namespace UnturnedGameMaster.Managers
             double bounty = dataManager.GameData.Bounty;
             double total = reward + victim.Bounty;
 
-            killer.AddBounty(bounty);
-            killer.Deposit(total);
+            playerDataManager.AddBounty(killer, bounty);
+            playerDataManager.DepositIntoWallet(killer, total);
 
-            victim.ResetBounty();
-            victim.SetBalance(Math.Round(victim.WalletBalance / 2));
+            playerDataManager.ResetBounty(victim);
+            playerDataManager.SetPlayerBalance(victim, Math.Round(victim.WalletBalance / 2));
             OnPlayerReceivePlayerReward?.Invoke(this, new RewardEventArgs(killer, total));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }
@@ -107,13 +127,13 @@ namespace UnturnedGameMaster.Managers
             double reward;
             reward = dataManager.GameData.ZombieKillReward;
 
-            player.Deposit(reward);
+            playerDataManager.DepositIntoWallet(player, reward);
             OnPlayerReceiveZombieReward?.Invoke(this, new RewardEventArgs(player, reward));
         }
 
         public void RandomDeath(PlayerData player)
         {
-            player.SetBalance(Math.Round(player.WalletBalance / 2));
+            playerDataManager.SetPlayerBalance(player, Math.Round(player.WalletBalance / 2));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(player));
         }
     }
