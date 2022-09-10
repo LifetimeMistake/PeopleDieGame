@@ -24,12 +24,21 @@ namespace UnturnedGameMaster.Autofac
         public void RegisterComponents(ContainerBuilder builder)
         {
             AutowirePropertySelector autowirePropertySelector = new AutowirePropertySelector();
+
             IEnumerable<Type> managers = Assembly.GetCallingAssembly()
                 .GetTypes().Where(x => typeof(IManager).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
+
+            IEnumerable<Type> bosses = Assembly.GetCallingAssembly()
+                .GetTypes().Where(x => typeof(IBoss).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
 
             foreach (Type managerType in managers)
             {
                 builder.RegisterType(managerType).InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
+            }
+
+            foreach (Type bossType in bosses)
+            {
+                builder.RegisterType(bossType).InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             }
 
             builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);

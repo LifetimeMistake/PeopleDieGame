@@ -139,10 +139,7 @@ namespace UnturnedGameMaster.Commands.General
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder();
-                foreach (string line in teamManager.GetTeamSummary(team).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    sb.AppendLine(line);
-                ChatHelper.Say(caller, sb);
+                ChatHelper.Say(caller, teamManager.GetTeamSummary(team));
             }
             catch(Exception ex)
             {

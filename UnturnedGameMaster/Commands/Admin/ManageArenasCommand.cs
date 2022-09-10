@@ -1,4 +1,5 @@
 ﻿using Rocket.API;
+using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<setname/setboss/setactdist/setdeactdist/setreward/setbounty> <arenaName/arenaId> <name/boss/distance/amount>";
+        public string Syntax => "<inspect/setname/setboss/setactdist/setdeactdist/setreward/setbounty/setbossspawn/setrewardspawn> <arenaName/arenaId> <name/boss/distance/amount>";
 
         public List<string> Aliases => new List<string>();
 
@@ -37,6 +38,9 @@ namespace UnturnedGameMaster.Commands.Admin
             string[] verbArgs = command.Skip(1).ToArray();
             switch (command[0].ToLowerInvariant())
             {
+                case "inspect":
+                    VerbInspect(caller, verbArgs);
+                    break;
                 case "setname":
                     VerbSetName(caller, verbArgs);
                     break;
@@ -67,11 +71,37 @@ namespace UnturnedGameMaster.Commands.Admin
             ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
+        private void VerbInspect(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID areny");
+                return;
+            }
+            try
+            {
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                BossArena arena = arenaManager.ResolveArena(command[0], false);
+
+                if (arena == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono areny \"{command[0]}\"");
+                    return;
+                }
+
+                ChatHelper.Say(caller, arenaManager.GetArenaSummary(arena));
+            }
+            catch (Exception ex)
+            {
+                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o arenie z powodu błędu serwera: {ex.Message}");
+            }
+        }
         private void VerbSetName(IRocketPlayer caller, string[] command)
         {
             if (command.Length != 2)
             {
                 ChatHelper.Say(caller, "Musisz podać nazwę lub ID areny oraz nową nazwę");
+                return;
             }
 
             try
@@ -104,7 +134,28 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             try
             {
-                ChatHelper.Say(caller, "no");
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                BossArena arena = arenaManager.ResolveArena(command[0], false);
+
+                if (arena == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono areny \"{command[0]}\"");
+                    return;
+                }
+
+                string searchTerm = string.Join(" ", command.Skip(1));
+                IBoss boss = ServiceLocator.Instance.LocateServicesOfType<IBoss>()
+                    .FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant()));
+
+                if (boss == null)
+                {
+                    ChatHelper.Say(caller, "Nie znaleziono podanego boss'a");
+                    return;
+                }
+
+                arena.SetBoss(boss);
+
+                ChatHelper.Say(caller, "Ustawiono boss'a areny");
             }
             catch (Exception ex)
             {
@@ -117,6 +168,7 @@ namespace UnturnedGameMaster.Commands.Admin
             if (command.Length != 2)
             {
                 ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                return;
             }
 
             double distance;
@@ -155,6 +207,7 @@ namespace UnturnedGameMaster.Commands.Admin
             if (command.Length != 2)
             {
                 ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                return;
             }
 
             double distance;
@@ -193,6 +246,7 @@ namespace UnturnedGameMaster.Commands.Admin
             if (command.Length != 2)
             {
                 ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                return;
             }
 
             double reward;
@@ -231,6 +285,7 @@ namespace UnturnedGameMaster.Commands.Admin
             if (command.Length != 2)
             {
                 ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                return;
             }
 
             double bounty;

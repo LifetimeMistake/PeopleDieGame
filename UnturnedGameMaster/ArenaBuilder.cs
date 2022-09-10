@@ -62,7 +62,7 @@ namespace UnturnedGameMaster
             completionBounty = bounty;
         }
 
-        public void SetBossSpawnPoint(Vector3 point)
+        public void SetActivationPoint(Vector3 point)
         {
             activationPoint = point;
         }

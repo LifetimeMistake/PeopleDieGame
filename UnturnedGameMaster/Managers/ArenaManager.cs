@@ -105,6 +105,28 @@ namespace UnturnedGameMaster.Managers
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
+        public StringBuilder GetArenaSummary(BossArena arena)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Nazwa areny: \"{arena.Name}\" | ID: {arena.Id}");
+            
+            if (arena.Conquered)
+                sb.AppendLine($"Status: Pokonana");
+            else
+                sb.AppendLine($"Status: Niepokonana");
+
+            sb.AppendLine($"Nazwa boss'a: \"{arena.BossModel.Name}\"");
+            sb.AppendLine($"Dystans aktywacji: \"{arena.ActivationDistance}\"");
+            sb.AppendLine($"Dystans dezaktywacji: \"{arena.DeactivationDistance}\"");
+            sb.AppendLine($"Bounty: ${arena.CompletionBounty}");
+            sb.AppendLine($"Nagroda: ${arena.CompletionReward}");
+            sb.AppendLine($"Punkt aktywacji: {arena.ActivationPoint}");
+            sb.AppendLine($"Punkt spawnu boss'a: {arena.BossSpawnPoint}");
+            sb.AppendLine($"Punkt spawnu nagrody: {arena.RewardSpawnPoint}");
+
+            return sb;
+        }
+
         public BossArena ResolveArena(string arenaNameOrId, bool exactMatch)
         {
             int id;
