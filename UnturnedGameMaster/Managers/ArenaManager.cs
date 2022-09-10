@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Controllers;
@@ -151,13 +152,35 @@ namespace UnturnedGameMaster.Managers
             return GetArenaByName(arenaNameOrId, exactMatch);
         }
 
+        public List<UnturnedPlayer> GetPlayersInsideArena(BossArena arena)
+        {
+            return Provider.clients
+                .Select(x => UnturnedPlayer.FromPlayer(x.player))
+                .Where(x =>
+                {
+                    return Vector3.Distance(arena.ActivationPoint, x.Position) <= arena.DeactivationDistance
+                     || Vector3.Distance(arena.BossSpawnPoint.Position, x.Position) <= arena.DeactivationDistance;
+                }).ToList();
+        }
+
+        public List<UnturnedPlayer> GetPlayerInActivationRange(BossArena arena, Team team = null)
+        {
+            return Provider.clients
+                .Select(x => UnturnedPlayer.FromPlayer(x.player))
+                .Where(x => team == null || playerDataManager.GetPlayer((ulong)x.CSteamID).TeamId == team.Id)
+                .Where(x =>
+                {
+                    return Vector3.Distance(arena.ActivationPoint, x.Position) <= arena.ActivationDistance;
+                }).ToList();
+        }
+
         public BossFight CreateBossFight(BossArena bossArena, Team team)
         {
             if (ongoingBossFights.Any(x => x.Arena == bossArena))
                 return null;
 
             // Verify that at least one of the attackers is inside the arena
-            bool hasTeamMembersInsideArena = teamManager.GetTeamMembers(team)
+            bool hasTeamMembersInsideArena = teamManager.GetOnlineTeamMembers(team)
                 .Select(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id))
                 .Where(x => x != null && !x.Dead)
                 .Any(x => Vector3.Distance(bossArena.ActivationPoint, x.Position) <= bossArena.ActivationDistance);
