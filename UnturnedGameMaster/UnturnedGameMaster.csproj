@@ -84,6 +84,7 @@
     <Compile Include="Autofac\InjectDependencyAttribute.cs" />
     <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
     <Compile Include="Autofac\ServiceLocator.cs" />
+    <Compile Include="Commands\Admin\ManageArenasCommand.cs" />
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
     <Compile Include="Commands\Admin\ManageShopCommand.cs" />
@@ -160,8 +161,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\Arena\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -128,7 +128,6 @@ namespace UnturnedGameMaster.Managers
                     return arena;
             }
 
-            // otherwise try matching by name
             return GetArenaByName(arenaNameOrId, exactMatch);
         }
 
