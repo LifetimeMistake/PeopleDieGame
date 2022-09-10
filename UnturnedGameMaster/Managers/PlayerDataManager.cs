@@ -19,6 +19,8 @@ namespace UnturnedGameMaster.Managers
         public event EventHandler<PlayerEventArgs> OnWalletBalanceChanged;
         public event EventHandler<PlayerEventArgs> OnWalletDepositedInto;
         public event EventHandler<PlayerEventArgs> OnWalletWithdrawnFrom;
+        public event EventHandler<PlayerEventArgs> OnBountyAdded;
+        public event EventHandler<PlayerEventArgs> OnBountyReset;
 
         public void Init()
         {
@@ -134,6 +136,18 @@ namespace UnturnedGameMaster.Managers
             playerData.Withdraw(amount);
             OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
             OnWalletWithdrawnFrom?.Invoke(this, new PlayerEventArgs(playerData));
+        }
+
+        public void AddBounty(PlayerData playerData, double amount)
+        {
+            playerData.AddBounty(amount);
+            OnBountyAdded?.Invoke(this, new PlayerEventArgs(playerData));
+        }
+
+        public void ResetBounty(PlayerData playerData)
+        {
+            playerData.ResetBounty();
+            OnBountyReset?.Invoke(this, new PlayerEventArgs(playerData));
         }
     }
 }
