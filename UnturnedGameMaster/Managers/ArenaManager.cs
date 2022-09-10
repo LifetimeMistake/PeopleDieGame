@@ -152,10 +152,11 @@ namespace UnturnedGameMaster.Managers
             return GetArenaByName(arenaNameOrId, exactMatch);
         }
 
-        public List<UnturnedPlayer> GetPlayersInsideArena(BossArena arena)
+        public List<UnturnedPlayer> GetPlayersInsideArena(BossArena arena, Team team = null)
         {
             return Provider.clients
                 .Select(x => UnturnedPlayer.FromPlayer(x.player))
+                .Where(x => team == null || playerDataManager.GetPlayer((ulong)x.CSteamID).TeamId == team.Id)
                 .Where(x =>
                 {
                     return Vector3.Distance(arena.ActivationPoint, x.Position) <= arena.DeactivationDistance
@@ -163,7 +164,7 @@ namespace UnturnedGameMaster.Managers
                 }).ToList();
         }
 
-        public List<UnturnedPlayer> GetPlayerInActivationRange(BossArena arena, Team team = null)
+        public List<UnturnedPlayer> GetPlayersInActivationRange(BossArena arena, Team team = null)
         {
             return Provider.clients
                 .Select(x => UnturnedPlayer.FromPlayer(x.player))
