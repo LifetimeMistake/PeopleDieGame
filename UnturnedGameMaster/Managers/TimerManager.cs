@@ -15,13 +15,11 @@ namespace UnturnedGameMaster.Managers
         public delegate void TimerAction();
         private GameObject tickGameObject;
         private GameTickProvider gameTickProvider;
-        private ulong tickCounter;
-        private Dictionary<TimerAction, ulong> timers;
+        private ulong tickCounter = 0;
+        private Dictionary<TimerAction, ulong> timers = new Dictionary<TimerAction, ulong>();
 
         public void Init()
         {
-            timers = new Dictionary<TimerAction, ulong>();
-            tickCounter = 0;
             SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
             InitTickProvider();
         }

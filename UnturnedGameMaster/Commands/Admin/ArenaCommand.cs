@@ -94,21 +94,13 @@ namespace UnturnedGameMaster.Commands.Admin
                 VectorPAR playerPos = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
 
                 ArenaBuilder arenaBuilder = new ArenaBuilder();
-                arenaBuilder.SetName("default");
-                arenaBuilder.SetActivationDistance(10);
-                arenaBuilder.SetDeactivationDistance(20);
-                arenaBuilder.SetCompletionReward(100);
-                arenaBuilder.SetCompletionBounty(100);
-                arenaBuilder.SetActivationPoint(callerPlayer.Position);
-                arenaBuilder.SetBossSpawnPoint(playerPos);
-                arenaBuilder.SetRewardSpawnPoint(playerPos);
-                arenaBuilder.SetBoss(null);
 
                 Builders.Add(caller.Id, arenaBuilder);
+                ChatHelper.Say(caller, "Rozpoczęto proces tworzenia areny");
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć areny z powodu błędu serwera: {ex.Message}");
+                ChatHelper.Say(caller, $"Nie udało się rozpocząć procesu tworzenia areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -128,7 +120,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                string name = string.Join(" ", command.Skip(1));
+                string name = string.Join(" ", command);
                 arenaBuilder.SetName(name);
 
                 ChatHelper.Say(caller, "Ustawiono nazwę areny");
@@ -155,7 +147,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double distance))
+                if (!double.TryParse(command[0], out double distance))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiedni dystans aktywacji areny");
                     return;
@@ -187,7 +179,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double distance))
+                if (!double.TryParse(command[0], out double distance))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiedni dystans dezaktywacji areny");
                     return;
@@ -219,7 +211,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double amount))
+                if (!double.TryParse(command[0], out double amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiednią wyskość nagrody areny");
                     return;
@@ -251,7 +243,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double amount))
+                if (!double.TryParse(command[0], out double amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiednią wyskość bounty areny");
                     return;
@@ -351,7 +343,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                string searchTerm = string.Join(" ", command.Skip(1));
+                string searchTerm = string.Join(" ", command);
                 IBoss boss = ServiceLocator.Instance.LocateServicesOfType<IBoss>()
                     .FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant()));
 
