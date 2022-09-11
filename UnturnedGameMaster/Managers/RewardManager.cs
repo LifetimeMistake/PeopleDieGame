@@ -36,7 +36,7 @@ namespace UnturnedGameMaster.Managers
             UnturnedPlayerEvents.OnPlayerUpdateStat -= UnturnedPlayerEvents_OnPlayerUpdateStat;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
         }
-
+        
         private void ArenaManager_OnBossFightCompleted(object sender, BossFightEventArgs e)
         {
             Team team = e.BossFight.DominantTeam;
