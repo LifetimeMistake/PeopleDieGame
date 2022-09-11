@@ -120,6 +120,7 @@
     <Compile Include="Commands\Admin\ManageGameCommand.cs" />
     <Compile Include="Commands\Admin\ManagePlayersCommand.cs" />
     <Compile Include="Commands\Admin\ManageTeamsCommand.cs" />
+    <Compile Include="Commands\Admin\SaveConfigCommand.cs" />
     <Compile Include="Commands\General\BioCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />
@@ -128,14 +129,14 @@
     <Compile Include="Commands\Teams\InvitesCommand.cs" />
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
-    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Controllers\BossController.cs" />
     <Compile Include="Controllers\IBossController.cs" />
-    <Compile Include="Controllers\TestBossController.cs" />
+    <Compile Include="Controllers\GroundpounderBossController.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
-    <Compile Include="Enums\ZombieAbility.cs" />
+    <Compile Include="Enums\ZombieAbilities.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
+    <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="Managers\ArenaManager.cs" />
     <Compile Include="Managers\EventMessageManagers\RewardEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\ShopEventMessageManager.cs" />
@@ -152,14 +153,16 @@
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
     <Compile Include="Managers\ZombiePoolManager.cs" />
-    <Compile Include="Models\Bosses\TestBoss.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderBoss.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderLargeMinion.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderSmallMinion.cs" />
     <Compile Include="Models\EventArgs\BossFightDominationEventArgs.cs" />
     <Compile Include="Models\EventArgs\BossFightEventArgs.cs" />
     <Compile Include="Models\EventArgs\BuyItemEventArgs.cs" />
     <Compile Include="Models\EventArgs\RewardEventArgs.cs" />
     <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
     <Compile Include="Models\BossFight.cs" />
-    <Compile Include="Models\Bosses\IBoss.cs" />
+    <Compile Include="Models\IZombieModel.cs" />
     <Compile Include="Models\BossArena.cs" />
     <Compile Include="Models\EventArgs\ArenaEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamBankEventArgs.cs" />
@@ -178,6 +181,7 @@
     <Compile Include="Models\GameData.cs" />
     <Compile Include="Models\PluginConfig.cs" />
     <Compile Include="Models\TeamInvitation.cs" />
+    <Compile Include="Models\Vector3S.cs" />
     <Compile Include="Models\VectorPAR.cs" />
     <Compile Include="Patches\ZombiePatches.cs" />
     <Compile Include="Plugin.cs" />
@@ -189,11 +193,15 @@
     <Compile Include="Providers\GameTickProvider.cs" />
     <Compile Include="Providers\LoadoutIdProvider.cs" />
     <Compile Include="Providers\TeamIdProvider.cs" />
+    <Compile Include="Reflection\FieldRef.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\Bosses\Cursed\" />
+    <Folder Include="Models\Bosses\Flamethrower\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

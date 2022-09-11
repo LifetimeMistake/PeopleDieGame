@@ -2,10 +2,10 @@
 
 namespace UnturnedGameMaster.Controllers
 {
-    public abstract class BossController<T> : IBossController where T : IBoss
+    public abstract class BossController<T> : IBossController where T : IZombieModel
     {
         public abstract bool EndFight();
-        public abstract IBoss GetBossBase();
+        public abstract IZombieModel GetBossBase();
         public abstract double GetBossHealthPercentage();
         public abstract bool IsBossDefeated();
         public abstract bool StartFight();

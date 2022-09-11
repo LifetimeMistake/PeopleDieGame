@@ -9,6 +9,6 @@ namespace UnturnedGameMaster.Controllers
         bool IsBossDefeated();
         double GetBossHealthPercentage();
         bool Update();
-        IBoss GetBossBase();
+        IZombieModel GetBossBase();
     }
 }

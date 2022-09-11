@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Mono.Cecil.Cil;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Patches
@@ -16,13 +16,56 @@ namespace UnturnedGameMaster.Patches
     [HarmonyPatch(typeof(Zombie), "tick")]
     public static class ZombieAbilityPatch
     {
-        [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions, ILGenerator iLGenerator)
+        private readonly static List<OpCode> startOpcodes = new List<OpCode>
         {
-            int startIndex = 807;
-            int endIndex = 1161;
+            // player != null
+            OpCodes.Ldarg_0,
+            OpCodes.Ldfld,
+            OpCodes.Ldnull,
+            OpCodes.Call,
+            OpCodes.Brtrue_S,
+            // barricade != null
+            OpCodes.Ldarg_0,
+            OpCodes.Ldfld,
+            OpCodes.Ldnull,
+            OpCodes.Call,
+            OpCodes.Brtrue_S,
+            // structure != null
+            OpCodes.Ldarg_0,
+            OpCodes.Ldfld,
+            OpCodes.Ldnull,
+            OpCodes.Call,
+            OpCodes.Brtrue_S,
+            // targetObstructionVehicle != null
+            OpCodes.Ldarg_0,
+            OpCodes.Ldfld,
+            OpCodes.Ldnull,
+            OpCodes.Call,
+            OpCodes.Brtrue_S,
+            // targetPassengerVehicle != null
+            OpCodes.Ldarg_0,
+            OpCodes.Ldfld,
+            OpCodes.Ldnull,
+            OpCodes.Call,
+            OpCodes.Brfalse
+        };
 
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
+        {
             List<CodeInstruction> opCodes = new List<CodeInstruction>(codeInstructions);
+            int startIndex = opCodes.Select(x => x.opcode).GetSubsequenceIndex(startOpcodes) + startOpcodes.Count;
+            if (startIndex == -1)
+                throw new Exception("Failed to find patch start");
+
+            MethodInfo sendZombieChargeInfo = AccessTools.Method(typeof(ZombieManager), "sendZombieCharge");
+            if (sendZombieChargeInfo == null)
+                throw new Exception("Failed to find ZombieManager.sendZombieCharge method");
+
+            int endIndex = opCodes.GetRange(startIndex, opCodes.Count - startIndex).FindIndex(x => x.opcode == OpCodes.Call && (MethodInfo)x.operand == sendZombieChargeInfo) + startIndex;
+            if (endIndex == -1)
+                throw new Exception("Failed to find patch end");
+
             for (int i = startIndex; i <= endIndex; i++)
             {
                 opCodes[i].opcode = OpCodes.Nop;
@@ -77,13 +120,14 @@ namespace UnturnedGameMaster.Patches
                 CodeInstruction codeInstruction = newOpCodes[i];
                 opCodes[startIndex + i].Replace(codeInstruction.opcode, codeInstruction.operand);
             }
+
             return opCodes;
         }
     }
 
     public static class CodeInstructionExtensions
     { 
-        public static void Replace(this CodeInstruction codeInstruction, System.Reflection.Emit.OpCode opCode, object operand = null)
+        public static void Replace(this CodeInstruction codeInstruction, OpCode opCode, object operand = null)
         {
             codeInstruction.opcode = opCode;
             codeInstruction.operand = operand;

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
@@ -30,6 +31,10 @@ namespace UnturnedGameMaster.Managers
         private ArenaIdProvider arenaIdProvider { get; set; }
         [InjectDependency]
         private TimerManager timerManager { get; set; }
+        [InjectDependency]
+        private ZombiePoolManager zombiePoolManager { get; set; }
+        [InjectDependency]
+        private GameManager gameManager { get; set; }
 
         private List<BossFight> ongoingBossFights = new List<BossFight>();
 
@@ -43,30 +48,47 @@ namespace UnturnedGameMaster.Managers
 
         public void Init()
         {
+            gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+            if (gameManager.GetGameState() == GameState.InGame)
+                RegisterTimers();
+        }
+
+        public void Dispose()
+        {
+            gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
+            UnregisterTimers();
+        }
+
+        private void RegisterTimers()
+        {
+            UnregisterTimers();
             timerManager.Register(ProcessFightStartConditions, 60);
             timerManager.Register(ProcessFightEndConditions, 60);
             timerManager.Register(UpdateDominantTeams, 60);
             timerManager.Register(UpdateFights, 1);
-
-            ArenaBuilder arenaBuilder = new ArenaBuilder();
-            arenaBuilder.SetName("augh");
-            arenaBuilder.SetBoss(new TestBoss());
-            arenaBuilder.SetBossSpawnPoint(new VectorPAR(new Vector3(10, 20, 30), 0));
-            arenaBuilder.SetActivationPoint(new Vector3(50, 30, 50));
-            arenaBuilder.SetActivationDistance(10);
-            arenaBuilder.SetDeactivationDistance(20);
-            arenaBuilder.SetCompletionReward(100);
-            arenaBuilder.SetCompletionBounty(500);
-
-            BossArena arena = CreateArena(arenaBuilder);
         }
 
-        public void Dispose()
+        private void UnregisterTimers()
         {
             timerManager.Unregister(ProcessFightStartConditions);
             timerManager.Unregister(ProcessFightEndConditions);
             timerManager.Unregister(UpdateFights);
             timerManager.Unregister(UpdateDominantTeams);
+        }
+
+        private void GameManager_OnGameStateChanged(object sender, EventArgs e)
+        {
+            GameState gameState = gameManager.GetGameState();
+            if (gameState == GameState.InGame)
+            {
+                Debug.Log("Started processing arena events");
+                RegisterTimers();
+            }
+            else
+            {
+                Debug.Log("Stopped processing arena events");
+                UnregisterTimers();
+            }
         }
 
         public BossArena CreateArena(ArenaBuilder arenaBuilder)
@@ -76,6 +98,17 @@ namespace UnturnedGameMaster.Managers
 
             int arenaId = arenaIdProvider.GenerateId();
             BossArena arena = arenaBuilder.ToArena(arenaId);
+
+            if (!zombiePoolManager.ZombiePoolExists(arena.BoundId))
+            {
+                if (!zombiePoolManager.CreateZombiePool(arena.BoundId, arenaBuilder.ZombiePoolSize))
+                    return null;
+            }
+            else
+            {
+                if (!zombiePoolManager.ResizeZombiePool(arena.BoundId, arenaBuilder.ZombiePoolSize, true))
+                    return null;
+            }
 
             Dictionary<int, BossArena> arenas = dataManager.GameData.Arenas;
             arenas.Add(arenaId, arena);
@@ -180,6 +213,12 @@ namespace UnturnedGameMaster.Managers
             if (ongoingBossFights.Any(x => x.Arena == bossArena))
                 return null;
 
+            if (!zombiePoolManager.ZombiePoolExists(bossArena.BoundId))
+            {
+                Debug.LogWarning("Could not activate arena, zombie pool does not exist.");
+                return null;
+            }
+
             // Verify that at least one of the attackers is inside the arena
             bool hasTeamMembersInsideArena = teamManager.GetOnlineTeamMembers(team)
                 .Select(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id))
@@ -187,15 +226,47 @@ namespace UnturnedGameMaster.Managers
                 .Any(x => Vector3.Distance(bossArena.ActivationPoint, x.Position) <= bossArena.ActivationDistance);
 
             if (!hasTeamMembersInsideArena)
+            {
+                Debug.LogWarning("Attempted to activate arena, but no attacker team members were inside.");
                 return null;
+            }
 
-            Type bossController = Assembly.GetCallingAssembly()
+            Type bossControllerType = Assembly.GetCallingAssembly()
                 .GetTypes()
-                .Where(x => typeof(BossController<>).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract)
-                .FirstOrDefault(x => x.GetGenericTypeDefinition() == bossArena.BossModel.GetType());
+                .Where(x => x.BaseType != null && x.BaseType.IsGenericType && x.BaseType.GetGenericTypeDefinition() == typeof(BossController<>) && x.IsClass && !x.IsAbstract)
+                .FirstOrDefault(x => x.BaseType.GetGenericArguments().FirstOrDefault() == bossArena.BossModel.GetType());
 
-            UnturnedChat.Say($"augh {bossController}");
-            return null;
+            if (bossControllerType == null)
+            {
+                Debug.LogWarning($"No matching boss controller found for boss {bossArena.BossModel.GetType().Name} ({bossArena.BossModel.Name})");
+                return null;
+            }
+
+            BossFight bossFight = new BossFight(bossArena, null, team, BossFightState.Idle);
+            IBossController bossController;
+
+            try
+            {
+                bossController = (IBossController)Activator.CreateInstance(bossControllerType, bossFight);
+            }
+            catch(Exception ex)
+            {
+                Debug.LogWarning($"Failed to create boss controller: {ex}");
+                return null;
+            }
+
+            bossFight.FightController = bossController;
+            if (!bossController.StartFight())
+            {
+                Debug.LogWarning("Boss controller failed to initialize the fight");
+                return null;
+            }
+
+            bossFight.State = BossFightState.Ongoing;
+
+            ongoingBossFights.Add(bossFight);
+            OnBossFightCreated?.Invoke(this, new BossFightEventArgs(bossFight));
+            return bossFight;
         }
 
         public bool EndBossFight(BossFight bossFight, BossFightState? reason = null)
@@ -223,7 +294,7 @@ namespace UnturnedGameMaster.Managers
         private void ProcessFightStartConditions()
         {
             List<BossArena> arenas = dataManager.GameData.Arenas.Values.ToList();
-            foreach (UnturnedPlayer player in Provider.clients.Select(x => UnturnedPlayer.FromSteamPlayer(x)))
+            foreach (UnturnedPlayer player in Provider.clients.Select(x => UnturnedPlayer.FromSteamPlayer(x)).ToList())
             {
                 // Get the arena which the player stepped into
                 BossArena activatedArena = arenas.Where(x => !x.Conquered && !ongoingBossFights.Any(y => y.Arena == x))
@@ -237,13 +308,17 @@ namespace UnturnedGameMaster.Managers
                     continue;
 
                 Team playerTeam = teamManager.GetTeam(playerData.TeamId.Value);
-                CreateBossFight(activatedArena, playerTeam);
+                BossFight bossFight = CreateBossFight(activatedArena, playerTeam);
+                if (bossFight == null)
+                    Debug.LogError($"Failed to start arena {activatedArena.Name}");
+                else
+                    Debug.Log($"Started arena {bossFight.Arena.Name}");
             }
         }
 
         private void ProcessFightEndConditions()
         {
-            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing))
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing).ToList())
             {
                 double deactivationDistance = bossFight.Arena.DeactivationDistance;
 
@@ -272,7 +347,7 @@ namespace UnturnedGameMaster.Managers
 
         private void UpdateFights()
         {
-            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing))
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing).ToList())
             {
                 if (!bossFight.FightController.Update())
                 {
@@ -283,6 +358,7 @@ namespace UnturnedGameMaster.Managers
                 if (bossFight.FightController.IsBossDefeated())
                 {
                     EndBossFight(bossFight, BossFightState.BossDefeated);
+                    bossFight.Arena.Conquered = true;
                     continue;
                 }
             }
@@ -295,13 +371,18 @@ namespace UnturnedGameMaster.Managers
                 double deactivationDistance = bossFight.Arena.DeactivationDistance;
 
                 // Find players inside arena
-                Dictionary<int, int> attackerGroups = Provider.clients
+                IEnumerable<UnturnedPlayer> participants = Provider.clients
                 .Select(x => UnturnedPlayer.FromSteamPlayer(x))
                 .Where(x =>
                 {
                     return Vector3.Distance(bossFight.Arena.ActivationPoint, x.Position) <= deactivationDistance
                      || Vector3.Distance(bossFight.Arena.BossSpawnPoint.Position, x.Position) <= deactivationDistance;
-                })
+                });
+
+                bossFight.Participants.Clear();
+                bossFight.Participants.AddRange(participants);
+
+                Dictionary<int, int> attackerGroups = participants
                 // Count the number of attackers from each team
                 .Select(x => playerDataManager.GetPlayer((ulong)x.CSteamID))
                 .Where(x => x != null && x.TeamId.HasValue)

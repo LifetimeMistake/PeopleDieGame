@@ -13,6 +13,9 @@ namespace UnturnedGameMaster.Managers
         private GameTickProvider gameTickProvider;
         private ulong tickCounter = 0;
         private Dictionary<TimerAction, ulong> timers = new Dictionary<TimerAction, ulong>();
+        private Dictionary<TimerAction, ulong> timersPendingAddition = new Dictionary<TimerAction, ulong>();
+        private List<TimerAction> timersPendingDeletion = new List<TimerAction>();
+        private bool isEnumerating;
 
         public void Init()
         {
@@ -57,10 +60,14 @@ namespace UnturnedGameMaster.Managers
 
         public bool Register(TimerAction timerAction, ulong interval)
         {
-            if (timers.ContainsKey(timerAction))
+            if (timers.ContainsKey(timerAction) || timersPendingAddition.ContainsKey(timerAction))
                 return false;
 
-            timers.Add(timerAction, interval);
+            if (isEnumerating)
+                timersPendingAddition.Add(timerAction, interval);
+            else
+                timers.Add(timerAction, interval);
+
             return true;
         }
 
@@ -75,11 +82,37 @@ namespace UnturnedGameMaster.Managers
 
         public bool Unregister(TimerAction timerAction)
         {
-            return timers.Remove(timerAction);
+            if (isEnumerating)
+            {
+                if (timersPendingDeletion.Contains(timerAction))
+                    return false;
+
+                timersPendingDeletion.Add(timerAction);
+                return true;
+            }
+            else
+                return timers.Remove(timerAction);
         }
 
         private void GameTickProvider_OnFixedUpdate(object sender, EventArgs e)
         {
+            if (timersPendingAddition.Count != 0)
+            {
+                foreach (KeyValuePair<TimerAction, ulong> kvp in timersPendingAddition)
+                    timers.Add(kvp.Key, kvp.Value);
+
+                timersPendingAddition.Clear();
+            }
+
+            if (timersPendingDeletion.Count != 0)
+            {
+                foreach (TimerAction timerAction in timersPendingDeletion)
+                    timers.Remove(timerAction);
+
+                timersPendingDeletion.Clear();
+            }
+
+            isEnumerating = true;
             foreach (KeyValuePair<TimerAction, ulong> kvp in timers)
             {
                 if (tickCounter % kvp.Value == 0)
@@ -87,6 +120,7 @@ namespace UnturnedGameMaster.Managers
                     kvp.Key.Invoke();
                 }
             }
+            isEnumerating = false;
 
             tickCounter++;
         }

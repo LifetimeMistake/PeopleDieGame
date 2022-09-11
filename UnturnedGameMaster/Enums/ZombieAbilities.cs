@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace UnturnedGameMaster.Enums
 {
+    [Flags]
     public enum ZombieAbilities
     {
-        ThrowObject = 1,
+        None = 0,
+        Throw = 1,
         Spit = 2,
         Charge = 4,
         Stomp = 8,
-        Breath = 16,
-        ThrowBoulder = 32,
-        Acid = 64,
-        Spark = 128
+        Breath = 16
     }
 }

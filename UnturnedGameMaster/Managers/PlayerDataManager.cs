@@ -40,12 +40,12 @@ namespace UnturnedGameMaster.Managers
             if (playerData == null)
             {
                 // register a new player
-                playerData = new PlayerData((ulong)player.CSteamID, player.CharacterName);
+                playerData = new PlayerData((ulong)player.CSteamID, player.DisplayName);
                 players.Add(playerData.Id, playerData);
             }
             else
             {
-                playerData.SetName(player.CharacterName);
+                playerData.SetName(player.DisplayName);
             }
         }
 

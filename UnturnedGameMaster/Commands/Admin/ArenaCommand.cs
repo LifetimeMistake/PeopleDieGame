@@ -21,7 +21,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<create/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss> <value>";
+        public string Syntax => "<create/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss/setpoolsize> <value>";
 
         public List<string> Aliases => new List<string>();
 
@@ -70,6 +70,9 @@ namespace UnturnedGameMaster.Commands.Admin
                     break;
                 case "setboss":
                     VerbSetBoss(caller, verbArgs);
+                    break;
+                case "setpoolsize":
+                    VerbSetPoolSize(caller, verbArgs);
                     break;
                 case "submit":
                     VerbSubmit(caller);
@@ -344,7 +347,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 string searchTerm = string.Join(" ", command);
-                IBoss boss = ServiceLocator.Instance.LocateServicesOfType<IBoss>()
+                IZombieModel boss = ServiceLocator.Instance.LocateServicesOfType<IZombieModel>()
                     .FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant()));
 
                 if (boss == null)
@@ -360,6 +363,37 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się ustawić nazwy boss'a areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetPoolSize(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length != 1)
+            {
+                ChatHelper.Say(caller, $"Musisz podać rozmiar puli spawnów");
+                return;
+            }
+
+            if (!int.TryParse(command[0], out int poolSize) || poolSize < 0)
+            {
+                ChatHelper.Say(caller, "Podałeś niepoprawny rozmiar puli");
+                return;
+            }
+
+            try
+            {
+                if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
+                {
+                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    return;
+                }
+
+                arenaBuilder.SetZombiePoolSize(poolSize);
+                ChatHelper.Say(caller, $"Ustawiono pulę zombie na {poolSize}");
+            }
+            catch (Exception ex)
+            {
+                ChatHelper.Say(caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
             }
         }
 

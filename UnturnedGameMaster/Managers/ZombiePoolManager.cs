@@ -13,28 +13,66 @@ namespace UnturnedGameMaster.Managers
     {
         [InjectDependency]
         private DataManager dataManager { get; set; }
+        [InjectDependency]
+        private TimerManager timerManager { get; set; }
         private Dictionary<byte, ManagedZombie[]> managedZombiePools = new Dictionary<byte, ManagedZombie[]>();
 
         public void Init()
         {
-            foreach (KeyValuePair<int, int> kvp in dataManager.GameData.ManagedZombiePools)
-            {
-                CreateZombiePool((byte)kvp.Key, kvp.Value);
-            }
+            timerManager.Register(TryLoadPools, 60);
         }
 
         public void Dispose()
         {
-            foreach (KeyValuePair<int, int> kvp in dataManager.GameData.ManagedZombiePools)
+            timerManager.Unregister(TryLoadPools);
+
+            if (ZombieManager.regions == null)
             {
-                RemoveZombiePool((byte)kvp.Key);
+                // Cannot destroy the managed zombies because ????
+                managedZombiePools.Clear();
+                return;
             }
+
+            foreach (KeyValuePair<byte, int> kvp in dataManager.GameData.ManagedZombiePools)
+            {
+                if (!managedZombiePools.ContainsKey(kvp.Key))
+                    continue;
+
+                foreach (ManagedZombie zombie in managedZombiePools[kvp.Key].Where(x => x != null))
+                    DestroyZombieSlot(kvp.Key, zombie);
+
+                managedZombiePools.Remove(kvp.Key);
+            }
+        }
+
+        private void TryLoadPools()
+        {
+            if (ZombieManager.regions == null)
+            {
+                Debug.LogWarning("Attempted to load managed zombie pools but in-game ZombieManager was not ready yet (this message is harmless)");
+                return;
+            }
+
+            foreach (KeyValuePair<byte, int> kvp in dataManager.GameData.ManagedZombiePools)
+            {
+                ManagedZombie[] zombieSlots = AllocateZombieSlots(kvp.Key, kvp.Value);
+                if (zombieSlots == null)
+                {
+                    throw new Exception($"Failed to allocate zombie slots for bound {kvp.Key}");
+                }
+                managedZombiePools.Add(kvp.Key, zombieSlots);
+            }
+
+            Debug.Log("Loaded managed zombie pools!");
+            timerManager.Unregister(TryLoadPools);
         }
 
         private ManagedZombie InitZombieSlot(byte boundId)
         {
             if (boundId > ZombieManager.regions.Length - 1)
+            {
                 return null; // region doesn't exist
+            }
 
             ushort zombieId = (ushort)ZombieManager.regions[(int)boundId].zombies.Count;
             GameObject zombiePrefab = (GameObject)(StaticResourceRef<GameObject>)AccessTools.Field(typeof(ZombieManager), "dedicatedZombiePrefab").GetValue(null);
@@ -108,7 +146,7 @@ namespace UnturnedGameMaster.Managers
 
         public bool CreateZombiePool(byte boundId, int poolSize)
         {
-            if (managedZombiePools.ContainsKey(boundId))
+            if (dataManager.GameData.ManagedZombiePools.ContainsKey(boundId))
                 return false;
 
             if (poolSize < 0)
@@ -119,6 +157,7 @@ namespace UnturnedGameMaster.Managers
                 return false;
 
             managedZombiePools.Add(boundId, zombieSlots);
+            dataManager.GameData.ManagedZombiePools.Add(boundId, poolSize);
             return true;
         }
 
@@ -142,7 +181,6 @@ namespace UnturnedGameMaster.Managers
                     DestroyZombieSlot(boundId, zombie);
 
                 managedZombiePools[boundId] = zombieSlots.Except(markedForDestruction).ToArray();
-                return true;
             }
             else
             {
@@ -151,8 +189,10 @@ namespace UnturnedGameMaster.Managers
                     return false;
 
                 managedZombiePools[boundId] = zombieSlots.Concat(newZombies).ToArray();
-                return true;
             }
+
+            dataManager.GameData.ManagedZombiePools[boundId] = newPoolSize;
+            return true;
         }
 
         public bool RemoveZombiePool(byte boundId)
@@ -164,6 +204,7 @@ namespace UnturnedGameMaster.Managers
                 DestroyZombieSlot(boundId, zombie);
 
             managedZombiePools.Remove(boundId);
+            dataManager.GameData.ManagedZombiePools.Remove(boundId);
             return true;
         }
 
@@ -202,6 +243,19 @@ namespace UnturnedGameMaster.Managers
             DestroyZombie(freeSlot);
             ZombieManager.sendZombieAlive(freeSlot, type, speciality, shirt, pants, hat, gear, position, MeasurementTool.angleToByte(angle));
             return freeSlot;
+        }
+
+        public ManagedZombie SpawnZombie(byte boundId, byte type, IZombieModel zombieModel, Vector3 position, float angle, bool force = false)
+        {
+            ManagedZombie managedZombie = SpawnZombie(boundId, type, (byte)zombieModel.Attributes, zombieModel.ShirtId, zombieModel.PantsId, zombieModel.HatId, zombieModel.GearId, position, angle, force);
+            if (managedZombie == null)
+                return null;
+
+            managedZombie.Health = zombieModel.Health;
+            managedZombie.MaxHealth = zombieModel.Health;
+            managedZombie.AddAbility(zombieModel.Abilities);
+
+            return managedZombie;
         }
 
         public void DestroyZombie(ManagedZombie zombie)

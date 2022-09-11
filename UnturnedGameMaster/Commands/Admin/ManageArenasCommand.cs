@@ -57,6 +57,9 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "setbounty":
                     VerbSetBounty(caller, verbArgs);
                     break;
+                case "setpoolsize":
+                    VerbSetPoolSize(caller, verbArgs);
+                    break;
                 default:
                     ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
@@ -142,7 +145,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 string searchTerm = string.Join(" ", command.Skip(1));
-                IBoss boss = ServiceLocator.Instance.LocateServicesOfType<IBoss>()
+                IZombieModel boss = ServiceLocator.Instance.LocateServicesOfType<IZombieModel>()
                     .FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant()));
 
                 if (boss == null)
@@ -314,6 +317,53 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 ChatHelper.Say(caller, $"Nie udało się ustawić bounty areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetPoolSize(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length < 2)
+            {
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz rozmiar puli spawnów");
+                return;
+            }
+
+            if (!int.TryParse(command[1], out int poolSize) || poolSize < 0)
+            {
+                ChatHelper.Say(caller, "Podałeś niepoprawny rozmiar puli");
+                return;
+            }
+
+            bool force = false;
+            if (command.Length >= 3 && !bool.TryParse(command[2], out force))
+            {
+                ChatHelper.Say(caller, "Podałeś niepoprawną wartość parametru force");
+                return;
+            }
+
+            try
+            {
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                ZombiePoolManager zombiePoolManager = ServiceLocator.Instance.LocateService<ZombiePoolManager>();
+                BossArena arena = arenaManager.ResolveArena(command[0], false);
+
+                if (arena == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono areny \"{command[0]}\"");
+                    return;
+                }
+
+                if (!zombiePoolManager.ResizeZombiePool(arena.BoundId, poolSize, force))
+                {
+                    ChatHelper.Say(caller, $"Nie udało się zmienić rozmiaru puli");
+                    return;
+                }
+
+                ChatHelper.Say(caller, $"Ustawiono pulę zombie na {poolSize}");
+            }
+            catch (Exception ex)
+            {
+                ChatHelper.Say(caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
             }
         }
     }

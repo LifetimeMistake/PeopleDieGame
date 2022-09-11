@@ -26,7 +26,7 @@ namespace UnturnedGameMaster.Autofac
                 .GetTypes().Where(x => typeof(IManager).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
 
             IEnumerable<Type> bosses = Assembly.GetCallingAssembly()
-                .GetTypes().Where(x => typeof(IBoss).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
+                .GetTypes().Where(x => typeof(IZombieModel).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
 
             foreach (Type managerType in managers)
             {

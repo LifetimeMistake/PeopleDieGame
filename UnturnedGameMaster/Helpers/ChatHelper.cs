@@ -14,14 +14,8 @@ namespace UnturnedGameMaster.Helpers
     {
         public static bool Say(PlayerData playerData, string text)
         {
-            PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
             List<string> lines = UnturnedChat.wrapMessage(text);
             CSteamID playerId = (CSteamID)playerData.Id;
-
-            if (playerDataManager.GetPlayer(playerData.Id) == null)
-            {
-                return false;
-            }
 
             foreach (string line in lines)
             {
@@ -96,6 +90,30 @@ namespace UnturnedGameMaster.Helpers
             {
                 Say(sbLine);
             }
+        }
+
+        public static void Say(IEnumerable<IRocketPlayer> players, string text)
+        {
+            foreach (IRocketPlayer player in players)
+                Say(player, text);
+        }
+
+        public static void Say(IEnumerable<PlayerData> players, string text)
+        {
+            foreach (PlayerData player in players)
+                Say(player, text);
+        }
+
+        public static void Say(IEnumerable<IRocketPlayer> players, StringBuilder sb)
+        {
+            foreach (IRocketPlayer player in players)
+                Say(player, sb);
+        }
+
+        public static void Say(IEnumerable<PlayerData> players, StringBuilder sb)
+        {
+            foreach (PlayerData player in players)
+                Say(player, sb);
         }
     }
 }

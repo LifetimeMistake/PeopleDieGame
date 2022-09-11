@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 using Rocket.Core.Plugins;
+using SDG.Framework.Devkit;
+using SDG.Unturned;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -21,6 +23,17 @@ namespace UnturnedGameMaster
             harmony.PatchAll();
             Debug.Log($"Patched {harmony.GetPatchedMethods().Count()} game methods");
 
+            LevelHierarchy.ready += LevelHierarchy_ready;
+        }
+
+        private void LevelHierarchy_ready()
+        {
+            LoadManagers();
+        }
+
+        private void LoadManagers()
+        {
+            Debug.Log("Loading managers...");
             IDatabaseProvider<GameData> databaseProvider = InitDatabase();
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar(databaseProvider);
             serviceLocator = new ServiceLocator();
@@ -36,8 +49,9 @@ namespace UnturnedGameMaster
             ChatHelper.Say("Game manager loaded!");
         }
 
-        protected override void Unload()
+        private void UnloadManagers()
         {
+            Debug.Log("Unloading managers...");
             ChatHelper.Say("Game manager unloading!");
 
             // Dispose all managers
@@ -45,7 +59,12 @@ namespace UnturnedGameMaster
             {
                 manager.Dispose();
             }
+        }
 
+        protected override void Unload()
+        {
+            LevelHierarchy.ready -= LevelHierarchy_ready;
+            UnloadManagers();
             harmony.UnpatchAll();
         }
 

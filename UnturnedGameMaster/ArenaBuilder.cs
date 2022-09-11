@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SDG.Unturned;
+using System;
 using UnityEngine;
 using UnturnedGameMaster.Models;
 
@@ -14,7 +15,21 @@ namespace UnturnedGameMaster
         private Vector3 activationPoint;
         private VectorPAR bossSpawnpoint;
         private VectorPAR rewardSpawnpoint;
-        private IBoss bossModel;
+        private IZombieModel bossModel;
+        private byte boundId;
+        private int zombiePoolSize;
+
+        public string ArenaName { get => arenaName; }
+        public double ActivationDistance { get => activationDistance; }
+        public double DeactivationDistance { get => deactivationDistance; }
+        public double CompletionBounty { get => completionBounty; }
+        public double CompletionReward { get => completionReward; }
+        public Vector3 ActivationPoint { get => activationPoint; }
+        public VectorPAR BossSpawnpoint { get => bossSpawnpoint; }
+        public VectorPAR RewardSpawnpoint { get => rewardSpawnpoint; }
+        public IZombieModel BossModel { get => bossModel; }
+        public byte BoundId { get => boundId; }
+        public int ZombiePoolSize { get => zombiePoolSize; }
 
         public void SetName(string name)
         {
@@ -58,11 +73,21 @@ namespace UnturnedGameMaster
 
         public void SetActivationPoint(Vector3 point)
         {
+            byte boundId;
+            if (!LevelNavigation.tryGetBounds(point, out boundId))
+                throw new ArgumentException("Point is outside of navigation grid bounds.");
+
+            this.boundId = boundId;
             activationPoint = point;
         }
 
         public void SetBossSpawnPoint(VectorPAR spawnpoint)
         {
+            byte boundId;
+            if (!LevelNavigation.tryGetBounds(spawnpoint.Position, out boundId))
+                throw new ArgumentException("Point is outside of navigation grid bounds.");
+
+            this.boundId = boundId;
             bossSpawnpoint = spawnpoint;
         }
 
@@ -71,9 +96,17 @@ namespace UnturnedGameMaster
             rewardSpawnpoint = spawnpoint;
         }
 
-        public void SetBoss(IBoss model)
+        public void SetBoss(IZombieModel model)
         {
             bossModel = model ?? throw new ArgumentNullException(nameof(model));
+        }
+
+        public void SetZombiePoolSize(int poolSize)
+        {
+            if (poolSize < 0)
+                throw new ArgumentOutOfRangeException(nameof(poolSize));
+
+            zombiePoolSize = poolSize;
         }
 
         public BossArena ToArena(int arenaId)
@@ -88,7 +121,8 @@ namespace UnturnedGameMaster
                 activationDistance,
                 deactivationDistance,
                 completionBounty,
-                completionReward);
+                completionReward,
+                boundId);
         }
     }
 }

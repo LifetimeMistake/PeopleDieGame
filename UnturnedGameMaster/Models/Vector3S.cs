@@ -1,0 +1,27 @@
+﻿using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace UnturnedGameMaster.Models
+{
+    public struct Vector3S
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public Vector3S(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public static implicit operator Vector3(Vector3S vector3S) => new Vector3(vector3S.x, vector3S.y, vector3S.z);
+        public static implicit operator Vector3S(Vector3 vector) => new Vector3S(vector.x, vector.y, vector.z);
+    }
+}
