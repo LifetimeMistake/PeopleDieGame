@@ -4,7 +4,7 @@ using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Managers.EventMessageManagers
 {
-    public class TeamEventMessageManager : IManager
+    public class TeamEventMessageManager : IDisposableManager
     {
         [InjectDependency]
         private TeamManager teamManager { get; set; }
@@ -23,6 +23,20 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
             teamManager.OnBankDepositedInto += TeamManager_OnBankDepositedInto;
             teamManager.OnBankWithdrawnFrom += TeamManager_OnBankWithdrawnFrom;
             teamManager.OnBankBalanceChanged += TeamManager_OnBankBalanceChanged;
+        }
+
+        public void Dispose()
+        {
+            teamManager.OnPlayerInvited -= TeamManager_OnPlayerInvited;
+            teamManager.OnInvitationAccepted -= TeamManager_OnInvitationAccepted;
+            teamManager.OnInvitationRejected -= TeamManager_OnInvitationRejected;
+            teamManager.OnInvitationCancelled -= TeamManager_OnInvitationCancelled;
+            teamManager.OnPlayerJoinedTeam -= TeamManager_OnPlayerJoinedTeam;
+            teamManager.OnPlayerLeftTeam -= TeamManager_OnPlayerLeftTeam;
+            teamManager.OnTeamLeaderChanged -= TeamManager_OnTeamLeaderChanged;
+            teamManager.OnBankDepositedInto -= TeamManager_OnBankDepositedInto;
+            teamManager.OnBankWithdrawnFrom -= TeamManager_OnBankWithdrawnFrom;
+            teamManager.OnBankBalanceChanged -= TeamManager_OnBankBalanceChanged;
         }
 
         private void TeamManager_OnBankWithdrawnFrom(object sender, Models.EventArgs.TeamBankEventArgs e)

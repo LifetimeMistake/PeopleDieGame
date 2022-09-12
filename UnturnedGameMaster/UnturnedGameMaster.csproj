@@ -138,6 +138,7 @@
     <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="Managers\ArenaManager.cs" />
+    <Compile Include="Managers\EventMessageManagers\ArenaEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\RewardEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\ShopEventMessageManager.cs" />
     <Compile Include="Managers\EventMessageManagers\TeamEventMessageManager.cs" />
