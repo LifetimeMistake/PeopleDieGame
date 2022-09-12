@@ -3,7 +3,7 @@ using UnturnedGameMaster.Helpers;
 
 namespace UnturnedGameMaster.Managers.EventMessageManagers
 {
-    public class RewardEventMessageManager : IManager
+    public class RewardEventMessageManager : IDisposableManager
     {
         [InjectDependency]
         private RewardManager rewardManager { get; set; }
@@ -13,6 +13,13 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
             rewardManager.OnPlayerReceiveDeathPenalty += RewardManager_OnPlayerReceiveDeathPenalty;
             rewardManager.OnPlayerReceivePlayerReward += RewardManager_OnPlayerReceivePlayerReward;
             rewardManager.OnPlayerReceiveZombieReward += RewardManager_OnPlayerReceiveZombieReward;
+        }
+
+        public void Dispose()
+        {
+            rewardManager.OnPlayerReceiveDeathPenalty -= RewardManager_OnPlayerReceiveDeathPenalty;
+            rewardManager.OnPlayerReceivePlayerReward -= RewardManager_OnPlayerReceivePlayerReward;
+            rewardManager.OnPlayerReceiveZombieReward -= RewardManager_OnPlayerReceiveZombieReward;
         }
 
         private void RewardManager_OnPlayerReceiveZombieReward(object sender, Models.EventArgs.RewardEventArgs e)

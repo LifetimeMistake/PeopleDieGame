@@ -4,15 +4,21 @@ using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Managers.EventMessageManagers
 {
-    public class ShopEventMessageManager : IManager
+    public class ShopEventMessageManager : IDisposableManager
     {
         [InjectDependency]
         private ShopManager shopManager { get; set; }
         [InjectDependency]
         private TeamManager teamManager { get; set; }
+
         public void Init()
         {
             shopManager.OnShopItemBought += ShopManager_OnShopItemBought;
+        }
+
+        public void Dispose()
+        {
+            shopManager.OnShopItemBought -= ShopManager_OnShopItemBought;
         }
 
         private void ShopManager_OnShopItemBought(object sender, Models.EventArgs.BuyItemEventArgs e)
