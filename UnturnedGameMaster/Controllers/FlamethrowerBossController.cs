@@ -3,45 +3,47 @@ using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Managers;
+using UnturnedGameMaster.Models.Bosses.Cursed;
 using UnturnedGameMaster.Models;
-using UnturnedGameMaster.Models.Bosses;
-using UnturnedGameMaster.Models.Bosses.Groundpounder;
+using UnturnedGameMaster.Models.Bosses.Flamethrower;
 
 namespace UnturnedGameMaster.Controllers
 {
-    public class GroundpounderBossController : BossController<GroundpounderBoss>
+    public class FlamethrowerBossController : BossController<FlamethrowerBoss>
     {
-        private GroundpounderLargeMinion largeMinion;
-        private GroundpounderSmallMinion smallMinion;
+        private FlamethrowerNormalMinion regularMinion;
+        private FlamethrowerBurningMinion burningMinion;
 
         private BossFight fight;
         private BossArena arena;
-        private GroundpounderBoss bossModel;
+        private FlamethrowerBoss bossModel;
 
         private bool spawnsMinions;
-        private bool usedLowerCooldown;
-        private bool usedHeal;
+        private bool spawnsUpgradedMinions;
+        private bool usedReduceCooldownOnce;
+        private bool usedReduceCooldownTwice;
 
-        private float minionSpawnInterval;
         private DateTime lastMinionSpawn;
-        private double lastMegaSpawnHealth;
+        private int minionSpawnInterval;
 
         private ManagedZombie bossZombie;
         private List<ManagedZombie> minions = new List<ManagedZombie>();
         private ZombiePoolManager zombiePoolManager;
 
-        public GroundpounderBossController(BossFight bossFight)
+        public FlamethrowerBossController(BossFight bossFight)
         {
             this.fight = bossFight ?? throw new ArgumentNullException(nameof(bossFight));
             this.arena = bossFight.Arena;
-            this.bossModel = (GroundpounderBoss)bossFight.Arena.BossModel;
+            this.bossModel = (FlamethrowerBoss)bossFight.Arena.BossModel;
             this.zombiePoolManager = ServiceLocator.Instance.LocateService<ZombiePoolManager>();
-            this.largeMinion = ServiceLocator.Instance.LocateService<GroundpounderLargeMinion>();
-            this.smallMinion = ServiceLocator.Instance.LocateService<GroundpounderSmallMinion>();
+            this.regularMinion = ServiceLocator.Instance.LocateService<FlamethrowerNormalMinion>();
+            this.burningMinion = ServiceLocator.Instance.LocateService<FlamethrowerBurningMinion>();
         }
 
         public override bool StartFight()
@@ -54,17 +56,18 @@ namespace UnturnedGameMaster.Controllers
             if (bossZombie == null)
                 return false; // failed to spawn main boss
 
-            ChatHelper.Say(fight.Participants, "Ziemia pod Twoimi stopami zaczyna się trząść...");
+            ChatHelper.Say(fight.Participants, "Powietrze wokół Ciebie robi się bardzo gorące (czujesz też zapach BBQ)..");
             return true;
         }
 
         private void Reset()
         {
             spawnsMinions = false;
-            usedLowerCooldown = false;
-            usedHeal = false;
+            spawnsUpgradedMinions = false;
+            usedReduceCooldownOnce = false;
+            usedReduceCooldownTwice = false;
             lastMinionSpawn = DateTime.MinValue;
-            lastMegaSpawnHealth = 1f;
+            minionSpawnInterval = 0;
         }
 
         public override bool EndFight()
@@ -75,13 +78,13 @@ namespace UnturnedGameMaster.Controllers
             foreach (ManagedZombie managedZombie in minions.Where(x => !x.isDead))
                 zombiePoolManager.DestroyZombie(bossZombie);
 
-            ChatHelper.Say(fight.Participants, "Wibracje ziemi ustają...");
+            ChatHelper.Say(fight.Participants, "Płomienie gasną...");
             return true;
         }
 
-        public override bool IsBossDefeated()
+        public override IZombieModel GetBossBase()
         {
-            return bossZombie.isDead;
+            return bossModel;
         }
 
         public override double GetBossHealthPercentage()
@@ -89,50 +92,76 @@ namespace UnturnedGameMaster.Controllers
             return bossZombie.GetHealth() / bossZombie.GetMaxHealth();
         }
 
+        public override bool IsBossDefeated()
+        {
+            return bossZombie.isDead;
+        }
+
         public override bool Update()
         {
-            // nothing more we can do :(
-            if (IsBossDefeated() && usedHeal)
-                return true;
+            if (bossZombie == null || IsBossDefeated())
+                return true; // nothing else to do
 
             double bossHealth = GetBossHealthPercentage();
 
-            if (!spawnsMinions && bossHealth < 0.9)
+            if (!spawnsMinions)
             {
-                // Start spawning minions
                 spawnsMinions = true;
-                minionSpawnInterval = 10;
+                minionSpawnInterval = 7;
             }
 
             if (spawnsMinions && (DateTime.Now - lastMinionSpawn).TotalSeconds > minionSpawnInterval)
             {
-                SpawnMinion(smallMinion);
+                IZombieModel minionModel = (spawnsUpgradedMinions) ? (IZombieModel)burningMinion : (IZombieModel)regularMinion;
+                SpawnMinion(minionModel);
                 lastMinionSpawn = DateTime.Now;
             }
 
-            if (!usedLowerCooldown && bossHealth < 0.5)
+            if (minionSpawnInterval > 6 && bossHealth < 0.65)
             {
-                ChatHelper.Say(fight.Participants, $"{bossModel.Name} twardnieje...");
-                bossZombie.ThrowTime *= 0.65f;
-                bossZombie.StompTime *= 0.65f;
-                usedLowerCooldown = true;
+                minionSpawnInterval = 6;
+            }
+            else if (minionSpawnInterval > 5 && bossHealth < 0.55)
+            {
+                minionSpawnInterval = 5;
+            }
+            else if (minionSpawnInterval > 4 && bossHealth < 0.4)
+            {
+                minionSpawnInterval = 4;
+            }
+            else if (minionSpawnInterval > 3 && bossHealth < 0.25)
+            {
+                minionSpawnInterval = 3;
+            }
+            else if (minionSpawnInterval > 2 && bossHealth < 0.15)
+            {
+                minionSpawnInterval = 2;
+            }
+            else if (minionSpawnInterval > 1 && bossHealth < 0.07)
+            {
+                minionSpawnInterval = 1;
             }
 
-            if (lastMegaSpawnHealth - bossHealth >= 0.2)
+            if (!spawnsUpgradedMinions && bossHealth < 0.75)
             {
-                if (SpawnMinion(largeMinion))
-                {
-                    ChatHelper.Say(fight.Participants, "Kolejny przeciwnik wyłania się zza kamieni...");
-                    lastMegaSpawnHealth = bossHealth;
-                }
+                spawnsUpgradedMinions = true;
+                ChatHelper.Say(fight.Participants, $"Przyzwane stworzenia {bossModel.Name}'a zaczynają się topić!");
             }
 
-            if (!usedHeal && bossHealth < 0.05)
+            if ((!usedReduceCooldownOnce && bossHealth < 0.75) || (!usedReduceCooldownTwice && bossHealth < 0.5))
             {
-                ChatHelper.Say(fight.Participants, $"{bossModel.Name} przekracza swoje własne fizyczne ograniczenia, jego życie odnawia się do pełna!!");
-                bossZombie.Health = bossModel.Health;
-                Reset(); // its rewind time
-                usedHeal = true;
+                if (!usedReduceCooldownOnce)
+                    usedReduceCooldownOnce = true;
+                else
+                    usedReduceCooldownTwice = true;
+
+                bossZombie.FireTime *= 0.75f;
+                ChatHelper.Say(fight.Participants, $"{bossModel.Name} nagrzewa się jeszcze bardziej!");
+            }
+
+            if (minionSpawnInterval != 3 && bossHealth < 0.15)
+            {
+                minionSpawnInterval = 3;
             }
 
             return true;
@@ -168,11 +197,6 @@ namespace UnturnedGameMaster.Controllers
                 randomPosition = hit.point + new Vector3(0, 1, 0);
 
             return randomPosition;
-        }
-
-        public override IZombieModel GetBossBase()
-        {
-            return bossModel;
         }
     }
 }

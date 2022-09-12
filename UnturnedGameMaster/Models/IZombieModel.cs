@@ -7,7 +7,7 @@ namespace UnturnedGameMaster.Models
     {
         string Name { get; }
         ushort Health { get; }
-        EZombieSpeciality Attributes { get; }
+        EZombieSpeciality Speciality { get; }
         ZombieAbilities Abilities { get; }
         byte HatId { get; }
         byte ShirtId { get; }
