@@ -15,17 +15,47 @@ namespace UnturnedGameMaster.Managers.EventMessageManagers
     {
         [InjectDependency]
         private ArenaManager arenaManager { get; set; }
+        [InjectDependency]
+        private TeamManager teamManager { get; set; }
 
         public void Init()
         {
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
             arenaManager.OnBossFightFailed += ArenaManager_OnBossFightFailed;
+            arenaManager.OnBossFightCreated += ArenaManager_OnBossFightCreated;
+            arenaManager.OnBossFightDominantTeamChanged += ArenaManager_OnBossFightDominantTeamChanged;
         }
 
         public void Dispose()
         {
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
             arenaManager.OnBossFightFailed -= ArenaManager_OnBossFightFailed;
+            arenaManager.OnBossFightCreated -= ArenaManager_OnBossFightCreated;
+            arenaManager.OnBossFightDominantTeamChanged -= ArenaManager_OnBossFightDominantTeamChanged;
+        }
+
+        private void ArenaManager_OnBossFightDominantTeamChanged(object sender, Models.EventArgs.BossFightDominationEventArgs e)
+        {
+            Team dominantTeam = e.NewAttackers;
+            Team oldTeam = e.OldAttackers;
+
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(dominantTeam))
+            {
+                ChatHelper.Say(player, $"Twoja drużyna uzyskała status dominującej w arenie");
+            }
+
+            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(oldTeam))
+            {
+                ChatHelper.Say(player, $"Twoja drużyna straciła status dominującej w arenie");
+            }
+        }
+
+        private void ArenaManager_OnBossFightCreated(object sender, Models.EventArgs.BossFightEventArgs e)
+        {
+            Team team = e.BossFight.DominantTeam;
+            BossArena arena = e.BossFight.Arena;
+
+            ChatHelper.Say($"Drużyna \"{team.Name}\" rozpoczęła walkę z boss'em \"{arena.BossModel.Name}\"");
         }
 
         private void ArenaManager_OnBossFightFailed(object sender, Models.EventArgs.BossFightEventArgs e)
