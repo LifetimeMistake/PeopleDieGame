@@ -130,6 +130,8 @@
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="Controllers\BossController.cs" />
+    <Compile Include="Controllers\CursedBossController.cs" />
+    <Compile Include="Controllers\FlamethrowerBossController.cs" />
     <Compile Include="Controllers\IBossController.cs" />
     <Compile Include="Controllers\GroundpounderBossController.cs" />
     <Compile Include="Enums\BossFightState.cs" />
@@ -154,6 +156,11 @@
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\LoadoutManager.cs" />
     <Compile Include="Managers\ZombiePoolManager.cs" />
+    <Compile Include="Models\Bosses\Cursed\CursedSmallMinion.cs" />
+    <Compile Include="Models\Bosses\Cursed\CursedBoss.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerBoss.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerBurningMinion.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerNormalMinion.cs" />
     <Compile Include="Models\Bosses\Groundpounder\GroundpounderBoss.cs" />
     <Compile Include="Models\Bosses\Groundpounder\GroundpounderLargeMinion.cs" />
     <Compile Include="Models\Bosses\Groundpounder\GroundpounderSmallMinion.cs" />
@@ -184,7 +191,8 @@
     <Compile Include="Models\TeamInvitation.cs" />
     <Compile Include="Models\Vector3S.cs" />
     <Compile Include="Models\VectorPAR.cs" />
-    <Compile Include="Patches\ZombiePatches.cs" />
+    <Compile Include="Patches\ZombieAgroPatch.cs" />
+    <Compile Include="Patches\ZombieAbilityPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ArenaIdProvider.cs" />
@@ -200,9 +208,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Bosses\Cursed\" />
-    <Folder Include="Models\Bosses\Flamethrower\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

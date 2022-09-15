@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Enums;
 
-namespace UnturnedGameMaster.Models.Bosses.Groundpounder
+namespace UnturnedGameMaster.Models.Bosses.Flamethrower
 {
-    public class GroundpounderSmallMinion : IZombieModel
+    public class FlamethrowerNormalMinion : IZombieModel
     {
-        public string Name { get; } = "Mr. Small";
+        public string Name { get; } = "Undead";
         public ushort Health { get; } = 100;
         public EZombieSpeciality Speciality { get; } = EZombieSpeciality.NORMAL;
         public ZombieAbilities Abilities { get; } = ZombieAbilities.None;

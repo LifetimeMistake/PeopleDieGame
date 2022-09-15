@@ -69,12 +69,17 @@ namespace UnturnedGameMaster.Models
             return Abilities.HasFlag(zombieAbility);
         }
 
-        public void AddAbility(ZombieAbilities zombieAbility)
+        public void AddAbilities(ZombieAbilities zombieAbility)
         {
             Abilities |= zombieAbility;
         }
+        
+        public void SetAbilities(ZombieAbilities zombieAbility)
+        {
+            Abilities = zombieAbility;
+        }
 
-        public void RemoveAbility(ZombieAbilities zombieAbility)
+        public void RemoveAbilities(ZombieAbilities zombieAbility)
         {
             Abilities &= ~zombieAbility;
         }

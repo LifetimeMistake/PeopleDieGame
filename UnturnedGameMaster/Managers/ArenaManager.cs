@@ -291,6 +291,11 @@ namespace UnturnedGameMaster.Managers
             return true;
         }
 
+        public List<BossFight> GetBossFights()
+        {
+            return ongoingBossFights;
+        }
+
         private void ProcessFightStartConditions()
         {
             List<BossArena> arenas = dataManager.GameData.Arenas.Values.ToList();

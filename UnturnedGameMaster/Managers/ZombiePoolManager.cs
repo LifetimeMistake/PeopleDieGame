@@ -247,13 +247,13 @@ namespace UnturnedGameMaster.Managers
 
         public ManagedZombie SpawnZombie(byte boundId, byte type, IZombieModel zombieModel, Vector3 position, float angle, bool force = false)
         {
-            ManagedZombie managedZombie = SpawnZombie(boundId, type, (byte)zombieModel.Attributes, zombieModel.ShirtId, zombieModel.PantsId, zombieModel.HatId, zombieModel.GearId, position, angle, force);
+            ManagedZombie managedZombie = SpawnZombie(boundId, type, (byte)zombieModel.Speciality, zombieModel.ShirtId, zombieModel.PantsId, zombieModel.HatId, zombieModel.GearId, position, angle, force);
             if (managedZombie == null)
                 return null;
 
             managedZombie.Health = zombieModel.Health;
             managedZombie.MaxHealth = zombieModel.Health;
-            managedZombie.AddAbility(zombieModel.Abilities);
+            managedZombie.SetAbilities(zombieModel.Abilities);
 
             return managedZombie;
         }
