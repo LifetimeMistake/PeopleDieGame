@@ -17,6 +17,8 @@ namespace UnturnedGameMaster.Services.Managers
         private TeamManager teamManager { get; set; }
         [InjectDependency]
         private DataManager dataManager { get; set; }
+        [InjectDependency]
+        private GameManager gameManager { get; set; }
 
 
         public event EventHandler<RewardEventArgs> OnPlayerReceivePlayerReward;
@@ -52,6 +54,11 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void UnturnedPlayerEvents_OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, Steamworks.CSteamID murderer)
         {
+            if (gameManager.GetGameState() == Enums.GameState.InLobby)
+            {
+                return;
+            }
+
             PlayerData victimData = playerDataManager.GetPlayer((ulong)player.CSteamID);
             PlayerData killerData = playerDataManager.GetPlayer((ulong)murderer);
 
@@ -96,6 +103,11 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void UnturnedPlayerEvents_OnPlayerUpdateStat(UnturnedPlayer player, SDG.Unturned.EPlayerStat stat)
         {
+            if (gameManager.GetGameState() == Enums.GameState.InLobby)
+            {
+                return;
+            }
+
             if (stat != SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_NORMAL)
                 return;
 
