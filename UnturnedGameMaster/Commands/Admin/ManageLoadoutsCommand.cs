@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {

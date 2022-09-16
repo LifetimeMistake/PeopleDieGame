@@ -4,8 +4,6 @@ using Steamworks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnturnedGameMaster.Autofac;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Helpers

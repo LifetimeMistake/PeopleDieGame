@@ -1,8 +1,7 @@
-﻿using JetBrains.Annotations;
-using Rocket.Unturned.Player;
+﻿using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
-using UnturnedGameMaster.Controllers;
+using UnturnedGameMaster.BossControllers;
 using UnturnedGameMaster.Enums;
 
 namespace UnturnedGameMaster.Models

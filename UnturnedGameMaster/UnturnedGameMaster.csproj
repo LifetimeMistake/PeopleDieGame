@@ -129,33 +129,33 @@
     <Compile Include="Commands\Teams\InvitesCommand.cs" />
     <Compile Include="Commands\Teams\RejectCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
-    <Compile Include="Controllers\BossController.cs" />
-    <Compile Include="Controllers\CursedBossController.cs" />
-    <Compile Include="Controllers\FlamethrowerBossController.cs" />
-    <Compile Include="Controllers\IBossController.cs" />
-    <Compile Include="Controllers\GroundpounderBossController.cs" />
+    <Compile Include="BossControllers\BossController.cs" />
+    <Compile Include="BossControllers\CursedBossController.cs" />
+    <Compile Include="BossControllers\FlamethrowerBossController.cs" />
+    <Compile Include="BossControllers\IBossController.cs" />
+    <Compile Include="BossControllers\GroundpounderBossController.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Enums\ZombieAbilities.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
-    <Compile Include="Managers\ArenaManager.cs" />
-    <Compile Include="Managers\EventMessageManagers\ArenaEventMessageManager.cs" />
-    <Compile Include="Managers\EventMessageManagers\RewardEventMessageManager.cs" />
-    <Compile Include="Managers\EventMessageManagers\ShopEventMessageManager.cs" />
-    <Compile Include="Managers\EventMessageManagers\TeamEventMessageManager.cs" />
-    <Compile Include="Managers\RewardManager.cs" />
-    <Compile Include="Managers\DataManager.cs" />
-    <Compile Include="Managers\GameManager.cs" />
-    <Compile Include="Managers\PlayerDataManager.cs" />
-    <Compile Include="Managers\RespawnManager.cs" />
-    <Compile Include="Managers\ShopManager.cs" />
-    <Compile Include="Managers\TeamManager.cs" />
-    <Compile Include="Managers\TimerManager.cs" />
-    <Compile Include="Managers\IDisposableManager.cs" />
-    <Compile Include="Managers\IManager.cs" />
-    <Compile Include="Managers\LoadoutManager.cs" />
-    <Compile Include="Managers\ZombiePoolManager.cs" />
+    <Compile Include="Services\Managers\ArenaManager.cs" />
+    <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\TeamEventMessageProvider.cs" />
+    <Compile Include="Services\Managers\RewardManager.cs" />
+    <Compile Include="Services\Managers\DataManager.cs" />
+    <Compile Include="Services\Managers\GameManager.cs" />
+    <Compile Include="Services\Managers\PlayerDataManager.cs" />
+    <Compile Include="Services\Managers\RespawnManager.cs" />
+    <Compile Include="Services\Managers\ShopManager.cs" />
+    <Compile Include="Services\Managers\TeamManager.cs" />
+    <Compile Include="Services\Managers\TimerManager.cs" />
+    <Compile Include="Services\IDisposableService.cs" />
+    <Compile Include="Services\IManager.cs" />
+    <Compile Include="Services\Managers\LoadoutManager.cs" />
+    <Compile Include="Services\Managers\ZombiePoolManager.cs" />
     <Compile Include="Models\Bosses\Cursed\CursedSmallMinion.cs" />
     <Compile Include="Models\Bosses\Cursed\CursedBoss.cs" />
     <Compile Include="Models\Bosses\Flamethrower\FlamethrowerBoss.cs" />
@@ -195,19 +195,21 @@
     <Compile Include="Patches\ZombieAbilityPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\ArenaIdProvider.cs" />
-    <Compile Include="Providers\GameStateFriendlyNameProvider.cs" />
-    <Compile Include="Providers\IDatabaseProvider.cs" />
-    <Compile Include="Providers\JsonDatabaseProvider.cs" />
-    <Compile Include="Providers\GameTickProvider.cs" />
-    <Compile Include="Providers\LoadoutIdProvider.cs" />
-    <Compile Include="Providers\TeamIdProvider.cs" />
+    <Compile Include="Services\Providers\ArenaIdProvider.cs" />
+    <Compile Include="Helpers\GameStateHelper.cs" />
+    <Compile Include="Services\Providers\IDatabaseProvider.cs" />
+    <Compile Include="Services\Providers\JsonDatabaseProvider.cs" />
+    <Compile Include="Services\Providers\GameTickProvider.cs" />
+    <Compile Include="Services\Providers\LoadoutIdProvider.cs" />
+    <Compile Include="Services\Providers\TeamIdProvider.cs" />
     <Compile Include="Reflection\FieldRef.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Providers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

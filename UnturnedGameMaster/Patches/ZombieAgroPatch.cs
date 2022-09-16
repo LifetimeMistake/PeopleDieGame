@@ -1,12 +1,9 @@
 ﻿using HarmonyLib;
 using SDG.Unturned;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
-using UnturnedGameMaster.Managers;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Patches
 {

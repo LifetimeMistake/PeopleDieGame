@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SDG.Unturned;
 using System;
-using UnityEngine;
-using UnityEngine.Rendering;
 using UnturnedGameMaster.Autofac;
 
 namespace UnturnedGameMaster.Models

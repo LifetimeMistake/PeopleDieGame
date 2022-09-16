@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 
@@ -126,7 +123,7 @@ namespace UnturnedGameMaster.Patches
     }
 
     public static class CodeInstructionExtensions
-    { 
+    {
         public static void Replace(this CodeInstruction codeInstruction, OpCode opCode, object operand = null)
         {
             codeInstruction.opcode = opCode;

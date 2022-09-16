@@ -1,13 +1,8 @@
 ﻿using Rocket.API;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
-using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {

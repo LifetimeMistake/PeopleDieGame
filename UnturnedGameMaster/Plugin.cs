@@ -1,15 +1,14 @@
 ﻿using HarmonyLib;
 using Rocket.Core.Plugins;
 using SDG.Framework.Devkit;
-using SDG.Unturned;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
-using UnturnedGameMaster.Providers;
+using UnturnedGameMaster.Services;
+using UnturnedGameMaster.Services.Providers;
 
 namespace UnturnedGameMaster
 {
@@ -33,17 +32,17 @@ namespace UnturnedGameMaster
 
         private void LoadManagers()
         {
-            Debug.Log("Loading managers...");
+            Debug.Log("Loading services...");
             IDatabaseProvider<GameData> databaseProvider = InitDatabase();
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar(databaseProvider);
             serviceLocator = new ServiceLocator();
             serviceLocator.Initialize(pluginAutoFacRegistrar);
             serviceLocator.BeginLifetimeScope();
 
-            // Init all managers
-            foreach (IManager manager in serviceLocator.LocateServicesOfType<IManager>())
+            // Init all services
+            foreach (IService service in serviceLocator.LocateServicesOfType<IService>())
             {
-                manager.Init();
+                service.Init();
             }
 
             ChatHelper.Say("Game manager loaded!");
@@ -51,13 +50,13 @@ namespace UnturnedGameMaster
 
         private void UnloadManagers()
         {
-            Debug.Log("Unloading managers...");
+            Debug.Log("Unloading services...");
             ChatHelper.Say("Game manager unloading!");
 
-            // Dispose all managers
-            foreach (IDisposableManager manager in serviceLocator.LocateServicesOfType<IDisposableManager>())
+            // Dispose all services
+            foreach (IDisposableService service in serviceLocator.LocateServicesOfType<IDisposableService>())
             {
-                manager.Dispose();
+                service.Dispose();
             }
         }
 

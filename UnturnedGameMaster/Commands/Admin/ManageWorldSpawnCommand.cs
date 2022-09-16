@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {

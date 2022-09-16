@@ -1,12 +1,5 @@
 ﻿using HarmonyLib;
-using Mono.Cecil;
 using SDG.Unturned;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Reflection;
@@ -73,7 +66,7 @@ namespace UnturnedGameMaster.Models
         {
             Abilities |= zombieAbility;
         }
-        
+
         public void SetAbilities(ZombieAbilities zombieAbility)
         {
             Abilities = zombieAbility;
@@ -90,7 +83,7 @@ namespace UnturnedGameMaster.Models
             baseUpdate();
         }
 
-        public static void UpdateAttacks(Zombie zombie, float targetDistance, ref float boulderThrowDelay, ref bool isThrowRelocating, 
+        public static void UpdateAttacks(Zombie zombie, float targetDistance, ref float boulderThrowDelay, ref bool isThrowRelocating,
             ref float lastAttack, ref float lastRelocate, ref float lastStartle, ref float lastSpecial, ref Player player, ref AIPath seeker, ref float specialStartleDelay,
             ref float specialUseDelay, ref float specialAttackDelay)
         {

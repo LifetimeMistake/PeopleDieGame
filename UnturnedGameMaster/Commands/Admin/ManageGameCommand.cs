@@ -5,8 +5,7 @@ using System.Linq;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
-using UnturnedGameMaster.Providers;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
@@ -93,7 +92,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 GameState state = gameManager.GetGameState();
-                string stateName = $"[{state}] {GameStateFriendlyNameProvider.GetFriendlyName(state)}";
+                string stateName = $"[{state}] {GameStateHelper.GetFriendlyName(state)}";
                 ChatHelper.Say(caller, $"Aktualny stan gry: {stateName}");
             }
             catch (Exception ex)

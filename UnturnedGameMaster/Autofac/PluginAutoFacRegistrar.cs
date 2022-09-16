@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
-using UnturnedGameMaster.Providers;
+using UnturnedGameMaster.Services;
+using UnturnedGameMaster.Services.Providers;
 
 namespace UnturnedGameMaster.Autofac
 {
@@ -23,7 +23,7 @@ namespace UnturnedGameMaster.Autofac
             AutowirePropertySelector autowirePropertySelector = new AutowirePropertySelector();
 
             IEnumerable<Type> managers = Assembly.GetCallingAssembly()
-                .GetTypes().Where(x => typeof(IManager).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
+                .GetTypes().Where(x => typeof(IService).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
 
             IEnumerable<Type> bosses = Assembly.GetCallingAssembly()
                 .GetTypes().Where(x => typeof(IZombieModel).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
@@ -37,10 +37,6 @@ namespace UnturnedGameMaster.Autofac
             {
                 builder.RegisterType(bossType).InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
             }
-
-            builder.RegisterType<LoadoutIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<TeamIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
-            builder.RegisterType<ArenaIdProvider>().InstancePerLifetimeScope().PropertiesAutowired(autowirePropertySelector, true);
 
             builder.RegisterInstance(databaseProvider).As<IDatabaseProvider<GameData>>().ExternallyOwned();
         }

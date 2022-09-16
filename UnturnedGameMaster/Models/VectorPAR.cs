@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace UnturnedGameMaster.Models
+﻿namespace UnturnedGameMaster.Models
 {
     public struct VectorPAR
     {

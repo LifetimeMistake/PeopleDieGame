@@ -3,13 +3,10 @@ using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
@@ -129,7 +126,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 ChatHelper.Say(caller, "Ustawiono nazwę areny");
             }
             catch (Exception ex)
-            { 
+            {
                 ChatHelper.Say(caller, $"Nie udało się ustawić nazwy areny z powodu błędu serwera: {ex.Message}");
             }
         }
@@ -261,7 +258,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 ChatHelper.Say(caller, $"Nie udało się ustawić wysokości bounty areny z powodu błędu serwera: {ex.Message}");
             }
         }
-        
+
         private void VerbSetActPoint(IRocketPlayer caller)
         {
             try

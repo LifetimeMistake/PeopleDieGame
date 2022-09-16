@@ -1,12 +1,11 @@
 ﻿using Rocket.API;
-using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
-using UnturnedGameMaster.Managers;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
