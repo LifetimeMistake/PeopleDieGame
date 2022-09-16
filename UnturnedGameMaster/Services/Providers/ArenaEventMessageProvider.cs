@@ -16,16 +16,14 @@ namespace UnturnedGameMaster.Services.Providers
 
         public void Init()
         {
-            arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
-            arenaManager.OnBossFightFailed += ArenaManager_OnBossFightFailed;
+            arenaManager.OnBossFightRemoved += ArenaManager_OnBossFightRemoved;
             arenaManager.OnBossFightCreated += ArenaManager_OnBossFightCreated;
             arenaManager.OnBossFightDominantTeamChanged += ArenaManager_OnBossFightDominantTeamChanged;
         }
 
         public void Dispose()
         {
-            arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
-            arenaManager.OnBossFightFailed -= ArenaManager_OnBossFightFailed;
+            arenaManager.OnBossFightRemoved -= ArenaManager_OnBossFightRemoved;
             arenaManager.OnBossFightCreated -= ArenaManager_OnBossFightCreated;
             arenaManager.OnBossFightDominantTeamChanged -= ArenaManager_OnBossFightDominantTeamChanged;
         }
@@ -46,31 +44,38 @@ namespace UnturnedGameMaster.Services.Providers
             }
         }
 
+        private void ArenaManager_OnBossFightRemoved(object sender, Models.EventArgs.BossFightEventArgs e)
+        {
+            Team team = e.BossFight.DominantTeam;
+            BossArena arena = e.BossFight.Arena;
+
+            switch (e.BossFight.State)
+            {
+                case Enums.BossFightState.BossDefeated:
+                    Color red = UnturnedChat.GetColorFromRGB(255, 0, 0);
+                    // used UnturnedChat to give the message a color, because kil boss cool B)
+                    UnturnedChat.Say($"Drużyna \"{team.Name}\" pokonała boss'a \"{arena.BossModel.Name}\" i otrzymała jego klucz!", red);
+                    break;
+                case Enums.BossFightState.AttackersDefeated:
+                    ChatHelper.Say($"Drużyna \"{team.Name}\" została pokonana przez \"{arena.BossModel.Name}\"!");
+                    break;
+                case Enums.BossFightState.Abandoned:
+                    ChatHelper.Say($"Drużyna \"{team.Name}\" przestraszyła się \"{arena.BossModel.Name}\" i uciekła z walki!");
+                    break;
+                default:
+                    ChatHelper.Say($"Walka z bossem \"{arena.BossModel.Name}\" została zakończona z powodu błedu serwera. sus");
+                    break;
+            }
+
+            ChatHelper.Say($"Drużyna \"{team.Name}\" rozpoczęła walkę z boss'em \"{arena.BossModel.Name}\"");
+        }
+
         private void ArenaManager_OnBossFightCreated(object sender, Models.EventArgs.BossFightEventArgs e)
         {
             Team team = e.BossFight.DominantTeam;
             BossArena arena = e.BossFight.Arena;
 
             ChatHelper.Say($"Drużyna \"{team.Name}\" rozpoczęła walkę z boss'em \"{arena.BossModel.Name}\"");
-        }
-
-        private void ArenaManager_OnBossFightFailed(object sender, Models.EventArgs.BossFightEventArgs e)
-        {
-            Team team = e.BossFight.DominantTeam;
-            BossArena arena = e.BossFight.Arena;
-
-            ChatHelper.Say($"Drużyna \"{team.Name}\" nie zdołała pokonać boss'a \"{arena.BossModel.Name}\"");
-        }
-
-        private void ArenaManager_OnBossFightCompleted(object sender, Models.EventArgs.BossFightEventArgs e)
-        {
-            Team team = e.BossFight.DominantTeam;
-            BossArena arena = e.BossFight.Arena;
-
-            Color red = UnturnedChat.GetColorFromRGB(255, 0, 0);
-
-            // used UnturnedChat to give the message a color, because kil boss cool B)
-            UnturnedChat.Say($"Drużyna \"{team.Name}\" pokonała boss'a \"{arena.BossModel.Name}\" i otrzymała jego klucz!", red);
         }
     }
 }
