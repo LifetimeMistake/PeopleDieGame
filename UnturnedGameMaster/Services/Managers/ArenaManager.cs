@@ -121,7 +121,7 @@ namespace UnturnedGameMaster.Services.Managers
                 return false;
 
             // Make sure all ongoing fights are killed prior to deletion.
-            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.Arena.Id == id))
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.Arena.Id == id).ToList())
                 EndBossFight(bossFight);
 
             arenas.Remove(id);
@@ -145,6 +145,11 @@ namespace UnturnedGameMaster.Services.Managers
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
                 return arenas.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+        }
+
+        public BossArena[] GetArenas()
+        {
+            return dataManager.GameData.Arenas.Values.ToArray();
         }
 
         public StringBuilder GetArenaSummary(BossArena arena)

@@ -138,6 +138,7 @@
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Enums\ZombieAbilities.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
+    <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />

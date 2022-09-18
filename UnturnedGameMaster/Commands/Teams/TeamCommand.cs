@@ -128,7 +128,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -172,7 +172,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -262,7 +262,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -336,7 +336,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -410,7 +410,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zaprosić gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -471,7 +471,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się awansować gracza do drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się awansować gracza do drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -522,7 +522,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -573,7 +573,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -633,7 +633,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wykonać polecenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -674,7 +674,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say($"Nie udało się opuścić drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, $"Nie udało się opuścić drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
     }

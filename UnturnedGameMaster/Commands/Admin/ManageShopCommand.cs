@@ -73,7 +73,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
             }
         }
         private void VerbAddItem(IRocketPlayer caller, string[] command)
@@ -134,7 +134,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się dodać przedmiotu do sklepu z powodu błędu serwera: {ex}");
             }
         }
 
@@ -167,7 +167,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się usunąć przedmiotu ze sklepu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć przedmiotu ze sklepu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -206,7 +206,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić ceny przedmiotu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić ceny przedmiotu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -236,7 +236,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
             }
         }
     }

@@ -66,8 +66,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić spawn świata z powodu błedu serwera: {ex.Message}");
-                return;
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić spawn świata z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -82,8 +81,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zresetować spawn świata z powodu błedu serwera: {ex.Message}");
-                return;
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zresetować spawn świata z powodu błedu serwera: {ex.Message}");
             }
         }
     }

@@ -69,9 +69,9 @@ namespace UnturnedGameMaster.Services.Managers
                         {
                             loadoutManager.GiveLoadout(playerData, loadout);
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            ChatHelper.Say(player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
+                            ExceptionHelper.Handle(ex, player, "Nie udało się nadać Tobie zestawu wyposażenia drużyny, skontaktuj się z administratorem.");
                         }
                     }
                 }

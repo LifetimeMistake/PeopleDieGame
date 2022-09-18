@@ -100,7 +100,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się rozpocząć procesu tworzenia areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się rozpocząć procesu tworzenia areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -127,7 +127,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić nazwy areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -159,7 +159,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić dystansu aktywacji areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić dystansu aktywacji areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -191,7 +191,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić dystansu dezaktywacji areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić dystansu dezaktywacji areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -223,7 +223,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić wysokości nagrody areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wysokości nagrody areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -255,7 +255,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić wysokości bounty areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wysokości bounty areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -277,7 +277,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić punktu aktywacji areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić punktu aktywacji areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -300,7 +300,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić punktu spawnu boss'a areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić punktu spawnu boss'a areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -323,7 +323,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić punktu spawnu nagrody areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić punktu spawnu nagrody areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -359,7 +359,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy boss'a areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić nazwy boss'a areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -390,7 +390,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -412,7 +412,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zatwierdzić areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zatwierdzić areny z powodu błędu serwera: {ex.Message}");
             }
         }
     }

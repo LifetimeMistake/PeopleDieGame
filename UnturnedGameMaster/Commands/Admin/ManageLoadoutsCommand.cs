@@ -38,6 +38,9 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "inspect":
                     VerbInspect(caller, verbArgs);
                     break;
+                case "list":
+                    VerbList(caller);
+                    break;
                 case "create":
                     VerbCreate(caller, verbArgs);
                     break;
@@ -60,6 +63,27 @@ namespace UnturnedGameMaster.Commands.Admin
                     ChatHelper.Say(caller, $"Nieprawidłowy argument.");
                     ShowSyntax(caller);
                     break;
+            }
+        }
+
+        private void VerbList(IRocketPlayer caller)
+        {
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+
+                StringBuilder sb = new StringBuilder();
+                ChatHelper.Say(caller, $"Lista zestawów wyposażeń:");
+                foreach (Loadout loadout in loadoutManager.GetLoadouts().OrderBy(x => x.Id))
+                {
+                    sb.AppendLine($"ID: {loadout.Id} | Nazwa: {loadout.Name}");
+                }
+
+                ChatHelper.Say(caller, sb);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o liście zestawów wyposażeń z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -103,7 +127,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o zestawie z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o zestawie z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -155,7 +179,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -183,7 +207,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się usunąć zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -235,7 +259,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się dodać przedmiotu do zestawu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się dodać przedmiotu do zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -274,7 +298,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się usunąć przedmiotu z zestawu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć przedmiotu z zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -308,7 +332,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić nazwy zestawu wyposażenia z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -338,7 +362,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić opisu zestawu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić opisu zestawu z powodu błędu serwera: {ex.Message}");
             }
         }
     }

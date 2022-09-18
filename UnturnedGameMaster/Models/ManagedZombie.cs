@@ -21,6 +21,7 @@ namespace UnturnedGameMaster.Models
         private FieldRef<float> spitTime;
 
         private FieldRef<float> fireDamage;
+        private FieldRef<EZombiePath> path; 
 
         private delegate void VoidDelegate();
         private VoidDelegate baseUpdate;
@@ -37,6 +38,7 @@ namespace UnturnedGameMaster.Models
         public float BoulderTime { get => boulderTime.Value; set => boulderTime.Value = value; }
         public float SpitTime { get => spitTime.Value; set => spitTime.Value = value; }
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
+        public EZombiePath Path { get => path.Value; set => path.Value = value; }
 
         public ManagedZombie()
         {
@@ -55,6 +57,7 @@ namespace UnturnedGameMaster.Models
             spitTime = FieldRef.GetFieldRef<Zombie, float>(this, "spitTime");
 
             fireDamage = FieldRef.GetFieldRef<Zombie, float>(this, "fireDamage");
+            path = FieldRef.GetFieldRef<Zombie, EZombiePath>(this, "path");
         }
 
         public bool CanUseAbility(ZombieAbilities zombieAbility)

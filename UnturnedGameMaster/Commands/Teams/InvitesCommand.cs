@@ -76,7 +76,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wyświetlić listy zaproszeń z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wyświetlić listy zaproszeń z powodu błedu serwera: {ex.Message}");
             }
         }
     }

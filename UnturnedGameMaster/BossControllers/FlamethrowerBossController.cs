@@ -49,6 +49,7 @@ namespace UnturnedGameMaster.BossControllers
 
             byte boundId = arena.BoundId;
             bossZombie = zombiePoolManager.SpawnZombie(boundId, 0, bossModel, arena.BossSpawnPoint.Position, arena.BossSpawnPoint.Rotation, true);
+            bossZombie.Path = EZombiePath.RIGHT_FLANK;
 
             if (bossZombie == null)
                 return false; // failed to spawn main boss

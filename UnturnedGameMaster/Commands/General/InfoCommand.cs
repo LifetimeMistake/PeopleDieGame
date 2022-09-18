@@ -92,8 +92,7 @@ namespace UnturnedGameMaster.Commands.General
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się odnaleźć danych gracza z powodu błedu serwera: {ex.Message}");
-                return;
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się odnaleźć danych gracza z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -138,7 +137,7 @@ namespace UnturnedGameMaster.Commands.General
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się odczytać danych drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -154,7 +153,7 @@ namespace UnturnedGameMaster.Commands.General
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się odczytać stanu gry z powodu błędu serwera: {ex.Message}");
             }
         }
     }

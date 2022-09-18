@@ -68,7 +68,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się rozpocząć gry z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się rozpocząć gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zakończyć gry z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zakończyć gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -97,7 +97,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się odczytać stanu gry z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się odczytać stanu gry z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -126,7 +126,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić stanu gry z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić stanu gry z powodu błedu serwera: {ex.Message}");
             }
         }
     }

@@ -37,7 +37,7 @@ namespace UnturnedGameMaster.Commands.Admin
             switch (command[0].ToLowerInvariant())
             {
                 case "list":
-                    VerbList(caller, verbArgs);
+                    VerbList(caller);
                     break;
                 case "inspect":
                     VerbInspect(caller, verbArgs);
@@ -93,7 +93,7 @@ namespace UnturnedGameMaster.Commands.Admin
             ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
-        private void VerbList(IRocketPlayer caller, string[] command)
+        private void VerbList(IRocketPlayer caller)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o liście drużyn z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o liście drużyn z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -183,7 +183,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o drużynie z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o drużynie z powodu błędu serwera: {ex.Message}");
             }
 
         }
@@ -211,7 +211,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -245,7 +245,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się usunąć drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -284,7 +284,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -316,7 +316,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -345,7 +345,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -379,7 +379,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić nazwy drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić nazwy drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -409,7 +409,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić opisu z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić opisu z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -445,7 +445,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zmienić domyślnego zestawu wyposażenia z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -474,7 +474,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zresetować zestawu wyposażenia drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -503,7 +503,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać ilości środków drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -538,7 +538,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić ilości środków drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić ilości środków drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -573,7 +573,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zdeponować środków do banku drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zdeponować środków do banku drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -608,7 +608,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wypłacić środków z banku drużyny z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wypłacić środków z banku drużyny z powodu błedu serwera: {ex.Message}");
             }
         }
     }

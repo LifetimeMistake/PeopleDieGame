@@ -70,7 +70,7 @@ namespace UnturnedGameMaster.Commands.Shop
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace UnturnedGameMaster.Commands.Shop
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o przedmiocie z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -167,7 +167,7 @@ namespace UnturnedGameMaster.Commands.Shop
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zakupić przedmiotu z powodu błędu serwera: {ex}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zakupić przedmiotu z powodu błędu serwera: {ex}");
             }
         }
     }

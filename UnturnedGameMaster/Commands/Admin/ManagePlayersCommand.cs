@@ -113,7 +113,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać drużyny gracza z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać drużyny gracza z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -161,7 +161,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się dodać gracza do drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się dodać gracza do drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -208,7 +208,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się usunąć gracza z drużyny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć gracza z drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -251,7 +251,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się awansować gracza z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się awansować gracza z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -287,7 +287,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić bio gracza z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić bio gracza z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -316,7 +316,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać ilości środków gracza z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać ilości środków gracza z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -351,7 +351,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić ilości środków gracza z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić ilości środków gracza z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -386,7 +386,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się zdeponować środków do portfela gracza z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się zdeponować środków do portfela gracza z powodu błedu serwera: {ex.Message}");
             }
         }
 
@@ -421,7 +421,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się wypłacić środków z portfela gracza z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się wypłacić środków z portfela gracza z powodu błedu serwera: {ex.Message}");
             }
         }
     }

@@ -75,7 +75,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się nadać zestawu z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się nadać zestawu z powodu błedu serwera: {ex.Message}");
             }
         }
 

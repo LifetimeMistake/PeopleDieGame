@@ -66,8 +66,6 @@ namespace UnturnedGameMaster.Services.Providers
                     ChatHelper.Say($"Walka z bossem \"{arena.BossModel.Name}\" została zakończona z powodu błedu serwera. sus");
                     break;
             }
-
-            ChatHelper.Say($"Drużyna \"{team.Name}\" rozpoczęła walkę z boss'em \"{arena.BossModel.Name}\"");
         }
 
         private void ArenaManager_OnBossFightCreated(object sender, Models.EventArgs.BossFightEventArgs e)

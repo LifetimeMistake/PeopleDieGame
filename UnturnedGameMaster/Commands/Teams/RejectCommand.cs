@@ -81,7 +81,7 @@ namespace UnturnedGameMaster.Commands.Teams
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się odrzucić zaproszenia z powodu błedu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się odrzucić zaproszenia z powodu błedu serwera: {ex.Message}");
             }
         }
     }

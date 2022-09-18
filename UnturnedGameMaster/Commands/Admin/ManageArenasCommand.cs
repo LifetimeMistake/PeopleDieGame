@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
@@ -38,6 +39,12 @@ namespace UnturnedGameMaster.Commands.Admin
                 case "inspect":
                     VerbInspect(caller, verbArgs);
                     break;
+                case "list":
+                    VerbList(caller);
+                    break;
+                case "remove":
+                    VerbRemove(caller, verbArgs);
+                    break;
                 case "setname":
                     VerbSetName(caller, verbArgs);
                     break;
@@ -71,6 +78,27 @@ namespace UnturnedGameMaster.Commands.Admin
             ChatHelper.Say(caller, $"/{Name} {Syntax}");
         }
 
+        private void VerbList(IRocketPlayer caller)
+        {
+            try
+            {
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+
+                StringBuilder sb = new StringBuilder();
+                ChatHelper.Say(caller, $"Lista aren:");
+                foreach (BossArena arena in arenaManager.GetArenas().OrderBy(x => x.Id))
+                {
+                    sb.AppendLine($"ID: {arena.Id} | Nazwa: {arena.Name}");
+                }
+
+                ChatHelper.Say(caller, sb);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o liście aren z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
         private void VerbInspect(IRocketPlayer caller, string[] command)
         {
             if (command.Length == 0)
@@ -93,9 +121,40 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się pobrać informacji o arenie z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać informacji o arenie z powodu błędu serwera: {ex.Message}");
             }
         }
+
+        private void VerbRemove(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0)
+            {
+                ChatHelper.Say(caller, "Musisz podać nazwę lub ID areny");
+                return;
+            }
+            try
+            {
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                BossArena arena = arenaManager.ResolveArena(command[0], false);
+
+                if (arena == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono areny \"{command[0]}\"");
+                    return;
+                }
+
+                if (!arenaManager.DeleteArena(arena.Id))
+                {
+                    ChatHelper.Say(caller, $"Nie udało się usunąć areny z powodu błędu systemu");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się usunąć areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
         private void VerbSetName(IRocketPlayer caller, string[] command)
         {
             if (command.Length != 2)
@@ -126,7 +185,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się utworzyć areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -159,7 +218,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić boss'a areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić boss'a areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -194,11 +253,11 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (ArgumentOutOfRangeException)
             {
-                ChatHelper.Say(caller, "Dystans nie może być ujemny");
+                ChatHelper.Say(caller, "Odległość nie może być ujemna");
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić dystansu aktywacji areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić dystansu aktywacji areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -233,11 +292,11 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (ArgumentOutOfRangeException)
             {
-                ChatHelper.Say(caller, "Dystans nie może być ujemny");
+                ChatHelper.Say(caller, "Odległość nie może być ujemna");
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić dystansy dezaktywacji areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić dystansy dezaktywacji areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -276,7 +335,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić nagrody areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić nagrody areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -315,7 +374,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić bounty areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić bounty areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -362,7 +421,7 @@ namespace UnturnedGameMaster.Commands.Admin
             }
             catch (Exception ex)
             {
-                ChatHelper.Say(caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
             }
         }
     }
