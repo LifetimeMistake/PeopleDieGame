@@ -18,7 +18,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<create/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss/setpoolsize> <value>";
+        public string Syntax => "<create/cancel/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss/setpoolsize> <value>";
 
         public List<string> Aliases => new List<string>();
 
@@ -40,6 +40,9 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 case "create":
                     VerbCreate(caller);
+                    break;
+                case "cancel":
+                    VerbCancel(caller);
                     break;
                 case "setname":
                     VerbSetName(caller, verbArgs);
@@ -90,10 +93,13 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             try
             {
-                UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID(((UnturnedPlayer)caller).CSteamID);
-                VectorPAR playerPos = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
-
                 ArenaBuilder arenaBuilder = new ArenaBuilder();
+
+                if (Builders.ContainsKey(caller.Id))
+                {
+                    ChatHelper.Say(caller, "Rozpocząłeś już proces tworzenia areny");
+                    return;
+                }
 
                 Builders.Add(caller.Id, arenaBuilder);
                 ChatHelper.Say(caller, "Rozpoczęto proces tworzenia areny");
@@ -101,6 +107,23 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 ExceptionHelper.Handle(ex, caller, $"Nie udało się rozpocząć procesu tworzenia areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbCancel(IRocketPlayer caller)
+        {
+            try
+            {
+                if (!Builders.Remove(caller.Id))
+                {
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
+                    return;
+                }
+                ChatHelper.Say(caller, "Anulowano proces tworzenia areny");
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się anulować procesu tworzenia areny z powodu błędu serwera: {ex.Message}");
             }
         }
 
@@ -116,7 +139,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -143,7 +166,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -175,7 +198,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -207,7 +230,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -239,7 +262,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -265,7 +288,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -287,7 +310,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -310,7 +333,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -339,7 +362,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -381,7 +404,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
@@ -400,7 +423,7 @@ namespace UnturnedGameMaster.Commands.Admin
             {
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
-                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    ChatHelper.Say(caller, "Nie rozpocząłeś procesu tworzenia areny");
                     return;
                 }
 
