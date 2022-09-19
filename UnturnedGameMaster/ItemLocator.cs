@@ -17,14 +17,11 @@ namespace UnturnedGameMaster
     {
         public static List<UnturnedPlayer> GetPlayersWithItem(ushort itemId)
         {
-            PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-
-            PlayerData[] playerDatas = playerDataManager.GetPlayers();
             List<UnturnedPlayer> playerList = new List<UnturnedPlayer>();
 
-            foreach (PlayerData playerData in playerDatas)
+            foreach (SteamPlayer steamPlayer in Provider.clients)
             {
-                playerList.Add(UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id));
+                playerList.Add(UnturnedPlayer.FromCSteamID(steamPlayer.playerID.steamID));
             }
 
             foreach (UnturnedPlayer player in playerList.ToList())
