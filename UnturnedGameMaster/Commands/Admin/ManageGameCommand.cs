@@ -113,8 +113,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
-                GameState gameState;
-                if (!Enum.TryParse(command[0], out gameState))
+                if (!Enum.TryParse(command[0], out GameState gameState))
                     throw new ArgumentException(nameof(command));
 
                 gameManager.SetGameState(gameState);

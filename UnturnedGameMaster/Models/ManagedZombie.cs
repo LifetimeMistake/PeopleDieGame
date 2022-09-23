@@ -39,6 +39,7 @@ namespace UnturnedGameMaster.Models
         public float SpitTime { get => spitTime.Value; set => spitTime.Value = value; }
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
         public EZombiePath Path { get => path.Value; set => path.Value = value; }
+        public bool AIEnabled { get; set; }
 
         public ManagedZombie()
         {
@@ -58,6 +59,7 @@ namespace UnturnedGameMaster.Models
 
             fireDamage = FieldRef.GetFieldRef<Zombie, float>(this, "fireDamage");
             path = FieldRef.GetFieldRef<Zombie, EZombiePath>(this, "path");
+            AIEnabled = true;
         }
 
         public bool CanUseAbility(ZombieAbilities zombieAbility)
@@ -82,6 +84,9 @@ namespace UnturnedGameMaster.Models
 
         private void Update()
         {
+            if (!AIEnabled)
+                return;
+
             // Passthrough unity event
             baseUpdate();
         }

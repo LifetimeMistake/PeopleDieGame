@@ -85,10 +85,7 @@ namespace UnturnedGameMaster.Commands.General
                     }
                 }
 
-                StringBuilder sb = new StringBuilder();
-                foreach (string line in playerDataManager.GetPlayerSummary(playerData).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    sb.AppendLine(line);
-                ChatHelper.Say(caller, sb);
+                ChatHelper.Say(caller, playerDataManager.GetPlayerSummary(playerData));
             }
             catch (Exception ex)
             {
@@ -146,10 +143,7 @@ namespace UnturnedGameMaster.Commands.General
             try
             {
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
-                StringBuilder sb = new StringBuilder();
-                foreach (string line in gameManager.GetGameSummary().Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    sb.AppendLine(line);
-                ChatHelper.Say(caller, sb);
+                ChatHelper.Say(caller, gameManager.GetGameSummary());
             }
             catch (Exception ex)
             {

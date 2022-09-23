@@ -1,8 +1,10 @@
-﻿using Rocket.API;
+﻿using JetBrains.Annotations;
+using Rocket.API;
 using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
@@ -10,7 +12,7 @@ using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Admin
 {
-    public class ArenaCommand : IRocketCommand
+    public class ArenaBuilderCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
@@ -18,7 +20,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<create/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss/setpoolsize> <value>";
+        public string Syntax => "<create/setname/setactdist/setdeactdist/setreward/setbounty/setactpoint/setbossspawn/setrewardspawn/setboss/setpoolsize/setrewardloadout> <value>";
 
         public List<string> Aliases => new List<string>();
 
@@ -70,6 +72,9 @@ namespace UnturnedGameMaster.Commands.Admin
                     break;
                 case "setpoolsize":
                     VerbSetPoolSize(caller, verbArgs);
+                    break;
+                case "setrewardloadout":
+                    VerbSetRewardLoadout(caller, verbArgs);
                     break;
                 case "submit":
                     VerbSubmit(caller);
@@ -315,9 +320,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 }
 
                 UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID(((UnturnedPlayer)caller).CSteamID);
-                VectorPAR playerPos = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
-
-                arenaBuilder.SetRewardSpawnPoint(playerPos);
+                arenaBuilder.SetRewardSpawnPoint(callerPlayer.Position);
 
                 ChatHelper.Say(caller, "Ustawiono punkt spawnu nagrody areny");
             }
@@ -394,6 +397,42 @@ namespace UnturnedGameMaster.Commands.Admin
             }
         }
 
+        private void VerbSetRewardLoadout(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length != 1)
+            {
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID zestawu nagród");
+                return;
+            }
+
+            try
+            {
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                
+                if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
+                {
+                    ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
+                    return;
+                }
+
+                string searchTerm = string.Join(" ", command);
+                Loadout loadout = loadoutManager.ResolveLoadout(searchTerm, false);
+
+                if (loadout == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu wyposażenia \"{searchTerm}\"");
+                    return;
+                }
+
+                arenaBuilder.SetRewardLoadout(loadout);
+                ChatHelper.Say(caller, $"Ustawiono nagrodę na \"{loadout.Name}\"");
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
         private void VerbSubmit(IRocketPlayer caller)
         {
             try
@@ -404,10 +443,49 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                if (string.IsNullOrWhiteSpace(arenaBuilder.ArenaName))
+                {
+                    ChatHelper.Say(caller, "Nie ustawiono nazwy areny");
+                    return;
+                }
 
+                if (arenaBuilder.ActivationPoint == default(Vector3))
+                {
+                    ChatHelper.Say(caller, "Nie ustawiono punktu aktywacji areny");
+                    return;
+                }
+
+                if (arenaBuilder.BossSpawnpoint.Position == default(Vector3))
+                {
+                    ChatHelper.Say(caller, "Nie ustawiono punktu spawnu bossa");
+                    return;
+                }
+
+                if (arenaBuilder.BossModel == null)
+                {
+                    ChatHelper.Say(caller, "Nie ustawiono bossa areny");
+                    return;
+                }
+
+                if (arenaBuilder.ZombiePoolSize == 0)
+                {
+                    ChatHelper.Say(caller, "Ostrzeżenie: Rozmiar puli zombie jest ustawiony na 0");
+                }
+
+                if (arenaBuilder.ActivationDistance == 0)
+                {
+                    ChatHelper.Say(caller, "Ostrzeżenie: Odległość aktywacji jest ustawiona na 0");
+                }
+
+                if (arenaBuilder.DeactivationDistance == 0)
+                {
+                    ChatHelper.Say(caller, "Ostrzeżenie: Odległość deaktywacji jest ustawiona na 0");
+                }
+
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
                 arenaManager.CreateArena(arenaBuilder);
                 Builders.Remove(caller.Id);
+
                 ChatHelper.Say(caller, "Utworzono arenę");
             }
             catch (Exception ex)

@@ -229,10 +229,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     return;
                 }
 
-                StringBuilder sb = new StringBuilder();
-                foreach (string line in shopManager.GetItemSummary(shopItem).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
-                    sb.AppendLine(line);
-                ChatHelper.Say(caller, sb);
+                ChatHelper.Say(caller, shopManager.GetItemSummary(shopItem));
             }
             catch (Exception ex)
             {

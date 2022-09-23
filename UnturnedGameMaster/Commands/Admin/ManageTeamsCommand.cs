@@ -173,8 +173,7 @@ namespace UnturnedGameMaster.Commands.Admin
                 else
                 {
                     sb.AppendLine("Punkt odradzania:");
-                    sb.AppendLine($"\t{teamRespawnPoint.Value.Position}");
-                    sb.AppendLine($"\t{teamRespawnPoint.Value.Rotation}");
+                    sb.AppendLine($"\t{teamRespawnPoint.Value}");
                 }
 
                 sb.AppendLine($"Stan konta: ${team.BankBalance}");

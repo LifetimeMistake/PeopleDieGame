@@ -19,6 +19,8 @@ namespace UnturnedGameMaster.Services.Managers
         private DataManager dataManager { get; set; }
         [InjectDependency]
         private GameManager gameManager { get; set; }
+        [InjectDependency]
+        private LoadoutManager loadoutManager { get; set; }
 
 
         public event EventHandler<RewardEventArgs> OnPlayerReceivePlayerReward;
@@ -50,6 +52,15 @@ namespace UnturnedGameMaster.Services.Managers
                 playerDataManager.DepositIntoWallet(playerData, arena.CompletionReward);
                 playerDataManager.AddBounty(playerData, arena.CompletionBounty);
             }
+
+            if (!arena.RewardLoadoutId.HasValue)
+                return;
+
+            Loadout reward = loadoutManager.GetLoadout(arena.RewardLoadoutId.Value);
+            if (reward == null)
+                return;
+
+            loadoutManager.DropLoadout(reward, arena.RewardSpawnPoint);
         }
 
         private void UnturnedPlayerEvents_OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, Steamworks.CSteamID murderer)

@@ -14,7 +14,7 @@ namespace UnturnedGameMaster.Commands.Teams
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "accepta";
+        public string Name => "accept";
 
         public string Help => "Akceptuje oczekujące zaproszenia do drużyny.";
 

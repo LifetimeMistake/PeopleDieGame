@@ -111,7 +111,7 @@
     <Compile Include="Autofac\InjectDependencyAttribute.cs" />
     <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
     <Compile Include="Autofac\ServiceLocator.cs" />
-    <Compile Include="Commands\Admin\ArenaCommand.cs" />
+    <Compile Include="Commands\Admin\ArenaBuilderCommand.cs" />
     <Compile Include="Commands\Admin\ManageArenasCommand.cs" />
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
@@ -121,6 +121,7 @@
     <Compile Include="Commands\Admin\ManagePlayersCommand.cs" />
     <Compile Include="Commands\Admin\ManageTeamsCommand.cs" />
     <Compile Include="Commands\Admin\SaveConfigCommand.cs" />
+    <Compile Include="Commands\Admin\ZombieCommand.cs" />
     <Compile Include="Commands\General\BioCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />

@@ -11,7 +11,7 @@ using UnturnedGameMaster.Services.Providers;
 
 namespace UnturnedGameMaster.Services.Managers
 {
-    public class TeamManager : IService
+    public class TeamManager : IDisposableService
     {
         [InjectDependency]
         private DataManager dataManager { get; set; }
@@ -19,6 +19,8 @@ namespace UnturnedGameMaster.Services.Managers
         private PlayerDataManager playerDataManager { get; set; }
         [InjectDependency]
         private TeamIdProvider teamIdProvider { get; set; }
+        [InjectDependency]
+        private LoadoutManager loadoutManager { get; set; }
 
         public event EventHandler<TeamMembershipEventArgs> OnPlayerJoinedTeam;
         public event EventHandler<TeamMembershipEventArgs> OnPlayerLeftTeam;
@@ -34,7 +36,23 @@ namespace UnturnedGameMaster.Services.Managers
         public event EventHandler<TeamBankEventArgs> OnBankWithdrawnFrom;
 
         public void Init()
-        { }
+        {
+            loadoutManager.OnLoadoutRemoved += LoadoutManager_OnLoadoutRemoved;
+        }
+
+        public void Dispose()
+        {
+            loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
+        }
+
+        private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
+        {
+            foreach(Team team in GetTeams())
+            {
+                if (team.DefaultLoadoutId == e.Loadout.Id)
+                    team.SetDefaultLoadout(null);
+            }
+        }
 
         public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null, double bankFunds = 1000)
         {

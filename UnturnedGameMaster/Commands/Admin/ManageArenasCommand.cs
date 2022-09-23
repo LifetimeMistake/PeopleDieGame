@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
@@ -18,7 +19,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/setname/setboss/setactdist/setdeactdist/setreward/setbounty/setbossspawn/setrewardspawn> <arenaName/arenaId> <name/boss/distance/amount>";
+        public string Syntax => "<inspect/setname/setboss/setactdist/setdeactdist/setreward/setbounty/setbossspawn/setrewardspawn/setrewardloadout> <arenaName/arenaId> <name/boss/distance/amount>";
 
         public List<string> Aliases => new List<string>();
 
@@ -65,6 +66,9 @@ namespace UnturnedGameMaster.Commands.Admin
                     break;
                 case "setpoolsize":
                     VerbSetPoolSize(caller, verbArgs);
+                    break;
+                case "setrewardloadout":
+                    VerbSetRewardLoadout(caller, verbArgs);
                     break;
                 default:
                     ChatHelper.Say(caller, $"Nieprawidłowy argument.");
@@ -265,7 +269,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length != 2)
             {
-                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans deaktywacji");
                 return;
             }
 
@@ -304,7 +308,7 @@ namespace UnturnedGameMaster.Commands.Admin
         {
             if (command.Length != 2)
             {
-                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz dystans aktywacji");
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz wartość nagrody");
                 return;
             }
 
@@ -422,6 +426,43 @@ namespace UnturnedGameMaster.Commands.Admin
             catch (Exception ex)
             {
                 ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić wielkości puli spawnów areny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetRewardLoadout(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length < 2)
+            {
+                ChatHelper.Say(caller, $"Musisz podać nazwę lub ID areny oraz nazwę lub ID zestawu nagród");
+                return;
+            }
+
+            try
+            {
+                ArenaManager arenaManager = ServiceLocator.Instance.LocateService<ArenaManager>();
+                LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
+                BossArena arena = arenaManager.ResolveArena(command[0], false);
+
+                if (arena == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono areny \"{command[0]}\"");
+                    return;
+                }
+
+                string searchTerm = string.Join(" ", command.Skip(1));
+                Loadout loadout = loadoutManager.ResolveLoadout(searchTerm, false);
+                if (loadout == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono zestawu nagród \"{searchTerm}\"");
+                    return;
+                }
+
+                arena.SetRewardLoadout(loadout);
+                ChatHelper.Say(caller, "Ustawiono zestaw nagród");
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić bounty areny z powodu błędu serwera: {ex.Message}");
             }
         }
     }
