@@ -10,6 +10,9 @@ using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Services.Managers;
+using UnityEngine;
+using UnturnedGameMaster.Reflection;
+using System.Reflection;
 
 namespace UnturnedGameMaster
 {
@@ -28,15 +31,11 @@ namespace UnturnedGameMaster
             {
                 List<InventorySearch> searchList = player.Inventory.search(itemId, false, true);
                 if (searchList.Count == 0)
-                {
                     playerList.Remove(player);
-                }
             }
 
             if (playerList.Count == 0)
-            {
                 return null;
-            }
 
             return playerList;
         }
@@ -48,9 +47,8 @@ namespace UnturnedGameMaster
             foreach (ItemRegion region in ItemManager.regions)
             {
                 if (region.items.Count == 0)
-                {
                     continue;
-                }
+
                 foreach (ItemData itemData in region.items)
                 {
                     if (itemData.item.id == itemId && itemData.isDropped)
@@ -62,6 +60,48 @@ namespace UnturnedGameMaster
                 return null;
 
             return items;
+        }
+
+        public static List<InteractableStorage> GetStoragesWithItem(ushort itemId)
+        {
+            List<InteractableStorage> storageList = UnityEngine.Object.FindObjectsOfType<InteractableStorage>().ToList();
+
+            foreach (InteractableStorage storage in storageList.ToList())
+            {
+                List<InventorySearch> searchList = storage.items.search(new List<InventorySearch>(), itemId, false, true);
+                
+                if (searchList.Count == 0)
+                    storageList.Remove(storage);
+            }
+
+            if (storageList.Count == 0)
+                return null;
+
+            return storageList;
+        }
+
+        public static List<InteractableVehicle> GetVehiclesWithItem(ushort itemId)
+        {
+            List<InteractableVehicle> vehicleList = VehicleManager.vehicles;
+
+            foreach (InteractableVehicle vehicle in vehicleList.ToList())
+            {
+                if (vehicle.trunkItems == null)
+                {
+                    vehicleList.Remove(vehicle);
+                    continue;
+                }
+
+                List<InventorySearch> searchList = vehicle.trunkItems.search(new List<InventorySearch>(), itemId, false, true);
+
+                if (searchList.Count == 0)
+                    vehicleList.Remove(vehicle);
+            }
+
+            if (vehicleList.Count == 0)
+                return null;
+
+            return vehicleList;
         }
     }
 }

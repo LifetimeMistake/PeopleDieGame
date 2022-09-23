@@ -10,7 +10,7 @@ using UnturnedGameMaster.Helpers;
 
 namespace UnturnedGameMaster.Commands
 {
-    public class TestCommand : IRocketCommand
+    public class TestLocateCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
@@ -41,10 +41,12 @@ namespace UnturnedGameMaster.Commands
 
             List<UnturnedPlayer> players = ItemLocator.GetPlayersWithItem(id);
             List<ItemData> items = ItemLocator.GetDroppedItems(id);
+            List<InteractableStorage> storages = ItemLocator.GetStoragesWithItem(id);
+            List<InteractableVehicle> vehicles = ItemLocator.GetVehiclesWithItem(id);
 
             StringBuilder sb = new StringBuilder();
 
-            if (items == null && players == null)
+            if (items == null && players == null && storages == null && vehicles == null)
             {
                 ChatHelper.Say(caller, $"Przedmiot z ID: {id} nie został znaleziony");
                 return;
@@ -64,6 +66,22 @@ namespace UnturnedGameMaster.Commands
                 foreach (ItemData item in items)
                 {
                     sb.AppendLine($"ID: {item.instanceID} | {item.point}");
+                }
+            }
+            if (storages != null)
+            {
+                sb.AppendLine($"Pojemniki posiadające przedmiot z ID: {id}");
+                foreach (InteractableStorage storage in storages)
+                {
+                    sb.AppendLine($"ID: {storage.name} | {storage.gameObject.transform.position}");
+                }
+            }
+            if (vehicles != null)
+            {
+                sb.AppendLine($"Pojazdy posiadające przedmiot z ID: {id}");
+                foreach (InteractableVehicle vehicle in vehicles)
+                {
+                    sb.AppendLine($"ID: {vehicle.name} | {vehicle.gameObject.transform.position}");
                 }
             }
 
