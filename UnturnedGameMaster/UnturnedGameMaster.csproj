@@ -135,12 +135,14 @@
     <Compile Include="BossControllers\FlamethrowerBossController.cs" />
     <Compile Include="BossControllers\IBossController.cs" />
     <Compile Include="BossControllers\GroundpounderBossController.cs" />
+    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
     <Compile Include="Enums\ZombieAbilities.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
+    <Compile Include="ItemLocator.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
