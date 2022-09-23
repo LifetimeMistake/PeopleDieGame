@@ -19,7 +19,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<inspect/setname/setboss/setactdist/setdeactdist/setreward/setbounty/setbossspawn/setrewardspawn/setrewardloadout> <arenaName/arenaId> <name/boss/distance/amount>";
+        public string Syntax => "<inspect/list/remove/setname/setboss/setactdist/setdeactdist/setreward/setbounty/setbossspawn/setrewardspawn/setrewardloadout> <arenaName/arenaId> <name/boss/distance/amount>";
 
         public List<string> Aliases => new List<string>();
 
