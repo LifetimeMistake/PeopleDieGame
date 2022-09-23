@@ -40,32 +40,31 @@ namespace UnturnedGameMaster.Commands
             }
 
             List<UnturnedPlayer> players = ItemLocator.GetPlayersWithItem(id);
+            List<ItemData> items = ItemLocator.GetDroppedItems(id);
+
             StringBuilder sb = new StringBuilder();
 
-            if (players == null) // if no players have item, look for dropped ones
+            if (items == null && players == null)
             {
-                List<ItemData> items = ItemLocator.GetDroppedItems(id);
+                ChatHelper.Say(caller, $"Przedmiot z ID: {id} nie został znaleziony");
+                return;
+            }
 
-                if (items == null)
+            if (players != null)
+            {
+                sb.AppendLine($"Gracze posiadający przedmiot z ID: {id}");
+                foreach (UnturnedPlayer player in players)
                 {
-                    ChatHelper.Say(caller, $"Przedmiot z ID: {id} nie został znaleziony");
-                    return;
+                    sb.AppendLine($"{player.CharacterName} | ID: {player.Id}");
                 }
-
+            }
+            if (items != null)
+            {
                 sb.AppendLine($"Znalezione przedmioty z ID: {id}");
                 foreach (ItemData item in items)
                 {
                     sb.AppendLine($"ID: {item.instanceID} | {item.point}");
                 }
-
-                ChatHelper.Say(sb);
-                return;
-            }
-
-            sb.AppendLine($"Gracze posiadający przedmiot z ID: {id}");
-            foreach (UnturnedPlayer player in players)
-            {
-                sb.AppendLine($"{player.CharacterName} | ID: {player.Id}");
             }
 
             ChatHelper.Say(sb);
