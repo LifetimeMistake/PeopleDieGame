@@ -49,18 +49,12 @@ namespace UnturnedGameMaster
 
         public void SetDefaultLoadout(Loadout loadout)
         {
-            if (loadout == null)
-                DefaultLoadoutId = null;
-            else
-                DefaultLoadoutId = loadout.Id;
+            DefaultLoadoutId = loadout?.Id ?? null;
         }
 
         public void SetTeamLeader(PlayerData player)
         {
-            if (player == null)
-                LeaderId = null;
-            else
-                LeaderId = player.Id;
+            LeaderId = player?.Id ?? null;
         }
 
         public void AddInvitation(TeamInvitation teamInvitation)

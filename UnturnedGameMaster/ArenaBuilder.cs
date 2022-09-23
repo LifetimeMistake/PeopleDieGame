@@ -14,10 +14,11 @@ namespace UnturnedGameMaster
         private double completionReward = 0;
         private Vector3 activationPoint;
         private VectorPAR bossSpawnpoint;
-        private VectorPAR rewardSpawnpoint;
+        private Vector3S rewardSpawnpoint;
         private IZombieModel bossModel;
         private byte boundId;
         private int zombiePoolSize;
+        private int? rewardLoadoutId;
 
         public string ArenaName { get => arenaName; }
         public double ActivationDistance { get => activationDistance; }
@@ -26,10 +27,11 @@ namespace UnturnedGameMaster
         public double CompletionReward { get => completionReward; }
         public Vector3 ActivationPoint { get => activationPoint; }
         public VectorPAR BossSpawnpoint { get => bossSpawnpoint; }
-        public VectorPAR RewardSpawnpoint { get => rewardSpawnpoint; }
+        public Vector3S RewardSpawnpoint { get => rewardSpawnpoint; }
         public IZombieModel BossModel { get => bossModel; }
         public byte BoundId { get => boundId; }
         public int ZombiePoolSize { get => zombiePoolSize; }
+        public int? RewardLoadoutId { get => rewardLoadoutId; }
 
         public void SetName(string name)
         {
@@ -91,7 +93,7 @@ namespace UnturnedGameMaster
             bossSpawnpoint = spawnpoint;
         }
 
-        public void SetRewardSpawnPoint(VectorPAR spawnpoint)
+        public void SetRewardSpawnPoint(Vector3S spawnpoint)
         {
             rewardSpawnpoint = spawnpoint;
         }
@@ -109,6 +111,11 @@ namespace UnturnedGameMaster
             zombiePoolSize = poolSize;
         }
 
+        public void SetRewardLoadout(Loadout loadout)
+        {
+            rewardLoadoutId = loadout?.Id ?? null;
+        }
+
         public BossArena ToArena(int arenaId)
         {
             return new BossArena(arenaId,
@@ -122,7 +129,8 @@ namespace UnturnedGameMaster
                 deactivationDistance,
                 completionBounty,
                 completionReward,
-                boundId);
+                boundId,
+                rewardLoadoutId);
         }
     }
 }

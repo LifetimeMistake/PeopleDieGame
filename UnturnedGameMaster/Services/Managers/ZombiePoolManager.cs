@@ -221,6 +221,11 @@ namespace UnturnedGameMaster.Services.Managers
             return GetZombiePool(boundId)?.Length ?? 0;
         }
 
+        public int GetFreeZombiesCount(byte boundId)
+        {
+            return GetZombiePool(boundId)?.Where(x => x.isDead).Count() ?? 0;
+        }
+
         public bool ZombiePoolExists(byte boundId)
         {
             return managedZombiePools.ContainsKey(boundId);

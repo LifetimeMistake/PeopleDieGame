@@ -1,8 +1,10 @@
 ﻿using Rocket.Unturned.Player;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
@@ -19,6 +21,7 @@ namespace UnturnedGameMaster.Services.Managers
         private LoadoutIdProvider loadoutIdProvider { get; set; }
 
         public event EventHandler<LoadoutAppliedEventArgs> OnLoadoutApplied;
+        public event EventHandler<LoadoutEventArgs> OnLoadoutDropped;
         public event EventHandler<LoadoutEventArgs> OnLoadoutCreated;
         public event EventHandler<LoadoutEventArgs> OnLoadoutRemoved;
 
@@ -53,6 +56,19 @@ namespace UnturnedGameMaster.Services.Managers
             }
 
             OnLoadoutApplied?.Invoke(this, new LoadoutAppliedEventArgs(playerData, loadout));
+        }
+
+        public void DropLoadout(Loadout loadout, Vector3 position)
+        {
+            foreach (KeyValuePair<int, int> kvp in loadout.Items)
+            {
+                Item item = new Item((ushort)kvp.Key, true);
+
+                for (int i = 0; i < kvp.Value; i++)
+                    ItemManager.dropItem(item, position, true, true, true);
+            }
+
+            OnLoadoutDropped?.Invoke(this, new LoadoutEventArgs(loadout));
         }
 
         public bool DeleteLoadout(int id)

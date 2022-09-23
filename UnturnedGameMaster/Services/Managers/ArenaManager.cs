@@ -32,6 +32,8 @@ namespace UnturnedGameMaster.Services.Managers
         private ZombiePoolManager zombiePoolManager { get; set; }
         [InjectDependency]
         private GameManager gameManager { get; set; }
+        [InjectDependency]
+        private LoadoutManager loadoutManager { get; set; }
 
         private List<BossFight> ongoingBossFights = new List<BossFight>();
 
@@ -45,6 +47,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         public void Init()
         {
+            loadoutManager.OnLoadoutRemoved += LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
@@ -52,8 +55,18 @@ namespace UnturnedGameMaster.Services.Managers
 
         public void Dispose()
         {
+            loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
             UnregisterTimers();
+        }
+
+        private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
+        {
+            foreach(BossArena arena in GetArenas())
+            {
+                if (arena.RewardLoadoutId == e.Loadout.Id)
+                    arena.SetRewardLoadout(null);
+            }
         }
 
         private void RegisterTimers()

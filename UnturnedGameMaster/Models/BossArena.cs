@@ -18,14 +18,15 @@ namespace UnturnedGameMaster.Models
         public IZombieModel BossModel { get => GetBossModel(); }
         public Vector3S ActivationPoint { get; private set; }
         public VectorPAR BossSpawnPoint { get; private set; }
-        public VectorPAR RewardSpawnPoint { get; private set; }
+        public Vector3S RewardSpawnPoint { get; private set; }
         public double ActivationDistance { get; private set; }
         public double DeactivationDistance { get; private set; }
         public double CompletionBounty { get; private set; }
         public double CompletionReward { get; private set; }
         public byte BoundId { get; private set; }
+        public int? RewardLoadoutId { get; private set; }
 
-        public BossArena(int id, string name, bool conquered, IZombieModel bossModel, Vector3S activationPoint, VectorPAR bossSpawnPoint, VectorPAR rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId)
+        public BossArena(int id, string name, bool conquered, IZombieModel bossModel, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId, int? rewardLoadoutId)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -39,10 +40,11 @@ namespace UnturnedGameMaster.Models
             CompletionBounty = completionBounty;
             CompletionReward = completionReward;
             BoundId = boundId;
+            RewardLoadoutId = rewardLoadoutId;
         }
 
         [JsonConstructor]
-        public BossArena(int id, string name, bool conquered, Type bossType, Vector3S activationPoint, VectorPAR bossSpawnPoint, VectorPAR rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId)
+        public BossArena(int id, string name, bool conquered, Type bossType, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId, int? rewardLoadoutId)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -56,6 +58,7 @@ namespace UnturnedGameMaster.Models
             CompletionBounty = completionBounty;
             CompletionReward = completionReward;
             BoundId = boundId;
+            RewardLoadoutId = rewardLoadoutId;
         }
 
         private IZombieModel GetBossModel()
@@ -135,9 +138,22 @@ namespace UnturnedGameMaster.Models
             BossSpawnPoint = spawnpoint;
         }
 
-        public void SetRewardSpawnPoint(VectorPAR spawnpoint)
+        public void SetRewardSpawnPoint(Vector3S spawnpoint)
         {
             RewardSpawnPoint = spawnpoint;
+        }
+
+        public void SetBoundId(byte boundId)
+        {
+            if (ZombieManager.regions.Length < boundId)
+                throw new ArgumentOutOfRangeException(nameof(boundId));
+
+            BoundId = boundId;
+        }
+
+        public void SetRewardLoadout(Loadout loadout)
+        {
+            RewardLoadoutId = loadout?.Id ?? null;
         }
     }
 }
