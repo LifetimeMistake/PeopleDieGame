@@ -85,7 +85,7 @@ namespace UnturnedGameMaster.Commands
                 }
             }
 
-            ChatHelper.Say(sb);
+            ChatHelper.Say(caller, sb);
         }
 
         private void ShowSyntax(IRocketPlayer caller)
