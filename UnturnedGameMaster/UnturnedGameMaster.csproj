@@ -124,6 +124,7 @@
     <Compile Include="Commands\Admin\SaveConfigCommand.cs" />
     <Compile Include="Commands\Admin\ZombieCommand.cs" />
     <Compile Include="Commands\General\BioCommand.cs" />
+    <Compile Include="Commands\General\BountylistCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />
     <Compile Include="Commands\Shop\ShopCommand.cs" />
@@ -146,6 +147,8 @@
     <Compile Include="ItemLocator.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
+    <Compile Include="Services\Managers\IService.cs" />
+    <Compile Include="Services\Managers\ObjectiveManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
     <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
@@ -159,7 +162,6 @@
     <Compile Include="Services\Managers\TeamManager.cs" />
     <Compile Include="Services\Managers\TimerManager.cs" />
     <Compile Include="Services\IDisposableService.cs" />
-    <Compile Include="Services\IManager.cs" />
     <Compile Include="Services\Managers\LoadoutManager.cs" />
     <Compile Include="Services\Managers\ZombiePoolManager.cs" />
     <Compile Include="Models\Bosses\Cursed\CursedSmallMinion.cs" />
