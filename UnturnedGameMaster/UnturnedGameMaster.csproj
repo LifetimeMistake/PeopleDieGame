@@ -120,15 +120,16 @@
     <Compile Include="Commands\Admin\ManageGameCommand.cs" />
     <Compile Include="Commands\Admin\ManagePlayersCommand.cs" />
     <Compile Include="Commands\Admin\ManageTeamsCommand.cs" />
+    <Compile Include="Commands\Admin\MeasureCommand.cs" />
     <Compile Include="Commands\Admin\SaveConfigCommand.cs" />
     <Compile Include="Commands\Admin\ZombieCommand.cs" />
     <Compile Include="Commands\General\BioCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />
     <Compile Include="Commands\Shop\ShopCommand.cs" />
-    <Compile Include="Commands\Teams\AcceptCommand.cs" />
+    <Compile Include="Commands\Teams\AcceptInviteCommand.cs" />
     <Compile Include="Commands\Teams\InvitesCommand.cs" />
-    <Compile Include="Commands\Teams\RejectCommand.cs" />
+    <Compile Include="Commands\Teams\RejectInviteCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="BossControllers\BossController.cs" />
     <Compile Include="BossControllers\CursedBossController.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="ItemLocator.cs" />
+    <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
@@ -211,9 +213,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Providers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

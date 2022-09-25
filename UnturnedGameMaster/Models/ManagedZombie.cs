@@ -96,6 +96,10 @@ namespace UnturnedGameMaster.Models
             ref float specialUseDelay, ref float specialAttackDelay)
         {
             ManagedZombie managedZombie = zombie as ManagedZombie;
+
+            if (managedZombie != null && !managedZombie.AIEnabled)
+                return;
+
             Transform zombieTransform = ((MonoBehaviour)zombie).transform;
             VoidDelegate RandomizeBoulderThrowDelay = AccessTools.MethodDelegate<VoidDelegate>(AccessTools.Method(typeof(Zombie), "RandomizeBoulderThrowDelay"), zombie);
             if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.MEGA || zombie.speciality == EZombieSpeciality.BOSS_KUWAIT || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Throw) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > boulderThrowDelay)

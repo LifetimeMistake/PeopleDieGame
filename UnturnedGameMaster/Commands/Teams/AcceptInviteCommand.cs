@@ -10,7 +10,7 @@ using UnturnedGameMaster.Services.Managers;
 
 namespace UnturnedGameMaster.Commands.Teams
 {
-    public class AcceptCommand : IRocketCommand
+    public class AcceptInviteCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
@@ -20,7 +20,7 @@ namespace UnturnedGameMaster.Commands.Teams
 
         public string Syntax => "<team name/team id>";
 
-        public List<string> Aliases => new List<string>();
+        public List<string> Aliases => new List<string>() { "accept" };
 
         public List<string> Permissions => new List<string>();
 
