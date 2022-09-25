@@ -146,8 +146,8 @@
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="ItemLocator.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
+    <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
-    <Compile Include="Services\Managers\IService.cs" />
     <Compile Include="Services\Managers\ObjectiveManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
