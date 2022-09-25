@@ -53,6 +53,15 @@ namespace UnturnedGameMaster.BossControllers
             if (bossZombie == null)
                 return false; // failed to spawn main boss
 
+            if (UnityEngine.Random.Range(0, 1) < 0.5)
+            {
+                bossZombie.PathOverride = EZombiePath.LEFT_FLANK;
+            }
+            else
+            {
+                bossZombie.PathOverride = EZombiePath.RIGHT_FLANK;
+            }
+
             ChatHelper.Say(fight.Participants, "Powietrze wokół Ciebie robi się bardzo gorące (czujesz też zapach BBQ)..");
             return true;
         }

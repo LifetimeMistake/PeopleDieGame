@@ -7,7 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
+using UnturnedGameMaster.Enums;
 using UnturnedGameMaster.Models;
+using UnturnedGameMaster.Models.EventArgs;
 
 namespace UnturnedGameMaster.Services.Managers
 {
@@ -16,89 +18,44 @@ namespace UnturnedGameMaster.Services.Managers
         [InjectDependency]
         private DataManager dataManager { get; set; }
 
+        public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
+        public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
+        public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemUpdated;
+
         public void Init()
         { }
 
-        public bool AddObjectiveItem(ushort itemId)
+        public bool CreateObjectiveItem(ushort itemId, BossArena arena, ObjectiveState objectiveState = ObjectiveState.AwaitingDrop)
         {
             ItemAsset item = Assets.find(EAssetType.ITEM, itemId) as ItemAsset;
-
             if (item == null)
-            {
                 return false;
-            }
 
-            dataManager.GameData.ObjectiveItems.Add(itemId);
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            if (objectiveItems.ContainsKey(itemId))
+                return false;
+
+            ObjectiveItem objectiveItem = new ObjectiveItem(itemId, objectiveState, arena.Id);
+            objectiveItems.Add(itemId, objectiveItem);
+            ObjectiveItemAdded?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
             return true;
         }
 
         public bool RemoveObjectiveItem(ushort itemId)
         {
-            if (!GetObjectiveItems().Contains(itemId))
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            if (!objectiveItems.ContainsKey(itemId))
                 return false;
 
-            dataManager.GameData.ObjectiveItems.Remove(itemId);
+            ObjectiveItem objectiveItem = objectiveItems[itemId];
+            objectiveItems.Remove(itemId);
+            ObjectiveItemRemoved?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
             return true;
         }
 
-        public bool SubmitObjectiveItems(PlayerData playerData)
+        public ObjectiveItem[] GetObjectiveItems()
         {
-            UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-
-            foreach (ushort itemId in GetObjectiveItems())
-            {
-                if (ItemLocator.GetPlayersWithItem(itemId).Contains(player))
-                    continue;
-                else
-                    return false;
-            }
-            return true;
-        }
-
-        public ushort[] GetObjectiveItems()
-        {
-            return dataManager.GameData.ObjectiveItems.ToArray();
-        }
-
-        public List<Vector3S> GetObjectiveItemPosition(ushort itemId)
-        {
-            List<Vector3S> positions = new List<Vector3S>();
-
-            if (!GetObjectiveItems().Contains(itemId))
-                return positions;
-
-            List<UnturnedPlayer> players = ItemLocator.GetPlayersWithItem(itemId);
-            List<ItemData> items = ItemLocator.GetDroppedItems(itemId);
-            List<InteractableStorage> storages = ItemLocator.GetStoragesWithItem(itemId);
-            List<InteractableVehicle> vehicles = ItemLocator.GetVehiclesWithItem(itemId);
-
-            if (items == null && players == null && storages == null && vehicles == null)
-            {
-                return null;
-            }
-
-            if (players != null)
-            {
-                foreach (UnturnedPlayer player in players)
-                    positions.Add(player.Position);
-            }
-            if (items != null)
-            {
-                foreach (ItemData item in items)
-                    positions.Add(item.point);
-            }
-            if (storages != null)
-            {
-                foreach (InteractableStorage storage in storages)
-                    positions.Add(storage.gameObject.transform.position);
-            }
-            if (vehicles != null)
-            {
-                foreach (InteractableVehicle vehicle in vehicles)
-                    positions.Add(vehicle.gameObject.transform.position);
-            }
-
-            return positions;
+            return dataManager.GameData.ObjectiveItems.Values.ToArray();
         }
     }
 }

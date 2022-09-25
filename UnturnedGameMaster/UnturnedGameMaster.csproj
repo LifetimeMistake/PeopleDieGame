@@ -141,11 +141,14 @@
     <Compile Include="Commands\TestLocateCommand.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\GameState.cs" />
+    <Compile Include="Enums\ObjectiveItemState.cs" />
     <Compile Include="Enums\ZombieAbilities.cs" />
     <Compile Include="Helpers\ChatHelper.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="ItemLocator.cs" />
+    <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
+    <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Patches\ZombiePathPatch.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\IService.cs" />

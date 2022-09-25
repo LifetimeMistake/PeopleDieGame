@@ -11,7 +11,7 @@ namespace UnturnedGameMaster.Models
         public Dictionary<ulong, PlayerData> PlayerData { get; set; }
         public Dictionary<int, BossArena> Arenas { get; set; }
         public Dictionary<byte, int> ManagedZombiePools { get; set; }
-        public List<ushort> ObjectiveItems { get; set; }
+        public Dictionary<ushort, ObjectiveItem> ObjectiveItems { get; set; }
         public int LastLoadoutId { get; set; }
         public int LastTeamId { get; set; }
         public int LastArenaId { get; set; }
@@ -30,7 +30,7 @@ namespace UnturnedGameMaster.Models
             PlayerData = new Dictionary<ulong, PlayerData>();
             Arenas = new Dictionary<int, BossArena>();
             ManagedZombiePools = new Dictionary<byte, int>();
-            ObjectiveItems = new List<ushort>();
+            ObjectiveItems = new Dictionary<ushort, ObjectiveItem>();
             LastLoadoutId = 0;
             LastTeamId = 0;
             LastArenaId = 0;
