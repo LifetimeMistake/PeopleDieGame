@@ -13,17 +13,35 @@ using UnturnedGameMaster.Models.EventArgs;
 
 namespace UnturnedGameMaster.Services.Managers
 {
-    internal class ObjectiveManager : IService
+    internal class ObjectiveManager : IDisposableService
     {
         [InjectDependency]
         private DataManager dataManager { get; set; }
+        [InjectDependency]
+        private ArenaManager arenaManager { get; set; }
 
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemUpdated;
 
         public void Init()
-        { }
+        {
+            arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
+        }
+
+        public void Dispose()
+        {
+            arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
+        }
+
+        private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
+        {
+            // Remove all connected objective items
+
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
+                objectiveItems.Remove(objectiveItem.ItemId);
+        }
 
         public bool CreateObjectiveItem(ushort itemId, BossArena arena, ObjectiveState objectiveState = ObjectiveState.AwaitingDrop)
         {
