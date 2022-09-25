@@ -21,10 +21,11 @@ namespace UnturnedGameMaster.Models
         private FieldRef<float> spitTime;
 
         private FieldRef<float> fireDamage;
-        private FieldRef<EZombiePath> path; 
+        private FieldRef<EZombiePath> path;
 
         private delegate void VoidDelegate();
         private VoidDelegate baseUpdate;
+        private EZombiePath? pathOverride;
 
         public ZombieAbilities Abilities { get; set; }
         public ushort Health { get => health.Value; set => health.Value = value; }
@@ -39,6 +40,7 @@ namespace UnturnedGameMaster.Models
         public float SpitTime { get => spitTime.Value; set => spitTime.Value = value; }
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
         public EZombiePath Path { get => path.Value; set => path.Value = value; }
+        public EZombiePath? PathOverride { get => pathOverride.Value; set => SetPathOverride(value); }
         public bool AIEnabled { get; set; }
 
         public ManagedZombie()
@@ -59,6 +61,13 @@ namespace UnturnedGameMaster.Models
 
             fireDamage = FieldRef.GetFieldRef<Zombie, float>(this, "fireDamage");
             path = FieldRef.GetFieldRef<Zombie, EZombiePath>(this, "path");
+
+            Reset();
+        }
+
+        public void Reset()
+        {
+            PathOverride = null;
             AIEnabled = true;
         }
 
@@ -89,6 +98,13 @@ namespace UnturnedGameMaster.Models
 
             // Passthrough unity event
             baseUpdate();
+        }
+
+        private void SetPathOverride(EZombiePath? path)
+        {
+            pathOverride = path;
+            if (path.HasValue)
+                Path = path.Value;
         }
 
         public static void UpdateAttacks(Zombie zombie, float targetDistance, ref float boulderThrowDelay, ref bool isThrowRelocating,

@@ -246,6 +246,7 @@ namespace UnturnedGameMaster.Services.Managers
                 return null;
 
             DestroyZombie(freeSlot);
+            freeSlot.Reset();
             ZombieManager.sendZombieAlive(freeSlot, type, speciality, shirt, pants, hat, gear, position, MeasurementTool.angleToByte(angle));
             return freeSlot;
         }

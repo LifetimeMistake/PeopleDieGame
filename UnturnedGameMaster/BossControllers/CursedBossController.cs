@@ -71,7 +71,7 @@ namespace UnturnedGameMaster.BossControllers
                 zombiePoolManager.DestroyZombie(bossZombie);
 
             foreach (ManagedZombie managedZombie in minions.Where(x => !x.isDead))
-                zombiePoolManager.DestroyZombie(bossZombie);
+                zombiePoolManager.DestroyZombie(managedZombie);
 
             ChatHelper.Say(fight.Participants, "Krzyki umarłych ustają...");
             return true;

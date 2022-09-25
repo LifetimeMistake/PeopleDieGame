@@ -54,6 +54,15 @@ namespace UnturnedGameMaster.BossControllers
             if (bossZombie == null)
                 return false; // failed to spawn main boss
 
+            if (UnityEngine.Random.Range(0, 1) < 0.5)
+            {
+                bossZombie.PathOverride = EZombiePath.LEFT_FLANK;
+            }
+            else
+            {
+                bossZombie.PathOverride = EZombiePath.RIGHT_FLANK;
+            }    
+
             ChatHelper.Say(fight.Participants, "Ziemia pod Twoimi stopami zaczyna się trząść...");
             return true;
         }
@@ -67,13 +76,26 @@ namespace UnturnedGameMaster.BossControllers
             lastMegaSpawnHealth = 1f;
         }
 
+        private void InvertFlankDirection()
+        {
+            switch(bossZombie.PathOverride)
+            {
+                case EZombiePath.LEFT_FLANK:
+                    bossZombie.PathOverride = EZombiePath.RIGHT_FLANK;
+                    break;
+                default:
+                    bossZombie.PathOverride = EZombiePath.LEFT_FLANK;
+                    break;
+            }
+        }
+
         public override bool EndFight()
         {
             if (bossZombie != null && !bossZombie.isDead)
                 zombiePoolManager.DestroyZombie(bossZombie);
 
             foreach (ManagedZombie managedZombie in minions.Where(x => !x.isDead))
-                zombiePoolManager.DestroyZombie(bossZombie);
+                zombiePoolManager.DestroyZombie(managedZombie);
 
             ChatHelper.Say(fight.Participants, "Wibracje ziemi ustają...");
             return true;

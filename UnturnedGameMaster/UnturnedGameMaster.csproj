@@ -112,6 +112,7 @@
     <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
     <Compile Include="Autofac\ServiceLocator.cs" />
     <Compile Include="Commands\Admin\ArenaBuilderCommand.cs" />
+    <Compile Include="Commands\Admin\EvaporateCommand.cs" />
     <Compile Include="Commands\Admin\ManageArenasCommand.cs" />
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="ItemLocator.cs" />
+    <Compile Include="Patches\ZombiePathPatch.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />

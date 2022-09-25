@@ -49,7 +49,6 @@ namespace UnturnedGameMaster.BossControllers
 
             byte boundId = arena.BoundId;
             bossZombie = zombiePoolManager.SpawnZombie(boundId, 0, bossModel, arena.BossSpawnPoint.Position, arena.BossSpawnPoint.Rotation, true);
-            bossZombie.Path = EZombiePath.RIGHT_FLANK;
 
             if (bossZombie == null)
                 return false; // failed to spawn main boss
@@ -74,7 +73,7 @@ namespace UnturnedGameMaster.BossControllers
                 zombiePoolManager.DestroyZombie(bossZombie);
 
             foreach (ManagedZombie managedZombie in minions.Where(x => !x.isDead))
-                zombiePoolManager.DestroyZombie(bossZombie);
+                zombiePoolManager.DestroyZombie(managedZombie);
 
             ChatHelper.Say(fight.Participants, "Płomienie gasną...");
             return true;
