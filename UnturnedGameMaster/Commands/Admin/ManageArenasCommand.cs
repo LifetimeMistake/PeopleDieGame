@@ -152,6 +152,7 @@ namespace UnturnedGameMaster.Commands.Admin
                     ChatHelper.Say(caller, $"Nie udało się usunąć areny z powodu błędu systemu");
                     return;
                 }
+                ChatHelper.Say(caller, "Usunięto arenę");
             }
             catch (Exception ex)
             {

@@ -40,9 +40,9 @@ namespace UnturnedGameMaster
             return playerList;
         }
 
-        public static List<ItemData> GetDroppedItems(ushort itemId)
+        public static List<RegionItem> GetDroppedItems(ushort itemId)
         {
-            List<ItemData> items = new List<ItemData>();
+            List<RegionItem> items = new List<RegionItem>();
 
             foreach (ItemRegion region in ItemManager.regions)
             {
@@ -52,7 +52,10 @@ namespace UnturnedGameMaster
                 foreach (ItemData itemData in region.items)
                 {
                     if (itemData.item.id == itemId && itemData.isDropped)
-                        items.Add(itemData);
+                    {
+                        RegionItem item = new RegionItem(region, itemData);
+                        items.Add(item);
+                    }
                 }
             }
 

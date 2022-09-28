@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Helpers;
+using UnturnedGameMaster.Models;
 
 namespace UnturnedGameMaster.Commands
 {
@@ -40,7 +41,7 @@ namespace UnturnedGameMaster.Commands
             }
 
             List<UnturnedPlayer> players = ItemLocator.GetPlayersWithItem(id);
-            List<ItemData> items = ItemLocator.GetDroppedItems(id);
+            List<RegionItem> items = ItemLocator.GetDroppedItems(id);
             List<InteractableStorage> storages = ItemLocator.GetStoragesWithItem(id);
             List<InteractableVehicle> vehicles = ItemLocator.GetVehiclesWithItem(id);
 
@@ -63,9 +64,9 @@ namespace UnturnedGameMaster.Commands
             if (items != null)
             {
                 sb.AppendLine($"Znalezione przedmioty z ID: {id}");
-                foreach (ItemData item in items)
+                foreach (RegionItem item in items)
                 {
-                    sb.AppendLine($"ID: {item.instanceID} | {item.point}");
+                    sb.AppendLine($"ID: {item.ItemData.instanceID} | {item.ItemData.point}");
                 }
             }
             if (storages != null)
