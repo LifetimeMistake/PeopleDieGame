@@ -24,6 +24,9 @@ namespace UnturnedGameMaster.Services.Managers
         
         public Dictionary<ushort, CachedItem> CachedItems { get; set; }
 
+        [InjectDependency]
+        private ArenaManager arenaManager { get; set; }
+
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemUpdated;
@@ -35,6 +38,23 @@ namespace UnturnedGameMaster.Services.Managers
             UnturnedPlayerEvents.OnPlayerInventoryAdded += UnturnedPlayerEvents_OnPlayerInventoryAdded;
             UnturnedPlayerEvents.OnPlayerInventoryRemoved += UnturnedPlayerEvents_OnPlayerInventoryRemoved;
             CachedItems = new Dictionary<ushort, CachedItem>();
+        }
+        {
+            arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
+        }
+
+        public void Dispose()
+        {
+            arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
+        }
+
+        private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
+        {
+            // Remove all connected objective items
+
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
+                objectiveItems.Remove(objectiveItem.ItemId);
         }
 
         public void Dispose()

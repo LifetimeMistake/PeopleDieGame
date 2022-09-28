@@ -8,9 +8,21 @@ namespace UnturnedGameMaster.Enums
 {
     public enum ObjectiveState 
     {
-        AwaitingDrop, // Default idle state for objective items
-        Roaming, // Set when item physically exists in the world
-        Stored, // Set when item is placed inside acceptable player-made storage
-        Secured // Set when item is placed inside of The Altar
+        /// <summary>
+        /// Default idle state for objective items
+        /// </summary>
+        AwaitingDrop,
+        /// <summary>
+        /// Set when item physically exists in the world
+        /// </summary>
+        Roaming,
+        /// <summary>
+        /// Set when item is placed inside acceptable player-made storage
+        /// </summary>
+        Stored,
+        /// <summary>
+        /// Set when item is placed inside of The Altar
+        /// </summary>
+        Secured
     }
 }
