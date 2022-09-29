@@ -24,9 +24,6 @@ namespace UnturnedGameMaster.Services.Managers
         
         public Dictionary<ushort, CachedItem> CachedItems { get; set; }
 
-        [InjectDependency]
-        private ArenaManager arenaManager { get; set; }
-
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemUpdated;
@@ -38,14 +35,6 @@ namespace UnturnedGameMaster.Services.Managers
             UnturnedPlayerEvents.OnPlayerInventoryAdded += UnturnedPlayerEvents_OnPlayerInventoryAdded;
             UnturnedPlayerEvents.OnPlayerInventoryRemoved += UnturnedPlayerEvents_OnPlayerInventoryRemoved;
             CachedItems = new Dictionary<ushort, CachedItem>();
-        }
-        {
-            arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
-        }
-
-        public void Dispose()
-        {
-            arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
         }
 
         private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
@@ -59,6 +48,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         public void Dispose()
         {
+            arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
             UnturnedPlayerEvents.OnPlayerInventoryAdded -= UnturnedPlayerEvents_OnPlayerInventoryAdded;
             UnturnedPlayerEvents.OnPlayerInventoryRemoved -= UnturnedPlayerEvents_OnPlayerInventoryRemoved;
@@ -159,9 +149,7 @@ namespace UnturnedGameMaster.Services.Managers
             BossArena arena = e.BossFight.Arena;
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem _objectiveItem = objectiveItems.Where(x => x.Value.ArenaId == arena.Id).FirstOrDefault().Value;
-
-            ObjectiveItem objectiveItem = dataManager.GameData.ObjectiveItems[_objectiveItem.ItemId];
+            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ArenaId == arena.Id).FirstOrDefault().Value;
 
             if (objectiveItem == null)
                 return;
@@ -183,9 +171,7 @@ namespace UnturnedGameMaster.Services.Managers
         private void UnturnedPlayerEvents_OnPlayerInventoryAdded(UnturnedPlayer player, Rocket.Unturned.Enumerations.InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
         {
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem _objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
-
-            ObjectiveItem objectiveItem = dataManager.GameData.ObjectiveItems[_objectiveItem.ItemId];
+            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
 
             if (objectiveItem == null)
                 return;
@@ -199,9 +185,7 @@ namespace UnturnedGameMaster.Services.Managers
         private void UnturnedPlayerEvents_OnPlayerInventoryRemoved(UnturnedPlayer player, Rocket.Unturned.Enumerations.InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
         {
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem _objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
-
-            ObjectiveItem objectiveItem = dataManager.GameData.ObjectiveItems[_objectiveItem.ItemId];
+            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
 
             if (objectiveItem == null)
                 return;
