@@ -47,13 +47,13 @@ namespace UnturnedGameMaster.Commands
 
             StringBuilder sb = new StringBuilder();
 
-            if (items == null && players == null && storages == null && vehicles == null)
+            if (items.Count == 0 && players.Count == 0 && storages.Count == 0 && vehicles.Count == 0)
             {
                 ChatHelper.Say(caller, $"Przedmiot z ID: {id} nie został znaleziony");
                 return;
             }
 
-            if (players != null)
+            if (players.Count != 0)
             {
                 sb.AppendLine($"Gracze posiadający przedmiot z ID: {id}");
                 foreach (UnturnedPlayer player in players)
@@ -61,7 +61,7 @@ namespace UnturnedGameMaster.Commands
                     sb.AppendLine($"{player.CharacterName} | ID: {player.Id}");
                 }
             }
-            if (items != null)
+            if (items.Count != 0)
             {
                 sb.AppendLine($"Znalezione przedmioty z ID: {id}");
                 foreach (RegionItem item in items)
@@ -69,7 +69,7 @@ namespace UnturnedGameMaster.Commands
                     sb.AppendLine($"ID: {item.ItemData.instanceID} | {item.ItemData.point}");
                 }
             }
-            if (storages != null)
+            if (storages.Count != 0)
             {
                 sb.AppendLine($"Pojemniki posiadające przedmiot z ID: {id}");
                 foreach (InteractableStorage storage in storages)
@@ -77,7 +77,7 @@ namespace UnturnedGameMaster.Commands
                     sb.AppendLine($"ID: {storage.name} | {storage.gameObject.transform.position}");
                 }
             }
-            if (vehicles != null)
+            if (vehicles.Count != 0)
             {
                 sb.AppendLine($"Pojazdy posiadające przedmiot z ID: {id}");
                 foreach (InteractableVehicle vehicle in vehicles)

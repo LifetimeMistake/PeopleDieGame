@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnturnedGameMaster.Enums;
+using UnturnedGameMaster.Helpers;
 
 namespace UnturnedGameMaster.Models
 {
@@ -28,123 +29,109 @@ namespace UnturnedGameMaster.Models
             if (!ValidateCache())
             {
                 if (validateCache == true)
+                {
                     RebuildCache();
+                    return GetLocation(false);
+                }
+                return CachedItemState.Unknown;
             }
             return State;
         }
 
         public bool ValidateCache()
         {
-            bool valid;
-
             switch (State)
             {
                 case CachedItemState.Ground:
-                    if (RegionItem == null)
-                    {
-                        valid = false;
-                        break;
-                    }
-                    valid = RegionItem.Region.items.Contains(RegionItem.ItemData);
-                    break;
+                    return (RegionItem != null && RegionItem.Region.items.Contains(RegionItem.ItemData));
                 case CachedItemState.Player:
-                    if (Player == null)
-                    {
-                        valid = false;
-                        break;
-                    }
-                    InventorySearch search = Player.Inventory.has(Id);
-                    valid = search != null;
-                    break;
+                    return (Player != null && Player.Inventory.has(Id) != null);
                 case CachedItemState.Vehicle:
-                    if (Vehicle == null)
-                    {
-                        valid = false;
-                        break;
-                    }
-                    search = Vehicle.trunkItems.has(Id);
-                    valid = search != null;
-                    break;
+                    return (Vehicle != null && Vehicle.trunkItems.has(Id) != null);
                 case CachedItemState.Storage:
-                    if (Storage == null)
-                    {
-                        valid = false;
-                        break;
-                    }
-                    search = Storage.items.has(Id);
-                    valid = search != null;
-                    break;
-                default:
-                    valid = false;
-                    break;
+                    return (Storage != null && Storage.items.has(Id) != null);
             }
 
-            return valid;
+            return false;
         }
 
         public void RebuildCache()
         {
-            SetRegionItem();
-            SetPlayer();
-            SetVehicle();
-            SetStorage();
-            
-            if (Player == null && Vehicle == null && Storage == null && RegionItem == null)
+            List<RegionItem> regionItems = ItemLocator.GetDroppedItems(Id);
+            RegionItem regionItem = regionItems.FirstOrDefault();
+            if (regionItem != null)
+            {
+                SetDroppedItem(regionItem);
+                return;
+            }
+
+            List<UnturnedPlayer> players = ItemLocator.GetPlayersWithItem(Id);
+            UnturnedPlayer player = players.FirstOrDefault();
+            if (player != null)
+            {
+                SetPlayer(player);
+                return;
+            }
+
+            List<InteractableVehicle> vehicles = ItemLocator.GetVehiclesWithItem(Id);
+            InteractableVehicle vehicle = vehicles.FirstOrDefault();
+            if (vehicle != null)
+            {
+                SetVehicle(vehicle);
+                return;
+            }
+
+            List<InteractableStorage> storages = ItemLocator.GetStoragesWithItem(Id);
+            InteractableStorage storage = storages.FirstOrDefault();
+            if (storage != null)
+            {
+                SetStorage(storage);
+                return;
+            }
+            else
             {
                 State = CachedItemState.Unknown;
-            }
-        }
-
-        private void SetRegionItem()
-        {
-            RegionItem = ItemLocator.GetDroppedItems(Id).FirstOrDefault();
-            if (RegionItem != null)
-            {
-                State = CachedItemState.Ground;
+                RegionItem = null;
                 Player = null;
                 Vehicle = null;
                 Storage = null;
-                return;
             }
         }
 
-        private void SetPlayer()
+        private void SetDroppedItem(RegionItem regionItem)
         {
-            Player = ItemLocator.GetPlayersWithItem(Id).FirstOrDefault();
-            if (Player != null)
-            {
-                State = CachedItemState.Player;
-                RegionItem = null;
-                Vehicle = null;
-                Storage = null;
-                return;
-            }
+            State = CachedItemState.Ground;
+            RegionItem = regionItem;
+            Player = null;
+            Vehicle = null;
+            Storage = null;
         }
 
-        private void SetVehicle()
+        private void SetPlayer(UnturnedPlayer player)
         {
-            Vehicle = ItemLocator.GetVehiclesWithItem(Id).FirstOrDefault();
-            if (Vehicle != null)
-            {
-                State = CachedItemState.Vehicle;
-                Player = null;
-                RegionItem = null;
-                Storage = null;
-                return;
-            }
+            State = CachedItemState.Player;
+            RegionItem = null;
+            Player = player;
+            Vehicle = null;
+            Storage = null;
         }
 
-        private void SetStorage()
+        private void SetVehicle(InteractableVehicle vehicle)
         {
-            Storage = ItemLocator.GetStoragesWithItem(Id).FirstOrDefault();
-            if (Storage != null)
-            {
-                State = CachedItemState.Storage;
-                Player = null;
-                RegionItem = null;
-                Vehicle = null;
-                return;
-            }
+            State = CachedItemState.Vehicle;
+            RegionItem = null;
+            Player = null;
+            Vehicle = vehicle;
+            Storage = null;
+        }
+
+        private void SetStorage(InteractableStorage storage)
+        {
+            State = CachedItemState.Storage;
+            RegionItem = null;
+            Player = null;
+            Vehicle = null;
+            Storage = storage;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace UnturnedGameMaster
             }
 
             if (playerList.Count == 0)
-                return null;
+                return new List<UnturnedPlayer>();
 
             return playerList;
         }
@@ -60,7 +60,7 @@ namespace UnturnedGameMaster
             }
 
             if (items.Count == 0)
-                return null;
+                return new List<RegionItem>();
 
             return items;
         }
@@ -78,7 +78,7 @@ namespace UnturnedGameMaster
             }
 
             if (storageList.Count == 0)
-                return null;
+                return new List<InteractableStorage>();
 
             return storageList;
         }
@@ -102,7 +102,7 @@ namespace UnturnedGameMaster
             }
 
             if (vehicleList.Count == 0)
-                return null;
+                return new List<InteractableVehicle>();
 
             return vehicleList;
         }

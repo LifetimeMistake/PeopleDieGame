@@ -21,6 +21,10 @@ namespace UnturnedGameMaster.Services.Managers
         private DataManager dataManager { get; set; }
         [InjectDependency]
         private ArenaManager arenaManager { get; set; }
+        [InjectDependency]
+        private TimerManager timerManager { get; set; }
+        [InjectDependency]
+        private GameManager gameManager { get; set; }
         
         public Dictionary<ushort, CachedItem> CachedItems { get; set; }
 
@@ -31,27 +35,62 @@ namespace UnturnedGameMaster.Services.Managers
 
         public void Init()
         {
+            arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
-            UnturnedPlayerEvents.OnPlayerInventoryAdded += UnturnedPlayerEvents_OnPlayerInventoryAdded;
-            UnturnedPlayerEvents.OnPlayerInventoryRemoved += UnturnedPlayerEvents_OnPlayerInventoryRemoved;
             CachedItems = new Dictionary<ushort, CachedItem>();
-        }
-
-        private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
-        {
-            // Remove all connected objective items
-
-            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
-                objectiveItems.Remove(objectiveItem.ItemId);
+            if (gameManager.GetGameState() == GameState.InGame)
+                RegisterTimers();
         }
 
         public void Dispose()
         {
             arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
-            UnturnedPlayerEvents.OnPlayerInventoryAdded -= UnturnedPlayerEvents_OnPlayerInventoryAdded;
-            UnturnedPlayerEvents.OnPlayerInventoryRemoved -= UnturnedPlayerEvents_OnPlayerInventoryRemoved;
+            UnregisterTimers();
+        }
+
+        private void RegisterTimers()
+        {
+            UnregisterTimers();
+            timerManager.Register(ValidateCaches, 60);
+        }
+
+        private void UnregisterTimers()
+        {
+            timerManager.Unregister(ValidateCaches);
+        }
+
+        private void ValidateCaches()
+        {
+            if (CachedItems.Count == 0)
+                return;
+
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+
+            foreach (KeyValuePair<ushort, CachedItem> kvp in CachedItems)
+            {
+                CachedItem item = kvp.Value;
+                if (!item.ValidateCache())
+                    item.RebuildCache();
+
+
+                ObjectiveItem objectiveItem = objectiveItems[item.Id];
+
+                switch (item.State)
+                {
+                    case CachedItemState.Ground:
+                    case CachedItemState.Player:
+                    case CachedItemState.Vehicle:
+                        objectiveItem.State = ObjectiveState.Roaming;
+                        break;
+                    case CachedItemState.Storage:
+                        objectiveItem.State = ObjectiveState.Stored;
+                        break;
+                    default:
+                        objectiveItem.State = ObjectiveState.Lost;
+                        break;
+                }
+            }
         }
 
         public bool CreateObjectiveItem(ushort itemId, BossArena arena, ObjectiveState objectiveState = ObjectiveState.AwaitingDrop)
@@ -149,7 +188,8 @@ namespace UnturnedGameMaster.Services.Managers
             BossArena arena = e.BossFight.Arena;
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ArenaId == arena.Id).FirstOrDefault().Value;
+            KeyValuePair<ushort, ObjectiveItem> query = objectiveItems.Where(x => x.Value.ArenaId == arena.Id).FirstOrDefault();
+            ObjectiveItem objectiveItem = query.Equals(null) ? null : query.Value;
 
             if (objectiveItem == null)
                 return;
@@ -168,45 +208,13 @@ namespace UnturnedGameMaster.Services.Managers
             ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
         }
 
-        private void UnturnedPlayerEvents_OnPlayerInventoryAdded(UnturnedPlayer player, Rocket.Unturned.Enumerations.InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
+        private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
         {
+            // Remove all connected objective items
+
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
-
-            if (objectiveItem == null)
-                return;
-
-            CachedItem cachedItem = CachedItems[objectiveItem.ItemId];
-            cachedItem.Player = player;
-            cachedItem.State = CachedItemState.Player;
-            objectiveItem.State = ObjectiveState.Stored;
-        }
-
-        private void UnturnedPlayerEvents_OnPlayerInventoryRemoved(UnturnedPlayer player, Rocket.Unturned.Enumerations.InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
-        {
-            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            ObjectiveItem objectiveItem = objectiveItems.Where(x => x.Value.ItemId == P.item.id).FirstOrDefault().Value;
-
-            if (objectiveItem == null)
-                return;
-
-            CachedItem cachedItem = CachedItems[objectiveItem.ItemId];
-            CachedItemState locationState = cachedItem.GetLocation();
-
-            switch (locationState)
-            {
-                
-                case CachedItemState.Vehicle:
-                case CachedItemState.Storage:
-                    objectiveItem.State = ObjectiveState.Stored;
-                    break;
-                case CachedItemState.Ground:
-                    objectiveItem.State = ObjectiveState.Roaming;
-                    break;
-                //default:
-                //  whar
-
-            }
+            foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
+                objectiveItems.Remove(objectiveItem.ItemId);
         }
     }
 }

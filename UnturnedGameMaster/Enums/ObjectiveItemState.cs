@@ -23,6 +23,7 @@ namespace UnturnedGameMaster.Enums
         /// <summary>
         /// Set when item is placed inside of The Altar
         /// </summary>
-        Secured
+        Secured,
+        Lost
     }
 }
