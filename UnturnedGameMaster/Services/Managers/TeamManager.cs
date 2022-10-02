@@ -47,7 +47,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
         {
-            foreach(Team team in GetTeams())
+            foreach (Team team in GetTeams())
             {
                 if (team.DefaultLoadoutId == e.Loadout.Id)
                     team.SetDefaultLoadout(null);

@@ -3,9 +3,6 @@ using Rocket.Unturned.Player;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
@@ -30,7 +27,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            if(command.Length != 5)
+            if (command.Length != 5)
             {
                 ChatHelper.Say(caller, "Nie podano wystarczającej ilości argumentów");
                 ShowSyntax(caller);

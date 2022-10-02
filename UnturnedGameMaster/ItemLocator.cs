@@ -1,18 +1,8 @@
 ﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
-using Steamworks;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnturnedGameMaster.Autofac;
-using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
-using UnturnedGameMaster.Services.Managers;
-using UnityEngine;
-using UnturnedGameMaster.Reflection;
-using System.Reflection;
 
 namespace UnturnedGameMaster
 {
@@ -72,7 +62,7 @@ namespace UnturnedGameMaster
             foreach (InteractableStorage storage in storageList.ToList())
             {
                 List<InventorySearch> searchList = storage.items.search(new List<InventorySearch>(), itemId, false, true);
-                
+
                 if (searchList.Count == 0)
                     storageList.Remove(storage);
             }

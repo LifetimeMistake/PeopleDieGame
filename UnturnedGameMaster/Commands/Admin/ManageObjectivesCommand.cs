@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
@@ -76,7 +75,7 @@ namespace UnturnedGameMaster.Commands.Admin
 
                 ObjectiveItem[] objectiveItems = objectiveManager.GetObjectiveItems();
 
-                
+
                 if (objectiveItems.Length == 0)
                 {
                     ChatHelper.Say(caller, "Brak artefaktów do wylistowania");

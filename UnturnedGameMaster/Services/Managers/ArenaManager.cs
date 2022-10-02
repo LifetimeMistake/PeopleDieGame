@@ -62,7 +62,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
         {
-            foreach(BossArena arena in GetArenas())
+            foreach (BossArena arena in GetArenas())
             {
                 if (arena.RewardLoadoutId == e.Loadout.Id)
                     arena.SetRewardLoadout(null);
@@ -91,12 +91,10 @@ namespace UnturnedGameMaster.Services.Managers
             GameState gameState = gameManager.GetGameState();
             if (gameState == GameState.InGame)
             {
-                Debug.Log("Started processing arena events");
                 RegisterTimers();
             }
             else
             {
-                Debug.Log("Stopped processing arena events");
                 UnregisterTimers();
             }
         }

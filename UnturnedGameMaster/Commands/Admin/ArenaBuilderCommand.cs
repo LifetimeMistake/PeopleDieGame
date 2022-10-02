@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Rocket.API;
+﻿using Rocket.API;
 using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
@@ -431,7 +430,7 @@ namespace UnturnedGameMaster.Commands.Admin
             try
             {
                 LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
-                
+
                 if (!Builders.TryGetValue(caller.Id, out ArenaBuilder arenaBuilder))
                 {
                     ChatHelper.Say(caller, "Nie rozpcząłeś procesu tworzenia areny");
