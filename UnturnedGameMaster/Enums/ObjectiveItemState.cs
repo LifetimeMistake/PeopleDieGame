@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UnturnedGameMaster.Enums
+﻿namespace UnturnedGameMaster.Enums
 {
-    public enum ObjectiveState 
+    public enum ObjectiveState
     {
         /// <summary>
         /// Default idle state for objective items

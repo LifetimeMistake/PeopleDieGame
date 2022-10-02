@@ -62,7 +62,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
         {
-            foreach(BossArena arena in GetArenas())
+            foreach (BossArena arena in GetArenas())
             {
                 if (arena.RewardLoadoutId == e.Loadout.Id)
                     arena.SetRewardLoadout(null);

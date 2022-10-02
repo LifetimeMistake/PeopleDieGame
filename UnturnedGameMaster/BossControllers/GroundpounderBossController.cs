@@ -61,7 +61,7 @@ namespace UnturnedGameMaster.BossControllers
             else
             {
                 bossZombie.PathOverride = EZombiePath.RIGHT_FLANK;
-            }    
+            }
 
             ChatHelper.Say(fight.Participants, "Ziemia pod Twoimi stopami zaczyna się trząść...");
             return true;
@@ -78,7 +78,7 @@ namespace UnturnedGameMaster.BossControllers
 
         private void InvertFlankDirection()
         {
-            switch(bossZombie.PathOverride)
+            switch (bossZombie.PathOverride)
             {
                 case EZombiePath.LEFT_FLANK:
                     bossZombie.PathOverride = EZombiePath.RIGHT_FLANK;
