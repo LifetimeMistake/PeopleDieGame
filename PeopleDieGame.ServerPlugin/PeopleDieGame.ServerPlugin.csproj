@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{296EDA69-7401-4508-A94E-65786388FE30}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PeopleDieGame.ServerPlugin</RootNamespace>
+    <AssemblyName>PeopleDieGame.ServerPlugin</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>false</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net45\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AstarPathfindingProject">
+      <HintPath>..\References\AstarPathfindingProject.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>..\References\com.rlabrecque.steamworks.net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.API">
+      <HintPath>..\References\Rocket.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Core">
+      <HintPath>..\References\Rocket.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Unturned">
+      <HintPath>..\References\Rocket.Unturned.dll</HintPath>
+    </Reference>
+    <Reference Include="SDG.NetTransport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\References\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\References\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArenaBuilder.cs" />
+    <Compile Include="Autofac\AutowirePropertySelector.cs" />
+    <Compile Include="Autofac\IAutoFacRegistrar.cs" />
+    <Compile Include="Autofac\InjectDependencyAttribute.cs" />
+    <Compile Include="Autofac\PluginAutoFacRegistrar.cs" />
+    <Compile Include="Autofac\ServiceLocator.cs" />
+    <Compile Include="Commands\Admin\ArenaBuilderCommand.cs" />
+    <Compile Include="Commands\Admin\EvaporateCommand.cs" />
+    <Compile Include="Commands\Admin\ManageArenasCommand.cs" />
+    <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
+    <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
+    <Compile Include="Commands\Admin\ManageObjectivesCommand.cs" />
+    <Compile Include="Commands\Admin\ManageShopCommand.cs" />
+    <Compile Include="Commands\Admin\ManageWorldSpawnCommand.cs" />
+    <Compile Include="Commands\Admin\ManageGameCommand.cs" />
+    <Compile Include="Commands\Admin\ManagePlayersCommand.cs" />
+    <Compile Include="Commands\Admin\ManageTeamsCommand.cs" />
+    <Compile Include="Commands\Admin\MeasureCommand.cs" />
+    <Compile Include="Commands\Admin\SaveConfigCommand.cs" />
+    <Compile Include="Commands\Admin\ZombieCommand.cs" />
+    <Compile Include="Commands\General\BioCommand.cs" />
+    <Compile Include="Commands\General\BountylistCommand.cs" />
+    <Compile Include="Commands\General\InfoCommand.cs" />
+    <Compile Include="Commands\General\ResetBioCommand.cs" />
+    <Compile Include="Commands\Shop\ShopCommand.cs" />
+    <Compile Include="Commands\Teams\AcceptInviteCommand.cs" />
+    <Compile Include="Commands\Teams\InvitesCommand.cs" />
+    <Compile Include="Commands\Teams\RejectInviteCommand.cs" />
+    <Compile Include="Commands\Teams\TeamCommand.cs" />
+    <Compile Include="BossControllers\BossController.cs" />
+    <Compile Include="BossControllers\CursedBossController.cs" />
+    <Compile Include="BossControllers\FlamethrowerBossController.cs" />
+    <Compile Include="BossControllers\IBossController.cs" />
+    <Compile Include="BossControllers\GroundpounderBossController.cs" />
+    <Compile Include="Commands\TestLocateCommand.cs" />
+    <Compile Include="Enums\BossFightState.cs" />
+    <Compile Include="Enums\CachedItemState.cs" />
+    <Compile Include="Enums\GameState.cs" />
+    <Compile Include="Enums\ObjectiveItemState.cs" />
+    <Compile Include="Enums\ZombieAbilities.cs" />
+    <Compile Include="Helpers\ChatHelper.cs" />
+    <Compile Include="Helpers\ExceptionHelper.cs" />
+    <Compile Include="Helpers\SequenceHelper.cs" />
+    <Compile Include="ItemLocator.cs" />
+    <Compile Include="Models\CachedItem.cs" />
+    <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
+    <Compile Include="Models\ObjectiveItem.cs" />
+    <Compile Include="Models\RegionItem.cs" />
+    <Compile Include="Patches\ItemDespawnPatch.cs" />
+    <Compile Include="Patches\ZombiePathPatch.cs" />
+    <Compile Include="Patches\ZombieRespawnPatch.cs" />
+    <Compile Include="Services\IService.cs" />
+    <Compile Include="Services\Managers\ArenaManager.cs" />
+    <Compile Include="Services\Managers\ObjectiveManager.cs" />
+    <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\TeamEventMessageProvider.cs" />
+    <Compile Include="Services\Managers\RewardManager.cs" />
+    <Compile Include="Services\Managers\DataManager.cs" />
+    <Compile Include="Services\Managers\GameManager.cs" />
+    <Compile Include="Services\Managers\PlayerDataManager.cs" />
+    <Compile Include="Services\Managers\RespawnManager.cs" />
+    <Compile Include="Services\Managers\ShopManager.cs" />
+    <Compile Include="Services\Managers\TeamManager.cs" />
+    <Compile Include="Services\Managers\TimerManager.cs" />
+    <Compile Include="Services\IDisposableService.cs" />
+    <Compile Include="Services\Managers\LoadoutManager.cs" />
+    <Compile Include="Services\Managers\ZombiePoolManager.cs" />
+    <Compile Include="Models\Bosses\Cursed\CursedSmallMinion.cs" />
+    <Compile Include="Models\Bosses\Cursed\CursedBoss.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerBoss.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerBurningMinion.cs" />
+    <Compile Include="Models\Bosses\Flamethrower\FlamethrowerNormalMinion.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderBoss.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderLargeMinion.cs" />
+    <Compile Include="Models\Bosses\Groundpounder\GroundpounderSmallMinion.cs" />
+    <Compile Include="Models\EventArgs\BossFightDominationEventArgs.cs" />
+    <Compile Include="Models\EventArgs\BossFightEventArgs.cs" />
+    <Compile Include="Models\EventArgs\BuyItemEventArgs.cs" />
+    <Compile Include="Models\EventArgs\RewardEventArgs.cs" />
+    <Compile Include="Models\EventArgs\ShopItemEventArgs.cs" />
+    <Compile Include="Models\BossFight.cs" />
+    <Compile Include="Models\IZombieModel.cs" />
+    <Compile Include="Models\BossArena.cs" />
+    <Compile Include="Models\EventArgs\ArenaEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamBankEventArgs.cs" />
+    <Compile Include="Models\ManagedZombie.cs" />
+    <Compile Include="Models\ShopItem.cs" />
+    <Compile Include="Models\EventArgs\LoadoutAppliedEventArgs.cs" />
+    <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />
+    <Compile Include="Models\EventArgs\PlayerEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamInvitationEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamMembershipEventArgs.cs" />
+    <Compile Include="Models\Exception\PlayerOfflineException.cs" />
+    <Compile Include="Models\Loadout.cs" />
+    <Compile Include="Models\PlayerData.cs" />
+    <Compile Include="Models\Team.cs" />
+    <Compile Include="Models\GameData.cs" />
+    <Compile Include="Models\PluginConfig.cs" />
+    <Compile Include="Models\TeamInvitation.cs" />
+    <Compile Include="Models\Vector3S.cs" />
+    <Compile Include="Models\VectorPAR.cs" />
+    <Compile Include="Patches\ZombieAgroPatch.cs" />
+    <Compile Include="Patches\ZombieAbilityPatch.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Providers\ArenaIdProvider.cs" />
+    <Compile Include="Helpers\GameStateHelper.cs" />
+    <Compile Include="Services\Providers\IDatabaseProvider.cs" />
+    <Compile Include="Services\Providers\JsonDatabaseProvider.cs" />
+    <Compile Include="Services\Providers\GameTickProvider.cs" />
+    <Compile Include="Services\Providers\LoadoutIdProvider.cs" />
+    <Compile Include="Services\Providers\TeamIdProvider.cs" />
+    <Compile Include="Reflection\FieldRef.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
