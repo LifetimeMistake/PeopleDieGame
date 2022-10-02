@@ -153,6 +153,7 @@
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
+    <Compile Include="Patches\ItemDespawnPatch.cs" />
     <Compile Include="Patches\ZombiePathPatch.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\IService.cs" />

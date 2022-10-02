@@ -12,6 +12,7 @@ namespace UnturnedGameMaster.Models
         public Dictionary<int, BossArena> Arenas { get; set; }
         public Dictionary<byte, int> ManagedZombiePools { get; set; }
         public Dictionary<ushort, ObjectiveItem> ObjectiveItems { get; set; }
+        public Dictionary<ushort, Vector3S?> LastObjectiveItemLocations { get; set; }
         public int LastLoadoutId { get; set; }
         public int LastTeamId { get; set; }
         public int LastArenaId { get; set; }
@@ -31,6 +32,7 @@ namespace UnturnedGameMaster.Models
             Arenas = new Dictionary<int, BossArena>();
             ManagedZombiePools = new Dictionary<byte, int>();
             ObjectiveItems = new Dictionary<ushort, ObjectiveItem>();
+            LastObjectiveItemLocations = new Dictionary<ushort, Vector3S?>();
             LastLoadoutId = 0;
             LastTeamId = 0;
             LastArenaId = 0;

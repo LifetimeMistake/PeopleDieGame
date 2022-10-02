@@ -27,6 +27,7 @@ namespace UnturnedGameMaster.Services.Managers
         private GameManager gameManager { get; set; }
         
         public Dictionary<ushort, CachedItem> CachedItems { get; set; }
+        private Dictionary<ushort, int> SearchCount { get; set; }
 
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
@@ -37,15 +38,21 @@ namespace UnturnedGameMaster.Services.Managers
         {
             arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
+            UnturnedEvents.Instance.OnPlayerDisconnected += Instance_OnPlayerDisconnected;
             CachedItems = new Dictionary<ushort, CachedItem>();
+            RespawnObjecitveItems();
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
         }
 
+        
+
         public void Dispose()
         {
+            SetLastLocations();
             arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
+            UnturnedEvents.Instance.OnPlayerDisconnected -= Instance_OnPlayerDisconnected;
             UnregisterTimers();
         }
 
@@ -58,6 +65,52 @@ namespace UnturnedGameMaster.Services.Managers
         private void UnregisterTimers()
         {
             timerManager.Unregister(ValidateCaches);
+        }
+
+        private void RespawnObjecitveItems()
+        {
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            Dictionary<ushort, Vector3S?> lastLocations = dataManager.GameData.LastObjectiveItemLocations;
+
+            foreach (KeyValuePair<ushort, ObjectiveItem> kvp in objectiveItems)
+            {
+                ObjectiveItem objectiveItem = kvp.Value;   
+                if (kvp.Value.State == ObjectiveState.Roaming)
+                {
+                    Item item = new Item(objectiveItem.ItemId, true);
+                    ItemManager.dropItem(item, (Vector3S)lastLocations[objectiveItem.ItemId], true, true, false);
+
+                    CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
+                    cachedItem.RebuildCache();
+                    CachedItems.Add(cachedItem.Id, cachedItem);
+
+                    ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+                }
+            }
+        }
+
+        private void SetLastLocations()
+        {
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            Dictionary<ushort, Vector3S?> lastLocations = dataManager.GameData.LastObjectiveItemLocations;
+
+            foreach (KeyValuePair<ushort, ObjectiveItem> kvp in objectiveItems)
+            {
+                Vector3S? location = GetObjectiveItemLocation(kvp.Key);
+
+                if (location != null)
+                {
+                    if (lastLocations.ContainsKey(kvp.Key))
+                    {
+                        lastLocations[kvp.Key] = location;
+                    }
+                    else
+                    {
+                        lastLocations.Add(kvp.Key, location);
+                    }
+                }
+
+            }
         }
 
         private void ValidateCaches()
@@ -88,8 +141,36 @@ namespace UnturnedGameMaster.Services.Managers
                         break;
                     default:
                         objectiveItem.State = ObjectiveState.Lost;
+                        SearchLostItems(objectiveItem);
                         break;
                 }
+            }
+        }
+
+        private void SearchLostItems(ObjectiveItem objectiveItem)
+        {
+            CachedItem cachedItem = CachedItems[objectiveItem.ItemId];
+
+            CachedItemState state = cachedItem.GetLocation();
+            if (state == CachedItemState.Unknown)
+                SearchCount[cachedItem.Id]++;
+            else
+                SearchCount[cachedItem.Id] = 0;
+
+            if (SearchCount[cachedItem.Id] == 3)
+            {
+                BossArena arena = arenaManager.GetArena(objectiveItem.ArenaId);
+
+                SearchCount[cachedItem.Id] = 0;
+
+                Item item = new Item(objectiveItem.ItemId, true);
+                ItemManager.dropItem(item, arena.RewardSpawnPoint, true, true, false);
+                cachedItem.RebuildCache();
+
+                objectiveItem.State = ObjectiveState.Roaming;
+                ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+
+                ChatHelper.Say($"Próba znalezienia artefaktu areny {arena.Name} zakończyła się niepowodzeniem, artefakt został zrespiony w odpowiedniej arenie");
             }
         }
 
@@ -204,6 +285,8 @@ namespace UnturnedGameMaster.Services.Managers
             cachedItem.RebuildCache();
             CachedItems.Add(cachedItem.Id, cachedItem);
 
+            SearchCount.Add(cachedItem.Id, 0);
+
             objectiveItem.State = ObjectiveState.Roaming;
             ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
         }
@@ -215,6 +298,25 @@ namespace UnturnedGameMaster.Services.Managers
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
             foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
                 objectiveItems.Remove(objectiveItem.ItemId);
+        }
+
+        private void Instance_OnPlayerDisconnected(UnturnedPlayer player)
+        {
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            foreach (ObjectiveItem objectiveItem in objectiveItems.Values)
+            {
+                InventorySearch search = player.Inventory.has(objectiveItem.ItemId);
+                if (search != null)
+                {
+                    byte index = player.Inventory.items[search.page].getIndex(search.jar.x, search.jar.y);
+                    player.Inventory.removeItem(search.page, index);
+                    player.Inventory.save();
+
+                    Item item = new Item(objectiveItem.ItemId, true);
+                    ItemManager.dropItem(item, player.Position, true, true, false);
+                    ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+                }
+            }
         }
     }
 }
