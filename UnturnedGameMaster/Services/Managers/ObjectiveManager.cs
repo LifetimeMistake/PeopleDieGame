@@ -25,8 +25,8 @@ namespace UnturnedGameMaster.Services.Managers
         private TimerManager timerManager { get; set; }
         [InjectDependency]
         private GameManager gameManager { get; set; }
-        
-        public Dictionary<ushort, CachedItem> CachedItems { get; set; }
+
+        private Dictionary<ushort, CachedItem> cachedItems = new Dictionary<ushort, CachedItem>();
 
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
@@ -37,7 +37,7 @@ namespace UnturnedGameMaster.Services.Managers
         {
             arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
-            CachedItems = new Dictionary<ushort, CachedItem>();
+            gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
         }
@@ -46,6 +46,7 @@ namespace UnturnedGameMaster.Services.Managers
         {
             arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
+            gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
             UnregisterTimers();
         }
 
@@ -60,14 +61,27 @@ namespace UnturnedGameMaster.Services.Managers
             timerManager.Unregister(ValidateCaches);
         }
 
+        private void GameManager_OnGameStateChanged(object sender, EventArgs e)
+        {
+            GameState gameState = gameManager.GetGameState();
+            if (gameState == GameState.InGame)
+            {
+                RegisterTimers();
+            }
+            else
+            {
+                UnregisterTimers();
+            }
+        }
+
         private void ValidateCaches()
         {
-            if (CachedItems.Count == 0)
+            if (cachedItems.Count == 0)
                 return;
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
 
-            foreach (KeyValuePair<ushort, CachedItem> kvp in CachedItems)
+            foreach (KeyValuePair<ushort, CachedItem> kvp in cachedItems)
             {
                 CachedItem item = kvp.Value;
                 if (!item.ValidateCache())
@@ -138,10 +152,10 @@ namespace UnturnedGameMaster.Services.Managers
 
         public Vector3S? GetObjectiveItemLocation(ushort itemId)
         {
-            if (!CachedItems.ContainsKey(itemId))
+            if (!cachedItems.ContainsKey(itemId))
                 return null;
 
-            CachedItem cachedItem = CachedItems[itemId];
+            CachedItem cachedItem = cachedItems[itemId];
             switch (cachedItem.GetLocation())
             {
                 case CachedItemState.Ground:
@@ -202,7 +216,7 @@ namespace UnturnedGameMaster.Services.Managers
 
             CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
             cachedItem.RebuildCache();
-            CachedItems.Add(cachedItem.Id, cachedItem);
+            cachedItems.Add(cachedItem.Id, cachedItem);
 
             objectiveItem.State = ObjectiveState.Roaming;
             ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));

@@ -91,12 +91,10 @@ namespace UnturnedGameMaster.Services.Managers
             GameState gameState = gameManager.GetGameState();
             if (gameState == GameState.InGame)
             {
-                Debug.Log("Started processing arena events");
                 RegisterTimers();
             }
             else
             {
-                Debug.Log("Stopped processing arena events");
                 UnregisterTimers();
             }
         }
