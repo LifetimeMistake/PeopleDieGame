@@ -1,9 +1,12 @@
-﻿using SDG.Unturned;
+﻿using Rocket.Unturned.Events;
+using Rocket.Unturned.Player;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnturnedGameMaster.Autofac;
 using UnturnedGameMaster.Enums;
+using UnturnedGameMaster.Helpers;
 using UnturnedGameMaster.Models;
 using UnturnedGameMaster.Models.EventArgs;
 
@@ -21,8 +24,6 @@ namespace UnturnedGameMaster.Services.Managers
         private GameManager gameManager { get; set; }
 
         private Dictionary<ushort, CachedItem> cachedItems = new Dictionary<ushort, CachedItem>();
-        
-        public Dictionary<ushort, CachedItem> CachedItems { get; set; }
         private Dictionary<ushort, int> SearchCount { get; set; }
 
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
@@ -35,14 +36,11 @@ namespace UnturnedGameMaster.Services.Managers
             arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
             UnturnedEvents.Instance.OnPlayerDisconnected += Instance_OnPlayerDisconnected;
-            CachedItems = new Dictionary<ushort, CachedItem>();
             RespawnObjecitveItems();
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
         }
-
-        
 
         public void Dispose()
         {
@@ -80,7 +78,7 @@ namespace UnturnedGameMaster.Services.Managers
 
                     CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
                     cachedItem.RebuildCache();
-                    CachedItems.Add(cachedItem.Id, cachedItem);
+                    cachedItems.Add(cachedItem.Id, cachedItem);
 
                     ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
                 }
@@ -126,7 +124,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void ValidateCaches()
         {
-            if (CachedItems.Count == 0)
+            if (cachedItems.Count == 0)
                 return;
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
@@ -160,7 +158,7 @@ namespace UnturnedGameMaster.Services.Managers
 
         private void SearchLostItems(ObjectiveItem objectiveItem)
         {
-            CachedItem cachedItem = CachedItems[objectiveItem.ItemId];
+            CachedItem cachedItem = cachedItems[objectiveItem.ItemId];
 
             CachedItemState state = cachedItem.GetLocation();
             if (state == CachedItemState.Unknown)
@@ -252,6 +250,11 @@ namespace UnturnedGameMaster.Services.Managers
         public ObjectiveItem[] GetObjectiveItems()
         {
             return dataManager.GameData.ObjectiveItems.Values.ToArray();
+        }
+
+        public CachedItem[] GetCachedItems()
+        {
+            return cachedItems.Values.ToArray();
         }
 
         public ObjectiveItem GetObjectiveItem(ushort itemId)
