@@ -9,6 +9,8 @@ using PeopleDieGame.ServerPlugin.Enums;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
+using Pathfinding.RVO.Sampled;
+using UnityEngine;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -24,7 +26,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         private GameManager gameManager { get; set; }
 
         private Dictionary<ushort, CachedItem> cachedItems = new Dictionary<ushort, CachedItem>();
-        private Dictionary<ushort, int> SearchCount { get; set; }
+        private Dictionary<ushort, int> searchAttemptCount = new Dictionary<ushort, int>();
 
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemAdded;
         public event EventHandler<ObjectiveItemEventArgs> ObjectiveItemRemoved;
@@ -33,10 +35,10 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void Init()
         {
+            InitCache();
             arenaManager.OnArenaRemoved += ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted += ArenaManager_OnBossFightCompleted;
             UnturnedEvents.Instance.OnPlayerDisconnected += Instance_OnPlayerDisconnected;
-            RespawnObjecitveItems();
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
@@ -44,7 +46,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void Dispose()
         {
-            SetLastLocations();
             arenaManager.OnArenaRemoved -= ArenaManager_OnArenaRemoved;
             arenaManager.OnBossFightCompleted -= ArenaManager_OnBossFightCompleted;
             UnturnedEvents.Instance.OnPlayerDisconnected -= Instance_OnPlayerDisconnected;
@@ -52,61 +53,28 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             UnregisterTimers();
         }
 
+        private void InitCache()
+        {
+            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
+            foreach (ObjectiveItem item in objectiveItems.Values)
+            {
+                if (item.State == ObjectiveState.AwaitingDrop)
+                    continue;
+
+                CachedItem cachedItem = new CachedItem(item.ItemId);
+                cachedItems.Add(item.ItemId, cachedItem);
+            }
+        }
+
         private void RegisterTimers()
         {
             UnregisterTimers();
-            timerManager.Register(ValidateCaches, 60);
+            timerManager.Register(ValidateCaches, 300);
         }
 
         private void UnregisterTimers()
         {
             timerManager.Unregister(ValidateCaches);
-        }
-
-        private void RespawnObjecitveItems()
-        {
-            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            Dictionary<ushort, Vector3S?> lastLocations = dataManager.GameData.LastObjectiveItemLocations;
-
-            foreach (KeyValuePair<ushort, ObjectiveItem> kvp in objectiveItems)
-            {
-                ObjectiveItem objectiveItem = kvp.Value;   
-                if (kvp.Value.State == ObjectiveState.Roaming)
-                {
-                    Item item = new Item(objectiveItem.ItemId, true);
-                    ItemManager.dropItem(item, (Vector3S)lastLocations[objectiveItem.ItemId], true, true, false);
-
-                    CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
-                    cachedItem.RebuildCache();
-                    cachedItems.Add(cachedItem.Id, cachedItem);
-
-                    ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
-                }
-            }
-        }
-
-        private void SetLastLocations()
-        {
-            Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            Dictionary<ushort, Vector3S?> lastLocations = dataManager.GameData.LastObjectiveItemLocations;
-
-            foreach (KeyValuePair<ushort, ObjectiveItem> kvp in objectiveItems)
-            {
-                Vector3S? location = GetObjectiveItemLocation(kvp.Key);
-
-                if (location != null)
-                {
-                    if (lastLocations.ContainsKey(kvp.Key))
-                    {
-                        lastLocations[kvp.Key] = location;
-                    }
-                    else
-                    {
-                        lastLocations.Add(kvp.Key, location);
-                    }
-                }
-
-            }
         }
 
         private void GameManager_OnGameStateChanged(object sender, EventArgs e)
@@ -122,23 +90,30 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
         }
 
+        private void SpawnObjectiveItem(ObjectiveItem objectiveItem, Vector3 spawnPoint)
+        {
+            Item item = new Item(objectiveItem.ItemId, true);
+            ItemManager.dropItem(item, spawnPoint, true, true, false);
+
+            objectiveItem.State = ObjectiveState.Roaming;
+            ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+        }
+
         private void ValidateCaches()
         {
             if (cachedItems.Count == 0)
                 return;
 
+            if (!Level.isLoaded)
+                return;
+
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-
-            foreach (KeyValuePair<ushort, CachedItem> kvp in cachedItems)
+            foreach (CachedItem item in cachedItems.Values)
             {
-                CachedItem item = kvp.Value;
-                if (!item.ValidateCache())
-                    item.RebuildCache();
-
-
                 ObjectiveItem objectiveItem = objectiveItems[item.Id];
+                CachedItemState location = item.GetLocation();
 
-                switch (item.State)
+                switch (location)
                 {
                     case CachedItemState.Ground:
                     case CachedItemState.Player:
@@ -150,36 +125,20 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                         break;
                     default:
                         objectiveItem.State = ObjectiveState.Lost;
-                        SearchLostItems(objectiveItem);
+                        if (searchAttemptCount.ContainsKey(item.Id))
+                            searchAttemptCount[item.Id]++;
+                        else
+                            searchAttemptCount.Add(item.Id, 1);
+
+                        if (searchAttemptCount[item.Id] == 5)
+                        {
+                            BossArena arena = arenaManager.GetArena(objectiveItem.ArenaId);
+                            SpawnObjectiveItem(objectiveItem, arena.RewardSpawnPoint);
+                            searchAttemptCount.Remove(item.Id);
+                            ChatHelper.Say($"Jednemu z artefaktów wyrosły nogi i uciekł, złapaliśmy go i umieściliśmy na arenie \"{arena.Name}\"!");
+                        }
                         break;
                 }
-            }
-        }
-
-        private void SearchLostItems(ObjectiveItem objectiveItem)
-        {
-            CachedItem cachedItem = cachedItems[objectiveItem.ItemId];
-
-            CachedItemState state = cachedItem.GetLocation();
-            if (state == CachedItemState.Unknown)
-                SearchCount[cachedItem.Id]++;
-            else
-                SearchCount[cachedItem.Id] = 0;
-
-            if (SearchCount[cachedItem.Id] == 3)
-            {
-                BossArena arena = arenaManager.GetArena(objectiveItem.ArenaId);
-
-                SearchCount[cachedItem.Id] = 0;
-
-                Item item = new Item(objectiveItem.ItemId, true);
-                ItemManager.dropItem(item, arena.RewardSpawnPoint, true, true, false);
-                cachedItem.RebuildCache();
-
-                objectiveItem.State = ObjectiveState.Roaming;
-                ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
-
-                ChatHelper.Say($"Próba znalezienia artefaktu areny {arena.Name} zakończyła się niepowodzeniem, artefakt został zrespiony w odpowiedniej arenie");
             }
         }
 
@@ -210,6 +169,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             ObjectiveItem objectiveItem = objectiveItems[itemId];
             objectiveItems.Remove(itemId);
+            cachedItems.Remove(itemId);
+            searchAttemptCount.Remove(itemId);
+
             ObjectiveItemRemoved?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
             return true;
         }
@@ -283,26 +245,19 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             BossArena arena = e.BossFight.Arena;
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
-            KeyValuePair<ushort, ObjectiveItem> query = objectiveItems.Where(x => x.Value.ArenaId == arena.Id).FirstOrDefault();
-            ObjectiveItem objectiveItem = query.Equals(null) ? null : query.Value;
+            foreach(ObjectiveItem objectiveItem in objectiveItems.Where(x => x.Value.ArenaId == arena.Id).Select(x => x.Value))
+            {
+                if (objectiveItem.State != ObjectiveState.AwaitingDrop)
+                    return;
 
-            if (objectiveItem == null)
-                return;
-
-            if (objectiveItem.State != ObjectiveState.AwaitingDrop)
-                return;
-
-            Item item = new Item(objectiveItem.ItemId, true);
-            ItemManager.dropItem(item, arena.RewardSpawnPoint, true, true, false);
-
-            CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
-            cachedItem.RebuildCache();
-            cachedItems.Add(cachedItem.Id, cachedItem);
-
-            SearchCount.Add(cachedItem.Id, 0);
-
-            objectiveItem.State = ObjectiveState.Roaming;
-            ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+                if (!cachedItems.ContainsKey(objectiveItem.ItemId))
+                {
+                    CachedItem cachedItem = new CachedItem(objectiveItem.ItemId);
+                    cachedItems.Add(objectiveItem.ItemId, cachedItem);
+                }
+                
+                SpawnObjectiveItem(objectiveItem, arena.RewardSpawnPoint);
+            }
         }
 
         private void ArenaManager_OnArenaRemoved(object sender, ArenaEventArgs e)
@@ -311,7 +266,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             Dictionary<ushort, ObjectiveItem> objectiveItems = dataManager.GameData.ObjectiveItems;
             foreach (ObjectiveItem objectiveItem in objectiveItems.Values.Where(x => x.ArenaId == e.Arena.Id))
-                objectiveItems.Remove(objectiveItem.ItemId);
+                RemoveObjectiveItem(objectiveItem.ItemId);
         }
 
         private void Instance_OnPlayerDisconnected(UnturnedPlayer player)
@@ -326,9 +281,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                     player.Inventory.removeItem(search.page, index);
                     player.Inventory.save();
 
-                    Item item = new Item(objectiveItem.ItemId, true);
-                    ItemManager.dropItem(item, player.Position, true, true, false);
-                    ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
+                    SpawnObjectiveItem(objectiveItem, player.Position);
                 }
             }
         }
