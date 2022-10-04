@@ -27,19 +27,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
             byte despawnItems_Y = (byte)AccessTools.Field(__instance.GetType(), "despawnItems_Y").GetValue(__instance);
             FieldInfo SendDestroyItemFieldInfo = __instance.GetType().GetField("SendDestroyItem", BindingFlags.Static | BindingFlags.NonPublic);
 
-            if (SendDestroyItemFieldInfo == null)
-            {
-                UnityEngine.Debug.Log("Nigger 1");
-                return true;
-            }
-
             ClientStaticMethod<byte, byte, uint, bool> SendDestroyItem = SendDestroyItemFieldInfo.GetValue(null) as ClientStaticMethod<byte, byte, uint, bool>;
-
-            if (SendDestroyItem == null)
-            {
-                UnityEngine.Debug.Log("Nigger 2");
-                return true;
-            }
 
             CachedItem[] cachedItems = objectiveManager.GetCachedItems();
 
