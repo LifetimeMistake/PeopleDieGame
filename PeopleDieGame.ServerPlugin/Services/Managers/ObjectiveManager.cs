@@ -95,6 +95,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             Item item = new Item(objectiveItem.ItemId, true);
             ItemManager.dropItem(item, spawnPoint, true, true, false);
 
+            if (cachedItems.ContainsKey(objectiveItem.ItemId))
+                cachedItems[objectiveItem.ItemId].RebuildCache();
+
             objectiveItem.State = ObjectiveState.Roaming;
             ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
         }
