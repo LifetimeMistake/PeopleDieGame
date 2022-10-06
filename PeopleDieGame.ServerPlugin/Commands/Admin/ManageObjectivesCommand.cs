@@ -7,6 +7,8 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
+using PeopleDieGame.ServerPlugin.Enums;
+using Autofac;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Admin
 {
@@ -126,10 +128,12 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 sb.AppendLine($"ID areny: {objectiveItem.ArenaId}");
                 sb.AppendLine($"Stan: {objectiveItem.State}");
 
+                CachedItemLocation location = objectiveManager.GetObjectiveItemLocation(objectiveItem.ItemId);
+                sb.AppendLine($"Lokalizacja: {location}");
 
-                Vector3S? location = objectiveManager.GetObjectiveItemLocation(objectiveItem.ItemId);
-                if (location != null)
-                    sb.AppendLine($"Pozycja: {location}");
+                Vector3S? position = objectiveManager.GetObjectiveItemPosition(objectiveItem.ItemId);
+                if (position != null)
+                    sb.AppendLine($"Pozycja: {position}");
 
                 ChatHelper.Say(caller, sb);
             }

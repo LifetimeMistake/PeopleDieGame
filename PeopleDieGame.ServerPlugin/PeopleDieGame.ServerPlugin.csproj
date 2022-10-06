@@ -140,6 +140,7 @@
     <Compile Include="BossControllers\FlamethrowerBossController.cs" />
     <Compile Include="BossControllers\IBossController.cs" />
     <Compile Include="BossControllers\GroundpounderBossController.cs" />
+    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Commands\TestLocateCommand.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\CachedItemState.cs" />
@@ -221,11 +222,20 @@
     <Compile Include="Services\Providers\GameTickProvider.cs" />
     <Compile Include="Services\Providers\LoadoutIdProvider.cs" />
     <Compile Include="Services\Providers\TeamIdProvider.cs" />
-    <Compile Include="Reflection\FieldRef.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PeopleDieGame.NetMethods\PeopleDieGame.NetMethods.csproj">
+      <Project>{25f1f577-aaee-4a65-ad82-4b736bdc0b7b}</Project>
+      <Name>PeopleDieGame.NetMethods</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PeopleDieGame.Reflection\PeopleDieGame.Reflection.csproj">
+      <Project>{71204c9f-00b2-4a6c-ad20-4d5dba72aed2}</Project>
+      <Name>PeopleDieGame.Reflection</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,7 +2,7 @@
 using SDG.Unturned;
 using UnityEngine;
 using PeopleDieGame.ServerPlugin.Enums;
-using PeopleDieGame.ServerPlugin.Reflection;
+using PeopleDieGame.Reflection;
 
 namespace PeopleDieGame.ServerPlugin.Models
 {

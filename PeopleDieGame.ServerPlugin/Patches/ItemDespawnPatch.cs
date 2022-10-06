@@ -14,7 +14,7 @@ using SDG.NetTransport;
 using PeopleDieGame.ServerPlugin.Helpers;
 using System.Diagnostics;
 using PeopleDieGame.ServerPlugin.Enums;
-using PeopleDieGame.ServerPlugin.Reflection;
+using PeopleDieGame.Reflection;
 
 namespace PeopleDieGame.ServerPlugin.Patches
 {
@@ -45,7 +45,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
                 {
                     ItemData item = itemList[i];
                     uint instanceID = item.instanceID;
-                    if (cachedItems.Any(x => x.GetLocation() == CachedItemState.Ground && x.RegionItem.ItemData.instanceID == instanceID))
+                    if (cachedItems.Any(x => x.GetLocation() == CachedItemLocation.Ground && x.RegionItem.ItemData.instanceID == instanceID))
                     {
                         FieldRef<float> lastDropped = FieldRef.GetFieldRef<ItemData, float>(item, "_lastDropped");
                         lastDropped.Value = Time.realtimeSinceStartup;

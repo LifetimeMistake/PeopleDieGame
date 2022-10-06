@@ -1,0 +1,11 @@
+﻿{
+	"Name": "PeopleDieGame.ClientModule",
+	"Version": "1.0.0.0",
+	"Assemblies":
+	[
+		{
+			"Path": "/PeopleDieGame.ClientModule.dll",
+			"Role": "Client"
+		}
+	]
+}

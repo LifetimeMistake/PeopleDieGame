@@ -1,6 +1,6 @@
 ﻿namespace PeopleDieGame.ServerPlugin.Enums
 {
-    public enum CachedItemState
+    public enum CachedItemLocation
     {
         Unknown,
         Ground,
