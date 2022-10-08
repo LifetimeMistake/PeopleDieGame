@@ -32,6 +32,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         [InjectDependency]
         private ArenaManager arenaManager { get; set; }
 
+        private static Altar altar { get; set; }
+
         public event EventHandler<AltarSubmitEventArgs> OnAltarSubmitItems;
 
         public void Init()
@@ -59,7 +61,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void ResizeReceptacles()
         {
-            Altar altar = GetAltar();
             if (altar.Receptacles.Count == 0)
                 return;
 
@@ -71,18 +72,18 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public Altar GetAltar()
         {
-            return dataManager.GameData.Altar;
+            if (altar == null)
+                altar = dataManager.GameData.Altar;
+            return altar;
         }
 
         public void SetAltarPosition(Vector3S position)
         {
-            Altar altar = dataManager.GameData.Altar;
             altar.SetPosition(position);
         }
 
         public void SetAltarRadius(double radius)
         {
-            Altar altar = dataManager.GameData.Altar;
             altar.SetRadius(radius);
         }
 
@@ -93,14 +94,12 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 throw new ArgumentException("Storage cannot be found or does not exist");
             }
 
-            Altar altar = dataManager.GameData.Altar;
             storage.items.resize(2, 2);
             altar.Receptacles.Add(storage);
         }
 
         public bool ResetReceptacles()
         {
-            Altar altar = dataManager.GameData.Altar;
             if (altar.Receptacles.Count == 0)
                 return false;
 
@@ -111,7 +110,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public bool IsPlayerInRadius(PlayerData playerData)
         {
             UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-            Altar altar = GetAltar();
 
             return Vector3.Distance(altar.Position.Value, player.Position) <= altar.Radius;
         }
@@ -122,7 +120,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return false;
 
             Team team = teamManager.GetTeam(playerData.TeamId.Value);
-            Altar altar = dataManager.GameData.Altar;
 
             if (altar.Receptacles.Count == 0)
                 throw new Exception("Altar does not have any receptacles");
@@ -146,8 +143,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void CheckAltarAbandoned()
         {
-            Altar altar = GetAltar();
-
             if (altar.Receptacles.Count == 0)
                 return;
 
