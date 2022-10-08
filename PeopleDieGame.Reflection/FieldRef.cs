@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace PeopleDieGame.ServerPlugin.Reflection
+namespace PeopleDieGame.Reflection
 {
     public class FieldRef<T>
     {
@@ -26,9 +26,9 @@ namespace PeopleDieGame.ServerPlugin.Reflection
             return new FieldRef<F>(fieldInfo, instance);
         }
 
-        public static FieldRef<F> GetFieldRef<I, F>(string fieldName)
+        public static FieldRef<F> GetFieldRef<F>(Type type, string fieldName)
         {
-            FieldInfo fieldInfo = AccessTools.Field(typeof(I), fieldName);
+            FieldInfo fieldInfo = AccessTools.Field(type, fieldName);
             return new FieldRef<F>(fieldInfo, null);
         }
     }

@@ -13,14 +13,14 @@ namespace PeopleDieGame.ServerPlugin.Models
         public InteractableVehicle Vehicle { get; private set; }
         public InteractableStorage Storage { get; private set; }
         public RegionItem RegionItem { get; private set; }
-        private CachedItemState Location { get; set; }
+        private CachedItemLocation Location { get; set; }
 
         public CachedItem(ushort id)
         {
             Id = id;
         }
 
-        public CachedItemState GetLocation(bool validateCache = true)
+        public CachedItemLocation GetLocation(bool validateCache = true)
         {
             if (!ValidateCache())
             {
@@ -29,7 +29,7 @@ namespace PeopleDieGame.ServerPlugin.Models
                     RebuildCache();
                     return GetLocation(false);
                 }
-                return CachedItemState.Unknown;
+                return CachedItemLocation.Unknown;
             }
             return Location;
         }
@@ -38,13 +38,13 @@ namespace PeopleDieGame.ServerPlugin.Models
         {
             switch (Location)
             {
-                case CachedItemState.Ground:
+                case CachedItemLocation.Ground:
                     return (RegionItem != null && RegionItem.Region.items.Contains(RegionItem.ItemData));
-                case CachedItemState.Player:
+                case CachedItemLocation.Player:
                     return (Player != null && Player.Inventory.has(Id) != null);
-                case CachedItemState.Vehicle:
+                case CachedItemLocation.Vehicle:
                     return (Vehicle != null && Vehicle.trunkItems.has(Id) != null);
-                case CachedItemState.Storage:
+                case CachedItemLocation.Storage:
                     return (Storage != null && Storage.items.has(Id) != null);
             }
 
@@ -86,7 +86,7 @@ namespace PeopleDieGame.ServerPlugin.Models
             }
             else
             {
-                Location = CachedItemState.Unknown;
+                Location = CachedItemLocation.Unknown;
                 RegionItem = null;
                 Player = null;
                 Vehicle = null;
@@ -96,7 +96,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private void SetDroppedItem(RegionItem regionItem)
         {
-            Location = CachedItemState.Ground;
+            Location = CachedItemLocation.Ground;
             RegionItem = regionItem;
             Player = null;
             Vehicle = null;
@@ -105,7 +105,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private void SetPlayer(UnturnedPlayer player)
         {
-            Location = CachedItemState.Player;
+            Location = CachedItemLocation.Player;
             RegionItem = null;
             Player = player;
             Vehicle = null;
@@ -114,7 +114,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private void SetVehicle(InteractableVehicle vehicle)
         {
-            Location = CachedItemState.Vehicle;
+            Location = CachedItemLocation.Vehicle;
             RegionItem = null;
             Player = null;
             Vehicle = vehicle;
@@ -123,7 +123,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private void SetStorage(InteractableStorage storage)
         {
-            Location = CachedItemState.Storage;
+            Location = CachedItemLocation.Storage;
             RegionItem = null;
             Player = null;
             Vehicle = null;

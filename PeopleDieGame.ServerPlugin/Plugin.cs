@@ -9,6 +9,7 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services;
 using PeopleDieGame.ServerPlugin.Services.Providers;
+using PeopleDieGame.NetMethods;
 
 namespace PeopleDieGame.ServerPlugin
 {
@@ -32,6 +33,10 @@ namespace PeopleDieGame.ServerPlugin
 
         private void LoadManagers()
         {
+            Debug.Log("Registering custom RPC calls...");
+            int customCallCount = CustomNetReflection.RegisterCustomRPCs();
+            Debug.Log($"Registered {customCallCount} calls!");
+
             Debug.Log("Loading services...");
             IDatabaseProvider<GameData> databaseProvider = InitDatabase();
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar(databaseProvider);

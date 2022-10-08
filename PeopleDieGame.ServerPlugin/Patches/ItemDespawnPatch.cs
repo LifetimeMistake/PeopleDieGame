@@ -13,6 +13,8 @@ using UnityEngine;
 using SDG.NetTransport;
 using PeopleDieGame.ServerPlugin.Helpers;
 using System.Diagnostics;
+using PeopleDieGame.ServerPlugin.Enums;
+using PeopleDieGame.Reflection;
 
 namespace PeopleDieGame.ServerPlugin.Patches
 {
@@ -26,13 +28,10 @@ namespace PeopleDieGame.ServerPlugin.Patches
             byte despawnItems_X = (byte)AccessTools.Field(__instance.GetType(), "despawnItems_X").GetValue(__instance);
             byte despawnItems_Y = (byte)AccessTools.Field(__instance.GetType(), "despawnItems_Y").GetValue(__instance);
             FieldInfo SendDestroyItemFieldInfo = __instance.GetType().GetField("SendDestroyItem", BindingFlags.Static | BindingFlags.NonPublic);
-
             ClientStaticMethod<byte, byte, uint, bool> SendDestroyItem = SendDestroyItemFieldInfo.GetValue(null) as ClientStaticMethod<byte, byte, uint, bool>;
 
             CachedItem[] cachedItems = objectiveManager.GetCachedItems();
-
-            List<ItemData> itemList = ItemManager.regions[(int)despawnItems_X, (int)despawnItems_Y].items.Where(x =>
-            !cachedItems.Any(y => y.GetLocation(false) == Enums.CachedItemState.Ground && y.RegionItem.ItemData.instanceID == x.instanceID)).ToList();
+            List<ItemData> itemList = ItemManager.regions[(int)despawnItems_X, (int)despawnItems_Y].items;
 
             if (Level.info == null || Level.info.type == ELevelType.ARENA)
             {
@@ -44,12 +43,19 @@ namespace PeopleDieGame.ServerPlugin.Patches
             {
                 for (int i = 0; i < itemList.Count; i++)
                 {
-                    if (Time.realtimeSinceStartup - itemList[i].lastDropped > (itemList[i].isDropped ? Provider.modeConfigData.Items.Despawn_Dropped_Time : Provider.modeConfigData.Items.Despawn_Natural_Time))
+                    ItemData item = itemList[i];
+                    uint instanceID = item.instanceID;
+                    if (cachedItems.Any(x => x.GetLocation() == CachedItemLocation.Ground && x.RegionItem.ItemData.instanceID == instanceID))
                     {
-                        uint instanceID = itemList[i].instanceID;
+                        FieldRef<float> lastDropped = FieldRef.GetFieldRef<ItemData, float>(item, "_lastDropped");
+                        lastDropped.Value = Time.realtimeSinceStartup;
+                        continue;
+                    }
+
+                    if (Time.realtimeSinceStartup - item.lastDropped > (itemList[i].isDropped ? Provider.modeConfigData.Items.Despawn_Dropped_Time : Provider.modeConfigData.Items.Despawn_Natural_Time))
+                    {
                         itemList.RemoveAt(i);
                         SendDestroyItem.Invoke(ENetReliability.Reliable, Regions.EnumerateClients(despawnItems_X, despawnItems_Y, ItemManager.ITEM_REGIONS), despawnItems_X, despawnItems_Y, instanceID, false);
-                        break;
                     }
                 }
 

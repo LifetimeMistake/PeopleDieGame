@@ -95,6 +95,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             Item item = new Item(objectiveItem.ItemId, true);
             ItemManager.dropItem(item, spawnPoint, true, true, false);
 
+            if (cachedItems.ContainsKey(objectiveItem.ItemId))
+                cachedItems[objectiveItem.ItemId].RebuildCache();
+
             objectiveItem.State = ObjectiveState.Roaming;
             ObjectiveItemSpawned?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
         }
@@ -111,16 +114,16 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             foreach (CachedItem item in cachedItems.Values)
             {
                 ObjectiveItem objectiveItem = objectiveItems[item.Id];
-                CachedItemState location = item.GetLocation();
+                CachedItemLocation location = item.GetLocation();
 
                 switch (location)
                 {
-                    case CachedItemState.Ground:
-                    case CachedItemState.Player:
-                    case CachedItemState.Vehicle:
+                    case CachedItemLocation.Ground:
+                    case CachedItemLocation.Player:
+                    case CachedItemLocation.Vehicle:
                         objectiveItem.State = ObjectiveState.Roaming;
                         break;
-                    case CachedItemState.Storage:
+                    case CachedItemLocation.Storage:
                         objectiveItem.State = ObjectiveState.Stored;
                         break;
                     default:
@@ -188,7 +191,16 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return true;
         }
 
-        public Vector3S? GetObjectiveItemLocation(ushort itemId)
+        public CachedItemLocation GetObjectiveItemLocation(ushort itemId)
+        {
+            if (!cachedItems.ContainsKey(itemId))
+                return CachedItemLocation.Unknown;
+
+            CachedItem cachedItem = cachedItems[itemId];
+            return cachedItem.GetLocation();
+        }
+
+        public Vector3S? GetObjectiveItemPosition(ushort itemId)
         {
             if (!cachedItems.ContainsKey(itemId))
                 return null;
@@ -196,13 +208,13 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             CachedItem cachedItem = cachedItems[itemId];
             switch (cachedItem.GetLocation())
             {
-                case CachedItemState.Ground:
+                case CachedItemLocation.Ground:
                     return cachedItem.RegionItem.ItemData.point;
-                case CachedItemState.Player:
+                case CachedItemLocation.Player:
                     return cachedItem.Player.Position;
-                case CachedItemState.Vehicle:
+                case CachedItemLocation.Vehicle:
                     return cachedItem.Vehicle.transform.position;
-                case CachedItemState.Storage:
+                case CachedItemLocation.Storage:
                     return cachedItem.Storage.transform.position;
                 default:
                     return null;
