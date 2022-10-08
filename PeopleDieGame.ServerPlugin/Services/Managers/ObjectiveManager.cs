@@ -90,7 +90,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
         }
 
-        private void SpawnObjectiveItem(ObjectiveItem objectiveItem, Vector3 spawnPoint)
+        public void SpawnObjectiveItem(ObjectiveItem objectiveItem, Vector3 spawnPoint)
         {
             Item item = new Item(objectiveItem.ItemId, true);
             ItemManager.dropItem(item, spawnPoint, true, true, false);

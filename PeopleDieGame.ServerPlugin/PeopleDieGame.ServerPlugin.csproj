@@ -114,6 +114,7 @@
     <Compile Include="Autofac\ServiceLocator.cs" />
     <Compile Include="Commands\Admin\ArenaBuilderCommand.cs" />
     <Compile Include="Commands\Admin\EvaporateCommand.cs" />
+    <Compile Include="Commands\Admin\ManageAltarCommand.cs" />
     <Compile Include="Commands\Admin\ManageArenasCommand.cs" />
     <Compile Include="Commands\Admin\GiveLoadoutCommand.cs" />
     <Compile Include="Commands\Admin\ManageLoadoutsCommand.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="BossControllers\IBossController.cs" />
     <Compile Include="BossControllers\GroundpounderBossController.cs" />
     <Compile Include="Commands\TestLocateCommand.cs" />
+    <Compile Include="Commands\TestSubmitCommand.cs" />
     <Compile Include="Enums\BossFightState.cs" />
     <Compile Include="Enums\CachedItemState.cs" />
     <Compile Include="Enums\GameState.cs" />
@@ -150,15 +152,19 @@
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\SequenceHelper.cs" />
     <Compile Include="ItemLocator.cs" />
+    <Compile Include="Models\Altar.cs" />
     <Compile Include="Models\CachedItem.cs" />
+    <Compile Include="Models\EventArgs\AltarSubmitEventArgs.cs" />
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
     <Compile Include="Patches\ItemDespawnPatch.cs" />
+    <Compile Include="Patches\ReceptacleDamagePatch.cs" />
     <Compile Include="Patches\ZombiePathPatch.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Managers\ArenaManager.cs" />
+    <Compile Include="Services\Managers\AltarManager.cs" />
     <Compile Include="Services\Managers\ObjectiveManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
