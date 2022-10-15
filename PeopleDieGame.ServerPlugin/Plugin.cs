@@ -23,6 +23,7 @@ namespace PeopleDieGame.ServerPlugin
             harmony.PatchAll();
             Debug.Log($"Patched {harmony.GetPatchedMethods().Count()} game methods");
 
+            NetMethodsLoader.Load();
             LevelHierarchy.ready += LevelHierarchy_ready;
         }
 
@@ -33,10 +34,6 @@ namespace PeopleDieGame.ServerPlugin
 
         private void LoadManagers()
         {
-            Debug.Log("Registering custom RPC calls...");
-            int customCallCount = CustomNetReflection.RegisterCustomRPCs();
-            Debug.Log($"Registered {customCallCount} calls!");
-
             Debug.Log("Loading services...");
             IDatabaseProvider<GameData> databaseProvider = InitDatabase();
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar(databaseProvider);
@@ -70,6 +67,7 @@ namespace PeopleDieGame.ServerPlugin
             LevelHierarchy.ready -= LevelHierarchy_ready;
             UnloadManagers();
             harmony.UnpatchAll();
+            NetMethodsLoader.Unload();
         }
 
         private IDatabaseProvider<GameData> InitDatabase()

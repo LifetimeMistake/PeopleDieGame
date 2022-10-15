@@ -37,6 +37,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="SDG.Glazier.Runtime">
+      <HintPath>..\References\SDG.Glazier.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="SDG.NetPak.Runtime">
       <HintPath>..\References\SDG.NetPak.Runtime.dll</HintPath>
     </Reference>
@@ -56,9 +59,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetMethodsLoader.cs" />
     <Compile Include="CustomNetReflection.cs" />
-    <Compile Include="Managers\CustomNetworkedManager.cs" />
-    <Compile Include="NetMethods\CustomNetworkedManager_NetMethods.cs" />
+    <Compile Include="Managers\MapMarkerManager.cs" />
+    <Compile Include="Models\MapMarker.cs" />
+    <Compile Include="NetMethods\MapMarkerManager_NetMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

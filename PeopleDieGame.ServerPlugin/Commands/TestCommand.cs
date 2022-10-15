@@ -1,10 +1,12 @@
 ﻿using PeopleDieGame.NetMethods.Managers;
 using Rocket.API;
+using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PeopleDieGame.ServerPlugin.Commands
 {
@@ -24,7 +26,8 @@ namespace PeopleDieGame.ServerPlugin.Commands
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            CustomNetworkedManager.SendCoolFeatureRequest("aaaaaa1295if2309");
+            Vector3 position = ((UnturnedPlayer)caller).Position + new Vector3(0, 0, 50);
+            MapMarkerManager.CreateMarker(position, "test");
         }
     }
 }
