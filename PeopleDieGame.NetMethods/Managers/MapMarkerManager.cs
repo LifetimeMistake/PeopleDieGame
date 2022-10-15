@@ -28,6 +28,7 @@ namespace PeopleDieGame.NetMethods.Managers
 
         private static void CreateMarkerObject(MapMarker marker)
         {
+            Debug.Log($"Setting marker: {marker.Id}, \"{marker.Label}\", {marker.Position}, {marker.Color}");
             ISleekImage sleekImage = Glazier.Get().CreateImage(PlayerDashboardInformationUI.icons.load<Texture2D>("Marker"));
             sleekImage.positionOffset_X = -10;
             sleekImage.positionOffset_Y = -10;
