@@ -57,7 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomNetReflection.cs" />
+    <Compile Include="Managers\BossBarManager.cs" />
     <Compile Include="Managers\CustomNetworkedManager.cs" />
+    <Compile Include="NetMethods\BossBarManager_NetMethods.cs" />
     <Compile Include="NetMethods\CustomNetworkedManager_NetMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

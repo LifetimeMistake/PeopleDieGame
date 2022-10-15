@@ -32,12 +32,13 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         [InjectDependency]
         private ArenaManager arenaManager { get; set; }
 
-        private static Altar altar { get; set; }
+        private Altar altar { get; set; }
 
         public event EventHandler<AltarSubmitEventArgs> OnAltarSubmitItems;
 
         public void Init()
         {
+            altar = dataManager.GameData.Altar;
             ResizeReceptacles();
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
