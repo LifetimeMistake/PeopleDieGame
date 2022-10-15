@@ -100,8 +100,28 @@ namespace PeopleDieGame.NetMethods.Managers
             if (!markers.ContainsKey(markerId))
                 return;
 
+            ISleekElement marker = markerImages[markerId];
+            mapMarkersContainer.Value.RemoveChild(marker);
             markers.Remove(markerId);
             markerImages.Remove(markerId);
+        }
+
+        public static void SyncMarkersToPlayer(SteamPlayer player)
+        {
+            if (!Provider.isServer)
+                return;
+
+            foreach(MapMarker mapMarker in markers.Values)
+                SendMarker.Invoke(ENetReliability.Reliable, player.transportConnection, mapMarker);
+        }
+
+        public static void ClearMarkers()
+        {
+            if (!Provider.isServer)
+                return;
+
+            foreach (MapMarker mapMarker in markers.Values)
+                SendRemoveMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), mapMarker.Id);
         }
 
         public static MapMarker CreateMarker(Vector3 position, string label = null, Color color = default)

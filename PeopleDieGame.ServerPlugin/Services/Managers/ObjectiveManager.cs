@@ -11,6 +11,7 @@ using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
 using Pathfinding.RVO.Sampled;
 using UnityEngine;
+using PeopleDieGame.NetMethods.Models;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -69,7 +70,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         private void RegisterTimers()
         {
             UnregisterTimers();
-            timerManager.Register(ValidateCaches, 300);
+            timerManager.Register(ValidateCaches, 60);
         }
 
         private void UnregisterTimers()
@@ -114,6 +115,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             foreach (CachedItem item in cachedItems.Values)
             {
                 ObjectiveItem objectiveItem = objectiveItems[item.Id];
+                ObjectiveState previousState = objectiveItem.State;
                 CachedItemLocation location = item.GetLocation();
 
                 switch (location)
@@ -141,6 +143,11 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                             ChatHelper.Say($"Jednemu z artefaktów wyrosły nogi i uciekł, złapaliśmy go i umieściliśmy na arenie \"{arena.Name}\"!");
                         }
                         break;
+                }
+
+                if (previousState != objectiveItem.State)
+                {
+                    ObjectiveItemUpdated?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
                 }
             }
         }
@@ -191,6 +198,14 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return true;
         }
 
+        public CachedItem GetItemCache(ushort itemId)
+        {
+            if (!cachedItems.ContainsKey(itemId))
+                return null;
+
+            return cachedItems[itemId];
+        }
+
         public CachedItemLocation GetObjectiveItemLocation(ushort itemId)
         {
             if (!cachedItems.ContainsKey(itemId))
@@ -200,7 +215,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return cachedItem.GetLocation();
         }
 
-        public Vector3S? GetObjectiveItemPosition(ushort itemId)
+        public Vector3? GetObjectiveItemPosition(ushort itemId)
         {
             if (!cachedItems.ContainsKey(itemId))
                 return null;

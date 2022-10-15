@@ -383,8 +383,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 IEnumerable<UnturnedPlayer> playersJoined = participants.Except(bossFight.Participants);
                 IEnumerable<UnturnedPlayer> playersLeft = bossFight.Participants.Except(participants);
 
-                Debug.Log($"Participants: {participants.Count()} {playersJoined.Count()} {playersLeft.Count()}");
-
                 bossFight.Participants.Clear();
                 bossFight.Participants.AddRange(participants);
 

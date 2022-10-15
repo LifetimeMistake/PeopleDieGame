@@ -44,6 +44,7 @@ namespace PeopleDieGame.ServerPlugin
             // Init all services
             foreach (IService service in serviceLocator.LocateServicesOfType<IService>())
             {
+                Debug.Log($"Loading service {service.GetType().Name}");
                 service.Init();
             }
 

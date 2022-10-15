@@ -40,7 +40,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         public float SpitTime { get => spitTime.Value; set => spitTime.Value = value; }
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
         public EZombiePath Path { get => path.Value; set => path.Value = value; }
-        public EZombiePath? PathOverride { get => pathOverride.Value; set => SetPathOverride(value); }
+        public EZombiePath? PathOverride { get => pathOverride; set => SetPathOverride(value); }
         public bool AIEnabled { get; set; }
 
         public ManagedZombie()
