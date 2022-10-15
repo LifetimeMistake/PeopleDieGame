@@ -61,6 +61,10 @@
   <ItemGroup>
     <Compile Include="NetMethodsLoader.cs" />
     <Compile Include="CustomNetReflection.cs" />
+    <Compile Include="Managers\BossBarManager.cs" />
+    <Compile Include="Managers\CustomNetworkedManager.cs" />
+    <Compile Include="NetMethods\BossBarManager_NetMethods.cs" />
+    <Compile Include="NetMethods\CustomNetworkedManager_NetMethods.cs" />
     <Compile Include="Managers\MapMarkerManager.cs" />
     <Compile Include="Models\MapMarker.cs" />
     <Compile Include="NetMethods\MapMarkerManager_NetMethods.cs" />
