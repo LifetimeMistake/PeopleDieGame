@@ -43,6 +43,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<BossFightEventArgs> OnBossFightRemoved;
         public event EventHandler<BossFightEventArgs> OnBossFightCompleted;
         public event EventHandler<BossFightEventArgs> OnBossFightFailed;
+        public event EventHandler<BossFightParticipantEventArgs> OnPlayerJoinedFight;
+        public event EventHandler<BossFightParticipantEventArgs> OnPlayerLeftFight;
         public event EventHandler<BossFightDominationEventArgs> OnBossFightDominantTeamChanged;
 
         public void Init()
@@ -74,7 +76,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             UnregisterTimers();
             timerManager.Register(ProcessFightStartConditions, 60);
             timerManager.Register(ProcessFightEndConditions, 60);
-            timerManager.Register(UpdateDominantTeams, 60);
+            timerManager.Register(UpdateParticipants, 60);
             timerManager.Register(UpdateFights, 1);
         }
 
@@ -83,7 +85,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Unregister(ProcessFightStartConditions);
             timerManager.Unregister(ProcessFightEndConditions);
             timerManager.Unregister(UpdateFights);
-            timerManager.Unregister(UpdateDominantTeams);
+            timerManager.Unregister(UpdateParticipants);
         }
 
         private void GameManager_OnGameStateChanged(object sender, EventArgs e)
@@ -233,11 +235,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
 
             // Verify that at least one of the attackers is inside the arena
-            bool hasTeamMembersInsideArena = teamManager.GetOnlineTeamMembers(team)
-                .Select(x => UnturnedPlayer.FromCSteamID((CSteamID)x.Id))
-                .Where(x => x != null && !x.Dead)
-                .Any(x => Vector3.Distance(bossArena.ActivationPoint, x.Position) <= bossArena.ActivationDistance);
-
+            bool hasTeamMembersInsideArena = GetPlayersInActivationRange(bossArena, team).Any(x => !x.Dead);
             if (!hasTeamMembersInsideArena)
             {
                 Debug.LogWarning("Attempted to activate arena, but no attacker team members were inside.");
@@ -327,6 +325,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
                 Team playerTeam = teamManager.GetTeam(playerData.TeamId.Value);
                 BossFight bossFight = CreateBossFight(activatedArena, playerTeam);
+
                 if (bossFight == null)
                     Debug.LogError($"Failed to start arena {activatedArena.Name}");
                 else
@@ -338,16 +337,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State == BossFightState.Ongoing).ToList())
             {
-                double deactivationDistance = bossFight.Arena.DeactivationDistance;
-
-                // Find players inside arena
-                IEnumerable<UnturnedPlayer> players = Provider.clients
-                .Select(x => UnturnedPlayer.FromPlayer(x.player))
-                .Where(x =>
-                {
-                    return Vector3.Distance(bossFight.Arena.ActivationPoint, x.Position) <= deactivationDistance
-                     || Vector3.Distance(bossFight.Arena.BossSpawnPoint.Position, x.Position) <= deactivationDistance;
-                });
+                IEnumerable<UnturnedPlayer> players = GetPlayersInsideArena(bossFight.Arena);
 
                 if (players.Count() != 0 && players.All(x => x.Dead))
                 {
@@ -382,20 +372,16 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
         }
 
-        private void UpdateDominantTeams()
+        private void UpdateParticipants()
         {
             foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
             {
-                double deactivationDistance = bossFight.Arena.DeactivationDistance;
-
                 // Find players inside arena
-                IEnumerable<UnturnedPlayer> participants = Provider.clients
-                .Select(x => UnturnedPlayer.FromSteamPlayer(x))
-                .Where(x =>
-                {
-                    return Vector3.Distance(bossFight.Arena.ActivationPoint, x.Position) <= deactivationDistance
-                     || Vector3.Distance(bossFight.Arena.BossSpawnPoint.Position, x.Position) <= deactivationDistance;
-                });
+                IEnumerable<UnturnedPlayer> participants = GetPlayersInsideArena(bossFight.Arena);
+                IEnumerable<UnturnedPlayer> playersJoined = participants.Except(bossFight.Participants);
+                IEnumerable<UnturnedPlayer> playersLeft = bossFight.Participants.Except(participants);
+
+                Debug.Log($"Participants: {participants.Count()} {playersJoined.Count()} {playersLeft.Count()}");
 
                 bossFight.Participants.Clear();
                 bossFight.Participants.AddRange(participants);
@@ -423,6 +409,16 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                             OnBossFightDominantTeamChanged?.Invoke(this, new BossFightDominationEventArgs(oldTeam, dominantTeam));
                         }
                     }
+                }
+
+                foreach(UnturnedPlayer player in playersJoined)
+                {
+                    OnPlayerJoinedFight?.Invoke(this, new BossFightParticipantEventArgs(bossFight, player));
+                }
+
+                foreach(UnturnedPlayer player in playersLeft)
+                {
+                    OnPlayerLeftFight?.Invoke(this, new BossFightParticipantEventArgs(bossFight, player));
                 }
             }
         }

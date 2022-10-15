@@ -18,6 +18,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
         {
             arenaManager.OnBossFightRemoved += ArenaManager_OnBossFightRemoved;
             arenaManager.OnBossFightCreated += ArenaManager_OnBossFightCreated;
+            arenaManager.OnPlayerJoinedFight += ArenaManager_OnPlayerJoinedFight;
+            arenaManager.OnPlayerLeftFight += ArenaManager_OnPlayerLeftFight;
             arenaManager.OnBossFightDominantTeamChanged += ArenaManager_OnBossFightDominantTeamChanged;
         }
 
@@ -25,6 +27,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
         {
             arenaManager.OnBossFightRemoved -= ArenaManager_OnBossFightRemoved;
             arenaManager.OnBossFightCreated -= ArenaManager_OnBossFightCreated;
+            arenaManager.OnPlayerJoinedFight -= ArenaManager_OnPlayerJoinedFight;
+            arenaManager.OnPlayerLeftFight -= ArenaManager_OnPlayerLeftFight;
             arenaManager.OnBossFightDominantTeamChanged -= ArenaManager_OnBossFightDominantTeamChanged;
         }
 
@@ -74,6 +78,16 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             BossArena arena = e.BossFight.Arena;
 
             ChatHelper.Say($"Drużyna \"{team.Name}\" rozpoczęła walkę z boss'em \"{arena.BossModel.Name}\"");
+        }
+
+        private void ArenaManager_OnPlayerLeftFight(object sender, Models.EventArgs.BossFightParticipantEventArgs e)
+        {
+            ChatHelper.Say(e.Player, $"Dołączasz do walki z {e.BossFight.FightController.GetBossBase().Name}!");
+        }
+
+        private void ArenaManager_OnPlayerJoinedFight(object sender, Models.EventArgs.BossFightParticipantEventArgs e)
+        {
+            ChatHelper.Say(e.Player, $"Opuszczasz walkę z {e.BossFight.FightController.GetBossBase().Name}!");
         }
     }
 }

@@ -155,6 +155,7 @@
     <Compile Include="Models\Altar.cs" />
     <Compile Include="Models\CachedItem.cs" />
     <Compile Include="Models\EventArgs\AltarSubmitEventArgs.cs" />
+    <Compile Include="Models\EventArgs\BossFightParticipantEventArgs.cs" />
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
