@@ -17,9 +17,7 @@ namespace PeopleDieGame.ClientModule
         {
             try
             {
-                Debug.Log("Registering custom RPC calls...");
-                int customCallCount = CustomNetReflection.RegisterCustomRPCs();
-                Debug.Log($"Registered {customCallCount} calls!");
+                NetMethodsLoader.Load();
             }
             catch(Exception ex)
             {
@@ -29,7 +27,14 @@ namespace PeopleDieGame.ClientModule
 
         public void shutdown()
         {
-            
+            try
+            {
+                NetMethodsLoader.Unload();
+            }
+            catch(Exception ex)
+            {
+                Debug.Log(ex);
+            }
         }
     }
 }

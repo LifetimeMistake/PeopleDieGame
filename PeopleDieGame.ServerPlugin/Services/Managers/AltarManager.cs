@@ -32,13 +32,12 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         [InjectDependency]
         private ArenaManager arenaManager { get; set; }
 
-        private Altar altar { get; set; }
+        private Altar altar { get => GetAltar(); }
 
         public event EventHandler<AltarSubmitEventArgs> OnAltarSubmitItems;
 
         public void Init()
         {
-            altar = dataManager.GameData.Altar;
             ResizeReceptacles();
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
@@ -73,9 +72,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public Altar GetAltar()
         {
-            if (altar == null)
-                altar = dataManager.GameData.Altar;
-            return altar;
+            return dataManager.GameData.Altar;
         }
 
         public void SetAltarPosition(Vector3S position)
@@ -108,10 +105,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return true;
         }
 
-        public bool IsPlayerInRadius(PlayerData playerData)
+        public bool IsPlayerInAltar(PlayerData playerData)
         {
             UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-
             return Vector3.Distance(altar.Position.Value, player.Position) <= altar.Radius;
         }
 
@@ -159,7 +155,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             foreach (SteamPlayer player in Provider.clients)
             {
                 PlayerData playerData = playerDataManager.GetPlayer((ulong)player.playerID.steamID);
-                if (!IsPlayerInRadius(playerData))
+                if (!IsPlayerInAltar(playerData))
                     continue;
                 return;
             }
@@ -177,7 +173,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 objectiveManager.SpawnObjectiveItem(item, arena.RewardSpawnPoint);
             }
 
-            ChatHelper.Say("Altar został pozostawiony z artefaktami w swoich pojemnikach. Wyczyszczono pojemniki i zrespiono artefakty.");
+            ChatHelper.Say("Artefakty w altarze odleciały do domu :(");
         }
     }
 }
