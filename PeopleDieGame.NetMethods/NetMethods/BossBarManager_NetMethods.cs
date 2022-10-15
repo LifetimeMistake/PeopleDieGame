@@ -12,26 +12,29 @@ namespace PeopleDieGame.NetMethods.NetMethods
     [NetInvokableGeneratedClass(typeof(BossBarManager))]
     public static class BossBarManager_NetMethods
     {
-        [NetInvokableGeneratedMethod("ReceiveBossBar", ENetInvokableGeneratedMethodPurpose.Read)]
-        public static void ReceiveBossBar_Read(in ClientInvocationContext context)
+        [NetInvokableGeneratedMethod("ReceiveUpdateBossBar", ENetInvokableGeneratedMethodPurpose.Read)]
+        public static void ReceiveUpdateBossBar_Read(in ClientInvocationContext context)
         {
             NetPakReader reader = context.reader;
             if (!reader.ReadString(out string name))
                 return;
             if (!reader.ReadFloat(out float health))
                 return;
-            if (!reader.ReadFloat(out float maxHealth))
-                return;
 
-            BossBarManager.ReceiveBossBar(name, health, maxHealth);
+            BossBarManager.ReceiveUpdateBossBar(name, health);
         }
 
-        [NetInvokableGeneratedMethod("ReceiveBossBar", ENetInvokableGeneratedMethodPurpose.Write)]
-        public static void ReceiveBossBar_Write(NetPakWriter writer, string name, float health, float maxHealth)
+        [NetInvokableGeneratedMethod("ReceiveUpdateBossBar", ENetInvokableGeneratedMethodPurpose.Write)]
+        public static void ReceiveUpdateBossBar_Write(NetPakWriter writer, string name, float health)
         {
             writer.WriteString(name);
             writer.WriteFloat(health);
-            writer.WriteFloat(maxHealth);
+        }
+
+        [NetInvokableGeneratedMethod("ReceiveRemoveBossBar", ENetInvokableGeneratedMethodPurpose.Read)]
+        public static void ReceiveRemoveBossBar_Read(in ClientInvocationContext context)
+        {
+            BossBarManager.ReceiveRemoveBossBar();
         }
     }
 }

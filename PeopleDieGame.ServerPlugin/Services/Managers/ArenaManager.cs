@@ -13,6 +13,7 @@ using PeopleDieGame.ServerPlugin.Enums;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
 using PeopleDieGame.ServerPlugin.Services.Providers;
+using PeopleDieGame.NetMethods.Managers;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -76,6 +77,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Register(ProcessFightEndConditions, 60);
             timerManager.Register(UpdateDominantTeams, 60);
             timerManager.Register(UpdateFights, 1);
+            timerManager.Register(UpdateBossBar, 30);
         }
 
         private void UnregisterTimers()
@@ -84,6 +86,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Unregister(ProcessFightEndConditions);
             timerManager.Unregister(UpdateFights);
             timerManager.Unregister(UpdateDominantTeams);
+            timerManager.Unregister(UpdateBossBar);
         }
 
         private void GameManager_OnGameStateChanged(object sender, EventArgs e)
@@ -279,6 +282,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             ongoingBossFights.Add(bossFight);
             OnBossFightCreated?.Invoke(this, new BossFightEventArgs(bossFight));
+
+            IZombieModel bossModel = bossArena.BossModel;
+
             return bossFight;
         }
 
@@ -423,6 +429,22 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                             OnBossFightDominantTeamChanged?.Invoke(this, new BossFightDominationEventArgs(oldTeam, dominantTeam));
                         }
                     }
+                }
+            }
+        }
+
+        private void UpdateBossBar()
+        {
+            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
+            {
+                IZombieModel bossModel = bossFight.Arena.BossModel;
+
+                foreach (UnturnedPlayer player in bossFight.Participants)
+                {
+                    string name = bossModel.Name;
+                    float health = (float)bossFight.FightController.GetBossHealthPercentage();
+
+                    BossBarManager.UpdateBossBar(name, health, player.SteamPlayer());
                 }
             }
         }
