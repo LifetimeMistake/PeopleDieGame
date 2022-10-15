@@ -9,11 +9,11 @@ using PeopleDieGame.ServerPlugin.Services.Managers;
 
 namespace PeopleDieGame.ServerPlugin.Commands.General
 {
-    public class BountyCommand : IRocketCommand
+    public class LeaderboardCommand : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
-        public string Name => "bountylist";
+        public string Name => "leaderboard";
 
         public string Help => "Wyświetla tabelę bounty graczy";
 
@@ -31,17 +31,11 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
 
             double totalBounty = 0;
             sb.AppendLine("Tabela bounty");
-            foreach (PlayerData playerData in playerDataList.ToList())
-            {
-                if (playerData.Bounty == 0)
-                {
-                    playerDataList.Remove(playerData);
-                    continue;
-                }
 
-                sb.AppendLine($"{playerData.Name} : ${playerData.Bounty}");
-                totalBounty += playerData.Bounty;
-            }
+            int i = 1;
+            foreach (PlayerData playerData in playerDataList.OrderByDescending(x => x.Bounty).Take(3))
+                sb.AppendLine($"#{i++} {playerData.Name}: ${playerData.Bounty}");
+
             if (playerDataList.Count == 0)
                 sb.AppendLine("Brak wyników");
             else
