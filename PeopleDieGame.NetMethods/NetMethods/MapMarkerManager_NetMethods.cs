@@ -21,7 +21,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
             NetPakReader reader = context.reader;
             if (!reader.ReadGuid(out Guid guid))
                 return;
-            if (!reader.ReadNormalVector3(out Vector3 position))
+            if (!reader.ReadClampedVector3(out Vector3 position))
                 return;
             if (!reader.ReadString(out string label))
                 return;
@@ -47,7 +47,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
             NetPakReader reader = context.reader;
             if (!reader.ReadGuid(out Guid guid))
                 return;
-            if (!reader.ReadNormalVector3(out Vector3 position))
+            if (!reader.ReadClampedVector3(out Vector3 position))
                 return;
 
             MapMarkerManager.ReceiveMarkerPosition(guid, position);
@@ -57,7 +57,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
         public static void ReceiveMarkerPosition_Write(NetPakWriter writer, Guid markerId, Vector3 newPosition)
         {
             writer.WriteGuid(markerId);
-            writer.WriteNormalVector3(newPosition);
+            writer.WriteClampedVector3(newPosition);
         }
 
         [NetInvokableGeneratedMethod("ReceiveMarkerLabel", ENetInvokableGeneratedMethodPurpose.Read)]
