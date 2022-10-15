@@ -36,7 +36,7 @@ namespace PeopleDieGame.ServerPlugin.Commands
                 AltarManager altarManager = ServiceLocator.Instance.LocateService<AltarManager>();
                 PlayerData callerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
 
-                if (!altarManager.IsPlayerInRadius(callerData))
+                if (!altarManager.IsPlayerInAltar(callerData))
                 {
                     ChatHelper.Say("Nie znajdujesz się w obszarze altar'u");
                     return;
