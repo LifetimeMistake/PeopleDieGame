@@ -79,17 +79,14 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Register(ProcessFightEndConditions, 60);
             timerManager.Register(UpdateParticipants, 60);
             timerManager.Register(UpdateFights, 1);
-            timerManager.Register(UpdateBossBar, 30);
         }
 
         private void UnregisterTimers()
         {
             timerManager.Unregister(ProcessFightStartConditions);
             timerManager.Unregister(ProcessFightEndConditions);
-            timerManager.Unregister(UpdateFights);
             timerManager.Unregister(UpdateParticipants);
-            timerManager.Unregister(UpdateDominantTeams);
-            timerManager.Unregister(UpdateBossBar);
+            timerManager.Unregister(UpdateFights);
         }
 
         private void GameManager_OnGameStateChanged(object sender, EventArgs e)
@@ -257,7 +254,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return null;
             }
 
-            BossFight bossFight = new BossFight(bossArena, null, team, BossFightState.Idle);
+            List<UnturnedPlayer> participants = GetPlayersInsideArena(bossArena);
+            BossFight bossFight = new BossFight(bossArena, null, team, participants, BossFightState.Idle);
             IBossController bossController;
 
             try
@@ -278,11 +276,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
 
             bossFight.State = BossFightState.Ongoing;
-
             ongoingBossFights.Add(bossFight);
             OnBossFightCreated?.Invoke(this, new BossFightEventArgs(bossFight));
-
-            IZombieModel bossModel = bossArena.BossModel;
 
             return bossFight;
         }
@@ -426,22 +421,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 foreach(UnturnedPlayer player in playersLeft)
                 {
                     OnPlayerLeftFight?.Invoke(this, new BossFightParticipantEventArgs(bossFight, player));
-                }
-            }
-        }
-
-        private void UpdateBossBar()
-        {
-            foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
-            {
-                IZombieModel bossModel = bossFight.Arena.BossModel;
-
-                foreach (UnturnedPlayer player in bossFight.Participants)
-                {
-                    string name = bossModel.Name;
-                    float health = (float)bossFight.FightController.GetBossHealthPercentage();
-
-                    BossBarManager.UpdateBossBar(name, health, player.SteamPlayer());
                 }
             }
         }

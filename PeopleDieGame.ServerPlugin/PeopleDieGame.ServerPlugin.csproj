@@ -168,6 +168,7 @@
     <Compile Include="Services\Managers\AltarManager.cs" />
     <Compile Include="Services\Managers\ObjectiveManager.cs" />
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
+    <Compile Include="Services\Providers\BossBarProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
     <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
     <Compile Include="Services\Providers\TeamEventMessageProvider.cs" />
