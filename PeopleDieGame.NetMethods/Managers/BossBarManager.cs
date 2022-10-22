@@ -70,7 +70,6 @@ namespace PeopleDieGame.NetMethods.Managers
 
             frame.RemoveAllChildren();
             container.Value.RemoveChild(frame);
-            container.Value.RemoveChild(healthBar);
             frame = null;
             healthBar = null;
             label = null;
