@@ -26,7 +26,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             arenaManager.OnPlayerLeftFight += ArenaManager_OnPlayerLeftFight;
             arenaManager.OnBossFightCreated += ArenaManager_OnBossFightCreated;
             arenaManager.OnBossFightRemoved += ArenaManager_OnBossFightRemoved;
-            timerManager.Register(UpdateBossBars, 30);
+            timerManager.Register(UpdateBossBars, 6);
         }
 
         public void Dispose()

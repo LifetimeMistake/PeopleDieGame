@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\AdvancedSleekProgress.cs" />
     <Compile Include="NetMethodsLoader.cs" />
     <Compile Include="CustomNetReflection.cs" />
     <Compile Include="Managers\BossBarManager.cs" />

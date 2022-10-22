@@ -18,7 +18,7 @@ namespace PeopleDieGame.NetMethods.Managers
         private static bool showBar = false;
         private static FieldRef<ISleekElement> container = FieldRef.GetFieldRef<ISleekElement>(typeof(PlayerLifeUI), "_container");
         private static ISleekElement frame;
-        private static SleekProgress healthBar;
+        private static AdvancedSleekProgress healthBar;
         private static ISleekLabel label;
 
         [SteamCall(ESteamCallValidation.ONLY_FROM_SERVER)]
@@ -32,13 +32,14 @@ namespace PeopleDieGame.NetMethods.Managers
                 frame.positionScale_X = 0.5f - (frame.sizeScale_X / 2);
                 frame.positionOffset_Y = 10;
 
-                healthBar = new SleekProgress("");
+                healthBar = new AdvancedSleekProgress(health);
                 healthBar.positionOffset_X = 10;
                 healthBar.positionOffset_Y = 10;
                 healthBar.sizeScale_X = 1f;
                 healthBar.sizeScale_Y = 0.5f;
                 healthBar.sizeOffset_X = -healthBar.positionOffset_X * 2;
-                healthBar.color = Palette.COLOR_R;
+                healthBar.Color = Palette.COLOR_R;
+                healthBar.DifferenceColor = new Color(255 / 255f, 201 / 255f, 14 / 255f);
 
                 label = Glazier.Get().CreateLabel();
                 label.fontAlignment = TextAnchor.MiddleCenter;
@@ -58,7 +59,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 showBar = true;
             }
 
-            healthBar.state = health;
+            healthBar.Value = health;
             label.text = name;
         }
 
