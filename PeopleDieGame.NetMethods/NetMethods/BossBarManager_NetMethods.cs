@@ -36,5 +36,10 @@ namespace PeopleDieGame.NetMethods.NetMethods
         {
             BossBarManager.ReceiveRemoveBossBar();
         }
+
+        [NetInvokableGeneratedMethod("ReceiveRemoveBossBar", ENetInvokableGeneratedMethodPurpose.Write)]
+        public static void ReceiveRemoveBossBar_Write(NetPakWriter writer)
+        {
+        }
     }
 }
