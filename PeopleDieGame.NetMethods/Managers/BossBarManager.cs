@@ -13,6 +13,7 @@ namespace PeopleDieGame.NetMethods.Managers
 {
     public class BossBarManager
     {
+        private static Color differenceColor = Environment.GetCommandLineArgs().Contains("--i-have-autism") ? Color.white : new Color(255 / 255f, 201 / 255f, 14 / 255f);
         private static readonly ClientStaticMethod<string, float> SendUpdateBossBar = ClientStaticMethod<string, float>.Get(new ClientStaticMethod<string, float>.ReceiveDelegate(ReceiveUpdateBossBar));
         private static readonly ClientStaticMethod SendRemoveBossBar = ClientStaticMethod.Get(new ClientStaticMethod.ReceiveDelegate(ReceiveRemoveBossBar));
         private static bool showBar = false;
@@ -39,7 +40,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 healthBar.sizeScale_Y = 0.5f;
                 healthBar.sizeOffset_X = -healthBar.positionOffset_X * 2;
                 healthBar.Color = Palette.COLOR_R;
-                healthBar.DifferenceColor = new Color(255 / 255f, 201 / 255f, 14 / 255f);
+                healthBar.DifferenceColor = differenceColor;
 
                 label = Glazier.Get().CreateLabel();
                 label.fontAlignment = TextAnchor.MiddleCenter;
