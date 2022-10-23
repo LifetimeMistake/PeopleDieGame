@@ -8,6 +8,7 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
+using System.Runtime.CompilerServices;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Shop
 {
@@ -19,7 +20,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
 
         public string Help => "Polecenia dotyczące sklepu przedmiotów";
 
-        public string Syntax => "<list/inspect/buy> <itemId/itemName> [<amount>]";
+        public string Syntax => "<list/search/inspect/buy> <itemId/itemName> [<amount>/page>]";
 
         public List<string> Aliases => new List<string>();
 
@@ -46,6 +47,9 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 case "buy":
                     VerbBuy(caller, verbArgs);
                     break;
+                case "search":
+                    VerbSearch(caller, verbArgs);
+                    break;
             }
         }
 
@@ -58,14 +62,102 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
         {
             try
             {
+                int page = 1;
+
+                if (command.Length > 0)
+                {
+                    if (!int.TryParse(command[0], out page))
+                    {
+                        ChatHelper.Say(caller, "Podano niepoprawną stronę w sklepie");
+                        return;
+                    }
+                }
+
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
+                ShopItem[] items = shopManager.GetItemList();
+                if (items.Length == 0)
+                {
+                    ChatHelper.Say(caller, "W sklepie nie ma żadnych przedmiotów");
+                    return;
+                }
 
                 StringBuilder sb = new StringBuilder();
-                ChatHelper.Say(caller, "Lista przedmiotów w sklepie:");
-                foreach (ShopItem item in shopManager.GetItemList())
+                sb.AppendLine("Lista przedmiotów w sklepie:");
+               
+
+                int pageCount = Math.Max(1, (int)Math.Ceiling((float)items.Length / 7));
+
+                if (page < 1 || page > pageCount)
+                {
+                    ChatHelper.Say(caller, $"Podano stronę z poza zakresu dostępnych stron (1-{pageCount}");
+                    return;
+                }
+
+                IEnumerable<ShopItem> pageItems = items.Skip((page - 1) * 7).Take(7);
+
+                foreach (ShopItem item in pageItems)
                 {
                     sb.AppendLine($"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
                 }
+
+                sb.AppendLine($"Strona {page} z {pageCount}");
+                ChatHelper.Say(caller, sb);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się pobrać listy przedmiotów z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSearch(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length == 0 || command[0] == "")
+            {
+                ChatHelper.Say("Musisz podać kryterium wyszukiwania");
+                return;
+            }
+
+            try
+            {
+                int page = 1;
+                string searchTerm = command[0];
+
+                if (command.Length > 1)
+                {
+                    if (!int.TryParse(command[1], out page))
+                    {
+                        ChatHelper.Say(caller, "Podano niepoprawną stronę w sklepie");
+                        return;
+                    }
+                }
+
+                ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
+                IEnumerable<ShopItem> items = shopManager.GetItemList().Where(x => x.Name.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant()));
+                if (items.Count() == 0)
+                {
+                    ChatHelper.Say(caller, "Nie znaleziono żadnych przedmiotów");
+                    return;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Lista przedmiotów w sklepie:");
+
+                int pageCount = Math.Max(1, (int)Math.Ceiling((float)items.Count() / 7));
+
+                if (page < 1 || page > pageCount)
+                {
+                    ChatHelper.Say(caller, $"Podano stronę z poza zakresu dostępnych stron (1-{pageCount}");
+                    return;
+                }
+
+                IEnumerable<ShopItem> pageItems = items.Skip((page - 1) * 7).Take(7);
+
+                foreach (ShopItem item in pageItems)
+                {
+                    sb.AppendLine($"ID: {item.UnturnedItemId} | Nazwa: \"{item.Name}\" | Cena: ${item.Price}");
+                }
+
+                sb.AppendLine($"Strona {page} z {pageCount}");
                 ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
