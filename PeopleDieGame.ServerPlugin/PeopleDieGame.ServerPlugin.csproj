@@ -131,6 +131,7 @@
     <Compile Include="Commands\General\BountylistCommand.cs" />
     <Compile Include="Commands\General\InfoCommand.cs" />
     <Compile Include="Commands\General\ResetBioCommand.cs" />
+    <Compile Include="Commands\Shop\BalanceCommand.cs" />
     <Compile Include="Commands\Shop\ShopCommand.cs" />
     <Compile Include="Commands\Teams\AcceptInviteCommand.cs" />
     <Compile Include="Commands\Teams\InvitesCommand.cs" />
