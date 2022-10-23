@@ -124,7 +124,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     ChatHelper.Say(caller, "Warn: Nie udało się dołączyć do utworzonej drużyny z powodu błędu systemu, poproś administratora o pomoc.");
                 }
 
-                ChatHelper.Say(caller, $"Utworzono drużynę \"{teamName}\"! Zaproś nowych graczy przy użyciu polecenia /invite <nazwa gracza>");
+                ChatHelper.Say(caller, $"Utworzono drużynę \"{teamName}\"! Zaproś nowych graczy przy użyciu polecenia /team invite <nazwa gracza>");
             }
             catch (Exception ex)
             {
