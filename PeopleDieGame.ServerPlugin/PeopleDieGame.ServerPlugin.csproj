@@ -161,6 +161,8 @@
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
+    <Compile Include="Patches\ArenaBarricadePatch.cs" />
+    <Compile Include="Patches\ArenaStructurePatch.cs" />
     <Compile Include="Patches\ItemDespawnPatch.cs" />
     <Compile Include="Patches\ReceptacleDamagePatch.cs" />
     <Compile Include="Patches\ZombiePathPatch.cs" />
