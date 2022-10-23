@@ -93,7 +93,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     }
                 }
 
-                ChatHelper.Say(sb);
+                ChatHelper.Say(caller, sb);
             }
             catch (Exception ex)
             {

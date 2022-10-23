@@ -38,16 +38,16 @@ namespace PeopleDieGame.ServerPlugin.Commands
 
                 if (!altarManager.IsPlayerInAltar(callerData))
                 {
-                    ChatHelper.Say("Nie znajdujesz się w obszarze altar'u");
+                    ChatHelper.Say(caller, "Nie znajdujesz się w obszarze altar'u");
                     return;
                 }
 
                 if (!altarManager.SubmitItems(callerData))
                 {
-                    ChatHelper.Say("you failed, booo");
+                    ChatHelper.Say(caller, "you failed, booo");
                     return;
                 }
-                ChatHelper.Say("waow");
+                ChatHelper.Say(caller, "waow");
             }
             catch (Exception ex)
             {
