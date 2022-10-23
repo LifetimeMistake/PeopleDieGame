@@ -30,6 +30,12 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
         {
             try
             {
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+                if (gameManager.GetGameState() != Enums.GameState.InGame)
+                {
+                    ChatHelper.Say(caller, "Nie można sprawdzić portfela, bo nie jesteś w grze, pajacu.");
+                    return;
+                }
                 UnturnedPlayer player = (UnturnedPlayer)caller;
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
