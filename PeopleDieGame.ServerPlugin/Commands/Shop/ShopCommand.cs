@@ -115,7 +115,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
-                if (gameManager.GetGameState() == Enums.GameState.InLobby)
+                if (gameManager.GetGameState() != Enums.GameState.InGame)
                 {
                     ChatHelper.Say(caller, "Nie można korzystać z sklepu w poczekalni!");
                     return;
@@ -139,7 +139,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                     return;
                 }
 
-                ShopItem shopItem = shopManager.ResolveItem(command[0], true);
+                ShopItem shopItem = shopManager.ResolveItem(command[0], false);
 
                 if (shopItem == null)
                 {
