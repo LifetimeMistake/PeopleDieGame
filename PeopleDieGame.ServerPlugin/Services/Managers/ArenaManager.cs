@@ -379,9 +379,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             foreach (BossFight bossFight in ongoingBossFights.Where(x => x.State != BossFightState.Idle))
             {
                 // Find players inside arena
-                IEnumerable<UnturnedPlayer> participants = GetPlayersInsideArena(bossFight.Arena);
-                IEnumerable<UnturnedPlayer> playersJoined = participants.Except(bossFight.Participants);
-                IEnumerable<UnturnedPlayer> playersLeft = bossFight.Participants.Except(participants);
+                IEnumerable<UnturnedPlayer> participants = GetPlayersInsideArena(bossFight.Arena).Where(x => !x.Dead);
+                IEnumerable<UnturnedPlayer> playersJoined = participants.Except(bossFight.Participants).ToList();
+                IEnumerable<UnturnedPlayer> playersLeft = bossFight.Participants.Except(participants).ToList();
 
                 bossFight.Participants.Clear();
                 bossFight.Participants.AddRange(participants);

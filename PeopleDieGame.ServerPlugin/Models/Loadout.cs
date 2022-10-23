@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace PeopleDieGame.ServerPlugin
@@ -10,6 +11,7 @@ namespace PeopleDieGame.ServerPlugin
         public string Description { get; private set; }
         public Dictionary<int, int> Items { get; private set; }
 
+        [JsonConstructor]
         public Loadout(int id, string name, string description, Dictionary<int, int> items)
         {
             Id = id;
