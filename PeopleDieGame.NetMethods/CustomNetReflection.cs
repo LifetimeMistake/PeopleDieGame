@@ -41,7 +41,7 @@ namespace PeopleDieGame.NetMethods
         private static readonly FieldInfo server_name = AccessTools.Field(typeof(ServerMethodInfo), "name");
         private static readonly FieldInfo server_customAttribute = AccessTools.Field(typeof(ServerMethodInfo), "customAttribute");
         private static readonly FieldInfo server_readMethod = AccessTools.Field(typeof(ServerMethodInfo), "readMethod");
-        private static readonly FieldInfo server_writeMethodInfo = AccessTools.Field(typeof(ServerMethodInfo), "writeMethodInfo");
+        private static readonly FieldInfo server_writeMethod = AccessTools.Field(typeof(ServerMethodInfo), "writeMethodInfo");
         private static readonly FieldInfo server_rateLimitIndex = AccessTools.Field(typeof(ServerMethodInfo), "rateLimitIndex");
         private static readonly FieldInfo server_methodIndex = AccessTools.Field(typeof(ServerMethodInfo), "methodIndex");
 
@@ -130,28 +130,31 @@ namespace PeopleDieGame.NetMethods
 
             if (clientMethodInfos.Count > 0)
             {
-                clientMethods.Value = clientMethods.Value.AddRangeToArray(clientMethodInfos.ToArray());
-                ClientMethodInfo[] clientMethodsArray = clientMethods.Value;
-                clientMethodsLength.Value = (uint)clientMethodsArray.Length;
-                clientMethodsBitCount.Value = NetPakConst.CountBits((uint)clientMethodsArray.Length);
+                ClientMethodInfo[] clientMethodsArray = clientMethods.Value.AddRangeToArray(clientMethodInfos.ToArray());
 
                 for (uint clientMethodIndex = 0U; clientMethodIndex < clientMethodsArray.Length; clientMethodIndex++)
                 {
                     client_methodIndex.SetValue(clientMethodsArray[(int)clientMethodIndex], clientMethodIndex);
                 }
+
+                clientMethods.Value = clientMethodsArray;
+                clientMethodsLength.Value = (uint)clientMethodsArray.Length;
+                clientMethodsBitCount.Value = NetPakConst.CountBits((uint)clientMethodsArray.Length);
             }
-            
+
             if (serverMethodInfos.Count > 0)
             {
-                serverMethods.Value = serverMethods.Value.AddRangeToArray(serverMethodInfos.ToArray());
-                ServerMethodInfo[] serverMethodsArray = serverMethods.Value;
-                serverMethodsLength.Value = (uint)serverMethodsArray.Length;
-                serverMethodsBitCount.Value = NetPakConst.CountBits((uint)serverMethodsArray.Length);
+                ServerMethodInfo[] serverMethodsArray = serverMethods.Value.AddRangeToArray(serverMethodInfos.ToArray());
 
                 for (uint serverMethodIndex = 0U; serverMethodIndex < serverMethodsArray.Length; serverMethodIndex++)
                 {
-                    server_methodIndex.SetValue(serverMethodsArray[(int)serverMethodIndex], serverMethodIndex);
+                    ServerMethodInfo serverMethodInfo = serverMethodsArray[serverMethodIndex];
+                    server_methodIndex.SetValue(serverMethodInfo, serverMethodIndex);
                 }
+
+                serverMethods.Value = serverMethodsArray;
+                serverMethodsLength.Value = (uint)serverMethodsArray.Length;
+                serverMethodsBitCount.Value = NetPakConst.CountBits((uint)serverMethodsArray.Length);
             }
 
             return clientMethodInfos.Count + serverMethodInfos.Count;
@@ -229,7 +232,7 @@ namespace PeopleDieGame.NetMethods
                     GeneratedMethod writeMethod;
                     if (FindAndRemoveGeneratedMethod(writeMethods, methodInfo.Name, out writeMethod))
                     {
-                        server_writeMethodInfo.SetValue(serverMethodInfo, writeMethod.Info);
+                        server_writeMethod.SetValue(serverMethodInfo, writeMethod.Info);
                     }
                     else
                     {
@@ -304,6 +307,22 @@ namespace PeopleDieGame.NetMethods
                 }
             }
             log.Invoke(string.Concat(new string[] { "Unable to find server ", generatedType.Name, ".", methodName, " receive implementation" }));
+            return null;
+        }
+
+        public static ServerMethodInfo GetServerMethodInfo(Type declaringType, string methodName)
+        {
+            foreach (ServerMethodInfo serverMethodInfo in NetReflection.serverMethods)
+            {
+                Type type = server_declaringType.GetValue(serverMethodInfo) as Type;
+                string name = server_name.GetValue(serverMethodInfo) as string;
+
+                if (type == declaringType && name.Equals(methodName, StringComparison.Ordinal))
+                {
+                    return serverMethodInfo;
+                }
+            }
+            log.Invoke("Unable to find server method info for " + declaringType.Name + "." + methodName);
             return null;
         }
     }

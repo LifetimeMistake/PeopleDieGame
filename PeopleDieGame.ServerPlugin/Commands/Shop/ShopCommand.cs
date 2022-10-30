@@ -9,8 +9,8 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
 using System.Runtime.CompilerServices;
-using Steamworks;
-using UnityEngine;
+using PeopleDieGame.NetMethods.Managers;
+using Mono.Cecil.Cil;
 using SDG.Unturned;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Shop
@@ -33,8 +33,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
         {
             if (command.Length == 0)
             {
-                ChatHelper.Say(caller, $"Musisz podać argument.");
-                ShowSyntax(caller);
+                OpenShopGUI(caller);
                 return;
             }
 
@@ -56,9 +55,52 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
             }
         }
 
-        private void ShowSyntax(IRocketPlayer caller)
+        private void OpenShopGUI(IRocketPlayer caller)
         {
-            ChatHelper.Say(caller, $"/{Name} {Syntax}");
+            try
+            {
+                ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+
+                if (gameManager.GetGameState() != Enums.GameState.InGame)
+                {
+                    ChatHelper.Say(caller, "Nie można korzystać z sklepu w poczekalni!");
+                    return;
+                }
+
+                UnturnedPlayer unturnedPlayer = (UnturnedPlayer)caller;
+                SteamPlayer steamPlayer = unturnedPlayer.SteamPlayer();
+                PlayerData playerData = playerDataManager.GetPlayer((ulong)unturnedPlayer.CSteamID);
+
+                if (playerData == null)
+                {
+                    ChatHelper.Say("Nie udało się odnaleźć profilu gracza");
+                    return;
+                }
+
+                if (!playerData.TeamId.HasValue)
+                {
+                    ChatHelper.Say(caller, "Musisz należeć do drużyny, by korzystać z sklepu.");
+                    return;
+                }
+
+                Team team = teamManager.GetTeam(playerData.TeamId.Value);
+                if (team == null)
+                {
+                    throw new Exception("Failed to find specified team.");
+                }
+
+                Dictionary<ushort, float> items = shopManager.GetSerializableItemList();
+                ShopMenuManager.UpdateBalance(steamPlayer, (float)team.BankBalance);
+                ShopMenuManager.UpdateShopItems(steamPlayer, items);
+                ShopMenuManager.OpenShopUI(steamPlayer);
+            }
+            catch(Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się otworzyć sklepu z powodu błędu serwera: {ex.Message}");
+            }
         }
 
         private void VerbList(IRocketPlayer caller, string[] command)

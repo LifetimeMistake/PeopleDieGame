@@ -41,11 +41,11 @@ namespace PeopleDieGame.ServerPlugin.Models
                 case CachedItemLocation.Ground:
                     return (RegionItem != null && RegionItem.Region.items.Contains(RegionItem.ItemData));
                 case CachedItemLocation.Player:
-                    return (Player != null && Player.Inventory.has(Id) != null);
+                    return (Player != null && Player.Inventory != null && !Player.Dead && Player.Inventory.has(Id) != null);
                 case CachedItemLocation.Vehicle:
-                    return (Vehicle != null && Vehicle.trunkItems.has(Id) != null);
+                    return (Vehicle != null && Vehicle.trunkItems != null && !Vehicle.isDead && Vehicle.trunkItems.has(Id) != null);
                 case CachedItemLocation.Storage:
-                    return (Storage != null && Storage.items.has(Id) != null);
+                    return (Storage != null && Storage.items != null && Storage.items.has(Id) != null);
             }
 
             return false;

@@ -293,6 +293,10 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (reason.HasValue)
                 bossFight.State = reason.Value;
 
+            // Mark arena as conquered before we fire any events
+            if (bossFight.State == BossFightState.BossDefeated)
+                bossFight.Arena.Conquered = true;
+
             BossFightEventArgs bossFightEventArgs = new BossFightEventArgs(bossFight);
             OnBossFightRemoved?.Invoke(this, bossFightEventArgs);
 
@@ -368,7 +372,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 if (bossFight.FightController.IsBossDefeated())
                 {
                     EndBossFight(bossFight, BossFightState.BossDefeated);
-                    bossFight.Arena.Conquered = true;
                     continue;
                 }
             }
