@@ -22,7 +22,6 @@ namespace PeopleDieGame.ServerPlugin
             harmony = new Harmony("PeopleDieGame.ServerPlugin");
             harmony.PatchAll();
             Debug.Log($"Patched {harmony.GetPatchedMethods().Count()} game methods");
-
             NetMethodsLoader.Load();
             LevelHierarchy.ready += LevelHierarchy_ready;
         }
@@ -56,10 +55,13 @@ namespace PeopleDieGame.ServerPlugin
             Debug.Log("Unloading services...");
             ChatHelper.Say("Game manager unloading!");
 
-            // Dispose all services
-            foreach (IDisposableService service in serviceLocator.LocateServicesOfType<IDisposableService>())
+            if(serviceLocator != null)
             {
-                service.Dispose();
+                // Dispose all services
+                foreach (IDisposableService service in serviceLocator.LocateServicesOfType<IDisposableService>())
+                {
+                    service.Dispose();
+                }
             }
         }
 
@@ -67,7 +69,7 @@ namespace PeopleDieGame.ServerPlugin
         {
             LevelHierarchy.ready -= LevelHierarchy_ready;
             UnloadManagers();
-            harmony.UnpatchAll();
+            harmony.UnpatchSelf();
             NetMethodsLoader.Unload();
         }
 

@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace PeopleDieGame.NetMethods.Managers
 {
-    public class BossBarManager
+    public static class BossBarManager
     {
         private static Color differenceColor = Environment.GetCommandLineArgs().Contains("--i-have-autism") ? Color.white : new Color(255 / 255f, 201 / 255f, 14 / 255f);
         private static readonly ClientStaticMethod<string, float> SendUpdateBossBar = ClientStaticMethod<string, float>.Get(new ClientStaticMethod<string, float>.ReceiveDelegate(ReceiveUpdateBossBar));
@@ -77,7 +77,6 @@ namespace PeopleDieGame.NetMethods.Managers
             label = null;
             showBar = false;
         }
-
 
         public static void UpdateBossBar(string name, float health, SteamPlayer player)
         {
