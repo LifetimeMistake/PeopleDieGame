@@ -8,6 +8,8 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
+using UnityEngine;
+using SDG.Unturned;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Admin
 {
@@ -19,7 +21,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<list/inspect/create/remove/getspawn/setspawn/resetspawn/setname/setdescription/setloadout/resetloadout/getbalance/setbalance/deposit/withdraw> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId/amount>]";
+        public string Syntax => "<list/inspect/create/remove/getspawn/setspawn/resetspawn/getbase/setname/setdescription/setloadout/resetloadout/getbalance/setbalance/deposit/withdraw> <teamName/teamId> [<name/description/spawnpoint/loadoutName/loadoutId/amount>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -56,6 +58,9 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     break;
                 case "resetspawn":
                     VerbResetSpawn(caller, verbArgs);
+                    break;
+                case "getbase":
+                    VerbGetBase(caller, verbArgs);
                     break;
                 case "setname":
                     VerbSetName(caller, verbArgs);
@@ -297,21 +302,32 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
 
             try
             {
-                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 string searchTerm = string.Join(" ", command);
                 Team team = teamManager.ResolveTeam(searchTerm, false);
-                UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID(((UnturnedPlayer)caller).CSteamID);
-
                 if (team == null)
                 {
                     ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
                     return;
                 }
 
+                if (!teamManager.TeamBases.ContainsKey(team))
+                {
+                    ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
+                    return;
+                }
+
+                UnturnedPlayer callerPlayer = (UnturnedPlayer)caller;
+
                 VectorPAR? respawnPoint = new VectorPAR(callerPlayer.Position, (byte)callerPlayer.Rotation);
+                if (!teamManager.IsInClaimRadius(team, respawnPoint.Value.Position))
+                {
+                    ChatHelper.Say(caller, "Znajdujesz się poza zasięgiem bazy");
+                    return;
+                }
+
                 team.RespawnPoint = respawnPoint;
-                ChatHelper.Say(caller, "Ustawiono respawn point drużyny");
+                ChatHelper.Say(caller, "Ustawiono punkt odradzania drużyny");
             }
             catch (Exception ex)
             {
@@ -345,6 +361,44 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
             catch (Exception ex)
             {
                 ExceptionHelper.Handle(ex, caller, $"Nie udało się zresetować punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbGetBase(IRocketPlayer caller, string[] command)
+        {
+            try
+            {
+                if (command.Length == 0)
+                {
+                    ChatHelper.Say(caller, "Musisz podać nazwę lub ID drużyny");
+                    return;
+                }
+
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                string searchTerm = string.Join(" ", command);
+                Team team = teamManager.ResolveTeam(searchTerm, false);
+                if (team == null)
+                {
+                    ChatHelper.Say(caller, $"Nie znaleziono drużyny \"{searchTerm}\"");
+                    return;
+                }
+
+                if (!teamManager.TeamBases.ContainsKey(team))
+                {
+                    ChatHelper.Say(caller, "Drużyna nie posiada bazy");
+                    return;
+                }
+
+                ClaimBubble claim = teamManager.TeamBases[team];
+                Vector3S? basePoint = claim.origin;
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"Koordynaty bazy drużyny \"{team.Name}\":");
+                sb.AppendLine($"\t{basePoint}");
+                ChatHelper.Say(caller, sb);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, $"Nie udało się pobrać informacji o bazie drużyny: {ex.Message}");
             }
         }
 

@@ -9,6 +9,9 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
 using System.Runtime.CompilerServices;
+using Steamworks;
+using UnityEngine;
+using SDG.Unturned;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Shop
 {
@@ -206,6 +209,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 ShopManager shopManager = ServiceLocator.Instance.LocateService<ShopManager>();
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
 
                 if (gameManager.GetGameState() != Enums.GameState.InGame)
                 {
@@ -228,6 +232,21 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 if (!callerPlayerData.TeamId.HasValue)
                 {
                     ChatHelper.Say(caller, "Musisz należeć do drużyny, by korzystać z sklepu.");
+                    return;
+                }
+
+                Team callerTeam = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+                UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID((CSteamID)callerPlayerData.Id);
+
+                if (!teamManager.TeamBases.ContainsKey(callerTeam))
+                {
+                    ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
+                    return;
+                }
+
+                if (!teamManager.IsInClaimRadius(callerTeam, callerPlayer.Position))
+                {
+                    ChatHelper.Say(caller, "Znajdujesz się poza zasięgiem bazy");
                     return;
                 }
 

@@ -8,6 +8,11 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
 using PeopleDieGame.ServerPlugin.Services.Providers;
+using Rocket.Unturned.Player;
+using PeopleDieGame.ServerPlugin.Helpers;
+using PeopleDieGame.ServerPlugin.Enums;
+using UnityEngine;
+using PeopleDieGame.Reflection;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -20,13 +25,18 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         [InjectDependency]
         private TeamIdProvider teamIdProvider { get; set; }
         [InjectDependency]
+        private GameManager gameManager { get; set; }
+        [InjectDependency]
         private LoadoutManager loadoutManager { get; set; }
+        [InjectDependency]
+        private TimerManager timerManager { get; set; }
 
         public event EventHandler<TeamMembershipEventArgs> OnPlayerJoinedTeam;
         public event EventHandler<TeamMembershipEventArgs> OnPlayerLeftTeam;
         public event EventHandler<TeamMembershipEventArgs> OnTeamLeaderChanged;
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
+        public event EventHandler<TeamEventArgs> OnBaseClaimRemoved;
         public event EventHandler<TeamInvitationEventArgs> OnPlayerInvited;
         public event EventHandler<TeamInvitationEventArgs> OnInvitationCancelled;
         public event EventHandler<TeamInvitationEventArgs> OnInvitationAccepted;
@@ -34,15 +44,35 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<TeamBankEventArgs> OnBankBalanceChanged;
         public event EventHandler<TeamBankEventArgs> OnBankDepositedInto;
         public event EventHandler<TeamBankEventArgs> OnBankWithdrawnFrom;
+        public event EventHandler<TeamBaseClaimEventArgs> OnBaseClaimCreated;
+
+        public Dictionary<Team, ClaimBubble> TeamBases { get; set; }
 
         public void Init()
         {
             loadoutManager.OnLoadoutRemoved += LoadoutManager_OnLoadoutRemoved;
+            gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+            if (gameManager.GetGameState() == GameState.InGame)
+                RegisterTimers();
+            GetClaims();
         }
 
         public void Dispose()
         {
             loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
+            gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
+            UnregisterTimers();
+        }
+
+        private void RegisterTimers()
+        {
+            UnregisterTimers();
+            timerManager.Register(AutoDeposit, 120);
+        }
+
+        private void UnregisterTimers()
+        {
+            timerManager.Unregister(AutoDeposit);
         }
 
         private void LoadoutManager_OnLoadoutRemoved(object sender, LoadoutEventArgs e)
@@ -52,6 +82,70 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 if (team.DefaultLoadoutId == e.Loadout.Id)
                     team.SetDefaultLoadout(null);
             }
+        }
+
+        private void GameManager_OnGameStateChanged(object sender, EventArgs e)
+        {
+            GameState gameState = gameManager.GetGameState();
+            if (gameState == GameState.InGame)
+            {
+                RegisterTimers();
+            }
+            else
+            {
+                UnregisterTimers();
+            }
+        }
+
+        private void GetClaims()
+        {
+            TeamBases = new Dictionary<Team, ClaimBubble>();
+            List<InteractableClaim> claimList = UnityEngine.Object.FindObjectsOfType<InteractableClaim>().ToList();
+
+            foreach (InteractableClaim claim in claimList)
+            {
+                Team team = GetTeamByGroup((CSteamID)claim.group);
+                if (team == null)
+                    return;
+
+                FieldRef<ClaimBubble> bubble = FieldRef.GetFieldRef<InteractableClaim, ClaimBubble>(claim, "bubble");
+                TeamBases.Add(team, bubble.Value);
+            }
+        }
+
+        private void AutoDeposit()
+        {
+            foreach (SteamPlayer steamPlayer in Provider.clients)
+            {
+                PlayerData playerData = playerDataManager.GetPlayer((ulong)steamPlayer.playerID.steamID);
+                UnturnedPlayer unturnedPlayer = UnturnedPlayer.FromSteamPlayer(steamPlayer);
+
+                if (!playerData.TeamId.HasValue)
+                    return;
+
+                Team team = GetTeam(playerData.TeamId.Value);
+                if (!TeamBases.ContainsKey(team))
+                    return;
+
+                if (Vector3.Distance(TeamBases[team].origin, unturnedPlayer.Position) < Math.Sqrt(TeamBases[team].sqrRadius))
+                {
+                    if (playerData.WalletBalance == 0)
+                        return;
+
+                    DepositIntoBank(team, playerData.WalletBalance);
+                    playerDataManager.SetPlayerBalance(playerData, 0);
+                    ChatHelper.Say(playerData, $"Środki z twojego portfela trafiły do banku twojej drużyny");
+                }
+            }
+        }
+
+        public bool IsInClaimRadius(Team team, Vector3S point)
+        {
+            ClaimBubble claim = TeamBases[team];
+
+            if (Vector3.Distance(claim.origin, point) > Math.Sqrt(claim.sqrRadius))
+                return false;
+            return true;
         }
 
         public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null, double bankFunds = 1000)
@@ -104,6 +198,12 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant() == name.ToLowerInvariant());
             else
                 return teams.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+        }
+
+        public Team GetTeamByGroup(CSteamID groupId)
+        {
+            Dictionary<int, Team> teams = dataManager.GameData.Teams;
+            return teams.Values.FirstOrDefault(x => x.GroupID == groupId);
         }
 
         public bool JoinTeam(PlayerData player, Team team)
@@ -318,6 +418,18 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             team.Withdraw(amount);
             OnBankWithdrawnFrom?.Invoke(this, new TeamBankEventArgs(team, amount));
             OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
+        }
+
+        public void SetBaseClaim(Team team, ClaimBubble bubble)
+        {
+            TeamBases.Add(team, bubble);
+            OnBaseClaimCreated?.Invoke(this, new TeamBaseClaimEventArgs(team, bubble));
+        }
+
+        public void RemoveBaseClaim(Team team)
+        {
+            TeamBases.Remove(team);
+            OnBaseClaimRemoved?.Invoke(this, new TeamEventArgs(team));
         }
     }
 }

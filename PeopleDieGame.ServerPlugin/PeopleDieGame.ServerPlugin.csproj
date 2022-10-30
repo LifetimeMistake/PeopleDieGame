@@ -159,12 +159,16 @@
     <Compile Include="Models\EventArgs\AltarSubmitEventArgs.cs" />
     <Compile Include="Models\EventArgs\BossFightParticipantEventArgs.cs" />
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamBaseClaimEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
     <Compile Include="Patches\ArenaBarricadePatch.cs" />
     <Compile Include="Patches\ArenaStructurePatch.cs" />
+    <Compile Include="Patches\CreateClaimPatch.cs" />
     <Compile Include="Patches\ItemDespawnPatch.cs" />
     <Compile Include="Patches\ReceptacleDamagePatch.cs" />
+    <Compile Include="Patches\RegisterClaimPatch.cs" />
+    <Compile Include="Patches\RemoveClaimPatch.cs" />
     <Compile Include="Patches\ZombiePathPatch.cs" />
     <Compile Include="Patches\ZombieRespawnPatch.cs" />
     <Compile Include="Services\IService.cs" />
@@ -174,11 +178,11 @@
     <Compile Include="Services\Providers\ArenaEventMessageProvider.cs" />
     <Compile Include="Services\Providers\BossBarProvider.cs" />
     <Compile Include="Services\Managers\ChaseManager.cs" />
+    <Compile Include="Services\Providers\GroupMappingProvider.cs" />
     <Compile Include="Services\Providers\MarkerSyncProvider.cs" />
     <Compile Include="Services\Providers\ObjectiveEventMessageProvider.cs" />
     <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
     <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
-    <Compile Include="Services\Providers\TeamEventMessageProvider.cs" />
     <Compile Include="Services\Managers\RewardManager.cs" />
     <Compile Include="Services\Managers\DataManager.cs" />
     <Compile Include="Services\Managers\GameManager.cs" />
@@ -235,6 +239,7 @@
     <Compile Include="Services\Providers\JsonDatabaseProvider.cs" />
     <Compile Include="Services\Providers\GameTickProvider.cs" />
     <Compile Include="Services\Providers\LoadoutIdProvider.cs" />
+    <Compile Include="Services\Providers\TeamEventMessageProvider.cs" />
     <Compile Include="Services\Providers\TeamIdProvider.cs" />
   </ItemGroup>
   <ItemGroup>

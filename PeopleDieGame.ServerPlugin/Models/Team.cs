@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PeopleDieGame.ServerPlugin.Models;
+using SDG.Unturned;
+using Steamworks;
 
 namespace PeopleDieGame.ServerPlugin
 {
@@ -12,11 +14,12 @@ namespace PeopleDieGame.ServerPlugin
         public string Description { get; private set; }
         public int? DefaultLoadoutId { get; private set; }
         public ulong? LeaderId { get; private set; }
+        public CSteamID? GroupID { get; set; }
         public double BankBalance { get; private set; }
         public VectorPAR? RespawnPoint { get; set; }
         public List<TeamInvitation> Invitations { get; private set; }
 
-        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, VectorPAR? respawnPoint = null, double bankBalance = 1000)
+        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, CSteamID? groupId = null, double bankBalance = 1000, VectorPAR? respawnPoint = null)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -26,6 +29,7 @@ namespace PeopleDieGame.ServerPlugin
             BankBalance = bankBalance;
             RespawnPoint = respawnPoint;
             Invitations = new List<TeamInvitation>();
+            GroupID = groupId;
         }
 
         public void SetName(string name)
@@ -35,6 +39,9 @@ namespace PeopleDieGame.ServerPlugin
 
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException(nameof(name));
+
+            GroupInfo teamGroup = GroupManager.getGroupInfo(GroupID.Value);
+            teamGroup.name = name;
 
             Name = name;
         }

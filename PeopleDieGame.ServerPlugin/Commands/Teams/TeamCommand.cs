@@ -7,6 +7,8 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
+using SDG.Unturned;
+using UnityEngine;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Teams
 {
@@ -64,6 +66,9 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     break;
                 case "leave":
                     VerbLeave(caller);
+                    break;
+                case "setspawn":
+                    VerbSetSpawn(caller);
                     break;
                 default:
                     ChatHelper.Say(caller, $"Nieprawidłowy argument.");
@@ -173,6 +178,50 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
             catch (Exception ex)
             {
                 ExceptionHelper.Handle(ex, caller, $"Nie udało się utworzyć drużyny z powodu błedu serwera: {ex.Message}");
+            }
+        }
+
+        private void VerbSetSpawn(IRocketPlayer caller)
+        {
+            try
+            {
+                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
+                UnturnedPlayer player = (UnturnedPlayer)caller;
+                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+
+                if (!callerPlayerData.TeamId.HasValue)
+                {
+                    ChatHelper.Say(caller, "Nie należysz do drużyny!");
+                    return;
+                }
+
+                TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
+                Team team = teamManager.GetTeam(callerPlayerData.TeamId.Value);
+
+                if (team.LeaderId != callerPlayerData.Id)
+                {
+                    ChatHelper.Say(caller, "Nie jesteś liderem drużyny");
+                }
+
+                if (!teamManager.TeamBases.ContainsKey(team))
+                {
+                    ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
+                    return;
+                }
+
+                VectorPAR? respawnPoint = new VectorPAR(player.Position, (byte)player.Rotation);
+                if (!teamManager.IsInClaimRadius(team, respawnPoint.Value.Position))
+                {
+                    ChatHelper.Say(caller, "Znajdujesz się poza zasięgiem bazy");
+                    return;
+                }
+
+                team.RespawnPoint = respawnPoint;
+                ChatHelper.Say(caller, "Ustawiono respawn point drużyny");
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić punktu odradzania drużyny z powodu błędu serwera: {ex.Message}");
             }
         }
 
