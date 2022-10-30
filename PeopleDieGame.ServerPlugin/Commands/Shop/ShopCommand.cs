@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using PeopleDieGame.NetMethods.Managers;
 using Mono.Cecil.Cil;
 using SDG.Unturned;
+using Steamworks;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Shop
 {
