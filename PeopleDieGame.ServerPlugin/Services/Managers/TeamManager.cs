@@ -46,7 +46,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<TeamBankEventArgs> OnBankWithdrawnFrom;
         public event EventHandler<TeamBaseClaimEventArgs> OnBaseClaimCreated;
 
-        public Dictionary<Team, ClaimBubble> TeamBases { get; set; }
+        private Dictionary<Team, ClaimBubble> claims = new Dictionary<Team, ClaimBubble>();
 
         public void Init()
         {
@@ -54,7 +54,18 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
-            GetClaims();
+
+            List<InteractableClaim> claimList = UnityEngine.Object.FindObjectsOfType<InteractableClaim>().ToList();
+
+            foreach (InteractableClaim claim in claimList)
+            {
+                Team team = GetTeamByGroup((CSteamID)claim.group);
+                if (team == null)
+                    return;
+
+                FieldRef<ClaimBubble> bubble = FieldRef.GetFieldRef<InteractableClaim, ClaimBubble>(claim, "bubble");
+                claims.Add(team, bubble.Value);
+            }
         }
 
         public void Dispose()
@@ -97,22 +108,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
         }
 
-        private void GetClaims()
-        {
-            TeamBases = new Dictionary<Team, ClaimBubble>();
-            List<InteractableClaim> claimList = UnityEngine.Object.FindObjectsOfType<InteractableClaim>().ToList();
-
-            foreach (InteractableClaim claim in claimList)
-            {
-                Team team = GetTeamByGroup((CSteamID)claim.group);
-                if (team == null)
-                    return;
-
-                FieldRef<ClaimBubble> bubble = FieldRef.GetFieldRef<InteractableClaim, ClaimBubble>(claim, "bubble");
-                TeamBases.Add(team, bubble.Value);
-            }
-        }
-
         private void AutoDeposit()
         {
             foreach (SteamPlayer steamPlayer in Provider.clients)
@@ -124,10 +119,10 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                     return;
 
                 Team team = GetTeam(playerData.TeamId.Value);
-                if (!TeamBases.ContainsKey(team))
+                if (!claims.ContainsKey(team))
                     return;
 
-                if (Vector3.Distance(TeamBases[team].origin, unturnedPlayer.Position) < Math.Sqrt(TeamBases[team].sqrRadius))
+                if (Vector3.Distance(claims[team].origin, unturnedPlayer.Position) < Math.Sqrt(claims[team].sqrRadius))
                 {
                     if (playerData.WalletBalance == 0)
                         return;
@@ -141,7 +136,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public bool IsInClaimRadius(Team team, Vector3S point)
         {
-            ClaimBubble claim = TeamBases[team];
+            ClaimBubble claim = claims[team];
 
             if (Vector3.Distance(claim.origin, point) > Math.Sqrt(claim.sqrRadius))
                 return false;
@@ -420,16 +415,34 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
-        public void SetBaseClaim(Team team, ClaimBubble bubble)
+        public void SetClaim(Team team, ClaimBubble bubble)
         {
-            TeamBases.Add(team, bubble);
+            claims.Add(team, bubble);
             OnBaseClaimCreated?.Invoke(this, new TeamBaseClaimEventArgs(team, bubble));
         }
 
-        public void RemoveBaseClaim(Team team)
+        public void RemoveClaim(Team team)
         {
-            TeamBases.Remove(team);
+            claims.Remove(team);
             OnBaseClaimRemoved?.Invoke(this, new TeamEventArgs(team));
+        }
+
+        public ClaimBubble GetClaim(Team team)
+        {
+            if (!claims.ContainsKey(team))
+                return null;
+
+            return claims[team];
+        }
+
+        public ClaimBubble[] GetClaims()
+        {
+            return claims.Values.ToArray();
+        }
+
+        public bool HasClaim(Team team)
+        {
+            return claims.ContainsKey(team);
         }
     }
 }

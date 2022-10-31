@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
 			else if (bubble == null)
 			{
 				bubble = ClaimManager.registerBubble(__instance.transform.position, 32f, __instance.owner, __instance.group);
-				teamManager.SetBaseClaim(team, bubble);
+				teamManager.SetClaim(team, bubble);
 			}
 
 			return false;

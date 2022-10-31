@@ -26,7 +26,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
             if (team == null)
                 throw new Exception($"Player {__instance.owner} attempted to place a claimflag (does not belong to a team)");
 
-            teamManager.RemoveBaseClaim(team);
+            teamManager.RemoveClaim(team);
         }
     }
 }

@@ -36,12 +36,11 @@ namespace PeopleDieGame.ServerPlugin.Patches
 				return false;
             }
 				
-			if (teamManager.TeamBases.ContainsKey(team))
+			if (teamManager.HasClaim(team))
             {
 				ChatHelper.Say(playerData, "Twoja drużyna posiada już bazę!");
 				return false;
 			}
-				
 
 			return true;
 		}

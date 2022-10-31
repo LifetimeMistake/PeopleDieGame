@@ -148,8 +148,7 @@ namespace PeopleDieGame.NetMethods
 
                 for (uint serverMethodIndex = 0U; serverMethodIndex < serverMethodsArray.Length; serverMethodIndex++)
                 {
-                    ServerMethodInfo serverMethodInfo = serverMethodsArray[serverMethodIndex];
-                    server_methodIndex.SetValue(serverMethodInfo, serverMethodIndex);
+                    server_methodIndex.SetValue(serverMethodsArray[serverMethodIndex], serverMethodIndex);
                 }
 
                 serverMethods.Value = serverMethodsArray;

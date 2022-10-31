@@ -203,7 +203,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     ChatHelper.Say(caller, "Nie jesteś liderem drużyny");
                 }
 
-                if (!teamManager.TeamBases.ContainsKey(team))
+                if (!teamManager.HasClaim(team))
                 {
                     ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
                     return;

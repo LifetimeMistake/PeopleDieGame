@@ -281,7 +281,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 Team callerTeam = teamManager.GetTeam(callerPlayerData.TeamId.Value);
                 UnturnedPlayer callerPlayer = UnturnedPlayer.FromCSteamID((CSteamID)callerPlayerData.Id);
 
-                if (!teamManager.TeamBases.ContainsKey(callerTeam))
+                if (!teamManager.HasClaim(callerTeam))
                 {
                     ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
                     return;

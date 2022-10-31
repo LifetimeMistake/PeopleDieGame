@@ -311,7 +311,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!teamManager.TeamBases.ContainsKey(team))
+                if (!teamManager.HasClaim(team))
                 {
                     ChatHelper.Say(caller, "Twoja drużyna nie posiada bazy");
                     return;
@@ -383,13 +383,13 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!teamManager.TeamBases.ContainsKey(team))
+                if (!teamManager.HasClaim(team))
                 {
                     ChatHelper.Say(caller, "Drużyna nie posiada bazy");
                     return;
                 }
 
-                ClaimBubble claim = teamManager.TeamBases[team];
+                ClaimBubble claim = teamManager.GetClaim(team);
                 Vector3S? basePoint = claim.origin;
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"Koordynaty bazy drużyny \"{team.Name}\":");
