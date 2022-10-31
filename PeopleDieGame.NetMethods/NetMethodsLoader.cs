@@ -26,7 +26,7 @@ namespace PeopleDieGame.NetMethods
 
         public static void Unload()
         {
-            harmony.UnpatchSelf();
+            harmony.UnpatchAll();
         }
 
         private static void Log(string text)

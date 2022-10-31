@@ -69,7 +69,7 @@ namespace PeopleDieGame.ServerPlugin
         {
             LevelHierarchy.ready -= LevelHierarchy_ready;
             UnloadManagers();
-            harmony.UnpatchSelf();
+            harmony.UnpatchAll();
             NetMethodsLoader.Unload();
         }
 
