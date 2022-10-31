@@ -18,7 +18,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
 
         public string Help => "Odrzuca oczekujące zaproszenie do drużyny.";
 
-        public string Syntax => "<team name/team id>";
+        public string Syntax => "";
 
         public List<string> Aliases => new List<string>();
 
@@ -26,12 +26,6 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
-            if (command.Length == 0)
-            {
-                ChatHelper.Say(caller, "Musisz podać nazwę drużyny której zaproszenie chcesz odrzucić.");
-                return;
-            }
-
             try
             {
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
@@ -57,21 +51,14 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                string teamName = string.Join(" ", command);
-                Team team = teamManager.ResolveTeam(teamName, false);
-                if (team == null)
+                TeamInvite invite = teamManager.GetInvite(callerPlayerData);
+                if (invite == null)
                 {
-                    ChatHelper.Say(caller, "Taka drużyna nie istnieje!");
+                    ChatHelper.Say(caller, "Nie posiadasz oczekującego zaproszenia do drużyny.");
                     return;
                 }
 
-                if (!team.GetInvitations().Any(x => x.TargetId == callerPlayerData.Id))
-                {
-                    ChatHelper.Say(caller, "Nie posiadasz oczekującego zaproszenia od tej drużyny.");
-                    return;
-                }
-
-                if (!teamManager.RejectInvitation(team, callerPlayerData))
+                if (!teamManager.RejectInvite(callerPlayerData))
                 {
                     ChatHelper.Say(caller, "Nie udało się odrzucić zaproszenia z powodu błedu systemu.");
                     return;

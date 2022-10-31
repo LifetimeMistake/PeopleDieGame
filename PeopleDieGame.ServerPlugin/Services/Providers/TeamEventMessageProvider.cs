@@ -95,36 +95,28 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             }
         }
 
-        private void TeamManager_OnInvitationCancelled(object sender, Models.EventArgs.TeamInvitationEventArgs e)
+        private void TeamManager_OnInvitationCancelled(object sender, Models.EventArgs.TeamInviteEventArgs e)
         {
-            PlayerData inviter = playerDataManager.GetPlayer(e.TeamInvitation.InviterId);
-            PlayerData target = playerDataManager.GetPlayer(e.TeamInvitation.TargetId);
-
-            ChatHelper.Say(target, $"Zaproszenie gracza {inviter.Name} do drużyny {e.Team.Name} zostało anulowane");
+            TeamInvite invite = e.Invite;
+            ChatHelper.Say(invite.Target, $"Zaproszenie do drużyny {invite.Team.Name} zostało anulowane");
         }
 
-        private void TeamManager_OnInvitationRejected(object sender, Models.EventArgs.TeamInvitationEventArgs e)
+        private void TeamManager_OnInvitationRejected(object sender, Models.EventArgs.TeamInviteEventArgs e)
         {
-            PlayerData inviter = playerDataManager.GetPlayer(e.TeamInvitation.InviterId);
-            PlayerData target = playerDataManager.GetPlayer(e.TeamInvitation.TargetId);
-
-            ChatHelper.Say(inviter, $"Gracz {target.Name} odrzucił twoje zaproszenie do drużyny");
+            TeamInvite invite = e.Invite;
+            ChatHelper.Say(invite.Inviter, $"Gracz {invite.Target.Name} odrzucił twoje zaproszenie do drużyny");
         }
 
-        private void TeamManager_OnInvitationAccepted(object sender, Models.EventArgs.TeamInvitationEventArgs e)
+        private void TeamManager_OnInvitationAccepted(object sender, Models.EventArgs.TeamInviteEventArgs e)
         {
-            PlayerData inviter = playerDataManager.GetPlayer(e.TeamInvitation.InviterId);
-            PlayerData target = playerDataManager.GetPlayer(e.TeamInvitation.TargetId);
-
-            ChatHelper.Say(inviter, $"Gracz {target.Name} przyjął twoje zaproszenie do drużyny");
+            TeamInvite invite = e.Invite;
+            ChatHelper.Say(invite.Inviter, $"Gracz {invite.Target.Name} przyjął twoje zaproszenie do drużyny");
         }
 
-        private void TeamManager_OnPlayerInvited(object sender, Models.EventArgs.TeamInvitationEventArgs e)
+        private void TeamManager_OnPlayerInvited(object sender, Models.EventArgs.TeamInviteEventArgs e)
         {
-            PlayerData inviter = playerDataManager.GetPlayer(e.TeamInvitation.InviterId);
-            PlayerData target = playerDataManager.GetPlayer(e.TeamInvitation.TargetId);
-
-            ChatHelper.Say(target, $"Masz nowe zaproszenie od gracza {inviter.Name} do drużyny {e.Team.Name}");
+            TeamInvite invite = e.Invite;
+            ChatHelper.Say(invite.Target, $"Masz nowe zaproszenie od {invite.Inviter.Name} do drużyny {invite.Team.Name}");
         }
     }
 }

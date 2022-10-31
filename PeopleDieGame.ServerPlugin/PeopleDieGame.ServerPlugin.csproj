@@ -108,12 +108,9 @@
     <Reference Include="SDG.NetTransport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
@@ -155,7 +152,6 @@
     <Compile Include="Commands\Shop\BalanceCommand.cs" />
     <Compile Include="Commands\Shop\ShopCommand.cs" />
     <Compile Include="Commands\Teams\AcceptInviteCommand.cs" />
-    <Compile Include="Commands\Teams\InvitesCommand.cs" />
     <Compile Include="Commands\Teams\RejectInviteCommand.cs" />
     <Compile Include="Commands\Teams\TeamCommand.cs" />
     <Compile Include="BossControllers\BossController.cs" />
@@ -240,7 +236,7 @@
     <Compile Include="Models\EventArgs\LoadoutEventArgs.cs" />
     <Compile Include="Models\EventArgs\PlayerEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamEventArgs.cs" />
-    <Compile Include="Models\EventArgs\TeamInvitationEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamInviteEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamMembershipEventArgs.cs" />
     <Compile Include="Models\Exception\PlayerOfflineException.cs" />
     <Compile Include="Models\Loadout.cs" />
@@ -248,7 +244,7 @@
     <Compile Include="Models\Team.cs" />
     <Compile Include="Models\GameData.cs" />
     <Compile Include="Models\PluginConfig.cs" />
-    <Compile Include="Models\TeamInvitation.cs" />
+    <Compile Include="Models\TeamInvite.cs" />
     <Compile Include="Models\Vector3S.cs" />
     <Compile Include="Models\VectorPAR.cs" />
     <Compile Include="Patches\ZombieAgroPatch.cs" />

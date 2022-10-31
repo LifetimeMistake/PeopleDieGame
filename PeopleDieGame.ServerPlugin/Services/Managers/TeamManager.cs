@@ -37,16 +37,17 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<TeamEventArgs> OnTeamCreated;
         public event EventHandler<TeamEventArgs> OnTeamRemoved;
         public event EventHandler<TeamEventArgs> OnBaseClaimRemoved;
-        public event EventHandler<TeamInvitationEventArgs> OnPlayerInvited;
-        public event EventHandler<TeamInvitationEventArgs> OnInvitationCancelled;
-        public event EventHandler<TeamInvitationEventArgs> OnInvitationAccepted;
-        public event EventHandler<TeamInvitationEventArgs> OnInvitationRejected;
+        public event EventHandler<TeamInviteEventArgs> OnPlayerInvited;
+        public event EventHandler<TeamInviteEventArgs> OnInvitationCancelled;
+        public event EventHandler<TeamInviteEventArgs> OnInvitationAccepted;
+        public event EventHandler<TeamInviteEventArgs> OnInvitationRejected;
         public event EventHandler<TeamBankEventArgs> OnBankBalanceChanged;
         public event EventHandler<TeamBankEventArgs> OnBankDepositedInto;
         public event EventHandler<TeamBankEventArgs> OnBankWithdrawnFrom;
         public event EventHandler<TeamBaseClaimEventArgs> OnBaseClaimCreated;
 
         private Dictionary<Team, ClaimBubble> claims = new Dictionary<Team, ClaimBubble>();
+        private List<TeamInvite> invites = new List<TeamInvite>();
 
         public void Init()
         {
@@ -132,6 +133,11 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                     ChatHelper.Say(playerData, $"Środki z twojego portfela trafiły do banku twojej drużyny");
                 }
             }
+        }
+
+        private void ProcessExpiredInvites()
+        {
+            invites.RemoveAll(x => x.IsExpired());
         }
 
         public bool IsInClaimRadius(Team team, Vector3S point)
@@ -301,67 +307,73 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return GetTeamByName(teamNameOrId, exactMatch);
         }
 
-        public bool InvitePlayer(Team team, PlayerData targetPlayerData, int invitationTTL = 30)
+        public bool InvitePlayer(Team team, PlayerData targetPlayer, int inviteTTL = 10)
         {
             if (!team.LeaderId.HasValue)
                 return false;
 
-            PlayerData callerPlayerData = playerDataManager.GetPlayer(team.LeaderId.Value);
-            if (callerPlayerData == null)
+            PlayerData callerPlayer = playerDataManager.GetPlayer(team.LeaderId.Value);
+            if (callerPlayer == null)
                 return false; // failed to get team leader
 
-            if (targetPlayerData.TeamId.HasValue) // player already belongs to a team
+            if (targetPlayer.TeamId.HasValue) // player already belongs to a team
                 return false;
 
-            if (team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
-                return false; // player already has a pending invitation
+            if (GetInvites().Any(x => x.Target == targetPlayer))
+                return false; // player already has a pending invite
 
-            TeamInvitation teamInvitation = new TeamInvitation(callerPlayerData.Id, targetPlayerData.Id, DateTime.Now, TimeSpan.FromSeconds(invitationTTL));
-            team.Invitations.Add(teamInvitation);
-            OnPlayerInvited?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
+            TeamInvite invite = new TeamInvite(callerPlayer, targetPlayer, team, DateTime.Now, TimeSpan.FromSeconds(inviteTTL));
+            invites.Add(invite);
+            OnPlayerInvited?.Invoke(this, new TeamInviteEventArgs(invite));
             return true;
         }
 
-        public bool CancelInvitation(Team team, PlayerData targetPlayerData)
+        public bool CancelInvite(PlayerData targetPlayer)
         {
-            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
-            if (teamInvitation != null)
-            {
-                team.RemoveInvitation(targetPlayerData.Id);
-                OnInvitationCancelled?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
-                return true;
-            }
+            TeamInvite invite = GetInvite(targetPlayer);
+            if (invite == null)
+                return false;
 
-            return false;
+            invites.Remove(invite);
+            OnInvitationCancelled?.Invoke(this, new TeamInviteEventArgs(invite));
+            return true;
         }
 
-        public bool AcceptInvitation(Team team, PlayerData targetPlayerData)
+        public bool AcceptInvite(PlayerData targetPlayer)
         {
-            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
-            if (teamInvitation != null)
-            {
-                if (!JoinTeam(targetPlayerData, team))
-                    return false;
+            TeamInvite invite = GetInvite(targetPlayer);
+            if (invite == null)
+                return false;
 
-                team.RemoveInvitation(targetPlayerData.Id);
-                OnInvitationAccepted?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
-                return true;
-            }
+            if (!JoinTeam(targetPlayer, invite.Team))
+                return false;
 
-            return false;
+            invites.Remove(invite);
+            OnInvitationAccepted?.Invoke(this, new TeamInviteEventArgs(invite));
+            return true;
         }
 
-        public bool RejectInvitation(Team team, PlayerData targetPlayerData)
+        public bool RejectInvite(PlayerData targetPlayer)
         {
-            TeamInvitation teamInvitation = team.GetInvitations().FirstOrDefault(x => x.TargetId == targetPlayerData.Id);
-            if (teamInvitation != null)
-            {
-                team.RemoveInvitation(targetPlayerData.Id);
-                OnInvitationRejected?.Invoke(this, new TeamInvitationEventArgs(team, teamInvitation));
-                return true;
-            }
+            TeamInvite invite = GetInvite(targetPlayer);
+            if (invite == null)
+                return false;
 
-            return false;
+            invites.Remove(invite);
+            OnInvitationRejected?.Invoke(this, new TeamInviteEventArgs(invite));
+            return true;
+        }
+
+        public TeamInvite[] GetInvites()
+        {
+            ProcessExpiredInvites();
+            return invites.ToArray();
+        }
+
+        public TeamInvite GetInvite(PlayerData targetPlayer)
+        {
+            ProcessExpiredInvites();
+            return invites.FirstOrDefault(x => x.Target == targetPlayer);
         }
 
         public string GetTeamSummary(Team team)

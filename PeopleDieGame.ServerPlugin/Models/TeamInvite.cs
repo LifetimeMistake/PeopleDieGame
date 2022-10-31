@@ -2,17 +2,19 @@
 
 namespace PeopleDieGame.ServerPlugin.Models
 {
-    public class TeamInvitation
+    public class TeamInvite
     {
-        public ulong InviterId;
-        public ulong TargetId;
+        public PlayerData Target;
+        public PlayerData Inviter;
+        public Team Team;
         public DateTime InviteDate;
         public TimeSpan InviteTTL;
 
-        public TeamInvitation(ulong inviterId, ulong targetId, DateTime inviteDate, TimeSpan inviteTTL)
+        public TeamInvite(PlayerData target, PlayerData inviter, Team team, DateTime inviteDate, TimeSpan inviteTTL)
         {
-            InviterId = inviterId;
-            TargetId = targetId;
+            Target = target ?? throw new ArgumentNullException(nameof(target));
+            Inviter = inviter ?? throw new ArgumentNullException(nameof(inviter));
+            Team = team ?? throw new ArgumentNullException(nameof(team));
             InviteDate = inviteDate;
             InviteTTL = inviteTTL;
         }

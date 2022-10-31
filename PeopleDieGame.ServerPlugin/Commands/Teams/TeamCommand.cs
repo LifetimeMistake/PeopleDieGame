@@ -295,9 +295,10 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                if (team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
+                TeamInvite invite = teamManager.GetInvite(targetPlayerData);
+                if (invite != null)
                 {
-                    ChatHelper.Say(caller, "Gracz posiada już oczekujące zaproszenie do tej drużyny.");
+                    ChatHelper.Say(caller, "Gracz posiada już oczekujące zaproszenie do drużyny.");
                     return;
                 }
 
@@ -369,13 +370,14 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                if (!team.GetInvitations().Any(x => x.TargetId == targetPlayerData.Id))
+                TeamInvite invite = teamManager.GetInvite(targetPlayerData);
+                if (invite == null || invite.Team != team)
                 {
                     ChatHelper.Say(caller, "Ten gracz nie ma oczekującego zaproszenia do Twojej drużyny.");
                     return;
                 }
 
-                if (!teamManager.CancelInvitation(team, targetPlayerData))
+                if (!teamManager.CancelInvite(targetPlayerData))
                 {
                     ChatHelper.Say(caller, "Nie udało się anulować zaproszenia z powodu błedu serwera");
                     return;
