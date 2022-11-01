@@ -18,12 +18,6 @@ namespace PeopleDieGame.NetMethods.NetMethods
             ShopMenuManager.ReceiveOpenShop();
         }
 
-        [NetInvokableGeneratedMethod("ReceiveCloseShop", ENetInvokableGeneratedMethodPurpose.Read)]
-        public static void ReceiveCloseShop_Read(in ClientInvocationContext context)
-        {
-            ShopMenuManager.ReceiveCloseShop();
-        }
-
         [NetInvokableGeneratedMethod("ReceiveUpdateShopItems", ENetInvokableGeneratedMethodPurpose.Read)]
         public static void ReceiveUpdateShopItems_Read(in ClientInvocationContext context)
         {

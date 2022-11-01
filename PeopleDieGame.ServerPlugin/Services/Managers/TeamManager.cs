@@ -13,6 +13,8 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Enums;
 using UnityEngine;
 using PeopleDieGame.Reflection;
+using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.Models.EventArgs;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -53,6 +55,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             loadoutManager.OnLoadoutRemoved += LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+            InviteManager.OnInviteAccepted += InviteManager_OnInviteAccepted;
+            InviteManager.OnInviteRejected += InviteManager_OnInviteRejected;
+
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
 
@@ -73,7 +78,27 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
+            InviteManager.OnInviteAccepted -= InviteManager_OnInviteAccepted;
+            InviteManager.OnInviteRejected -= InviteManager_OnInviteRejected;
             UnregisterTimers();
+        }
+
+        private void InviteManager_OnInviteAccepted(object sender, InviteResponseEventArgs e)
+        {
+            PlayerData playerData = playerDataManager.GetPlayer(e.Player.playerID.characterID);
+            if (playerData == null)
+                return;
+
+            AcceptInvite(playerData);
+        }
+
+        private void InviteManager_OnInviteRejected(object sender, InviteResponseEventArgs e)
+        {
+            PlayerData playerData = playerDataManager.GetPlayer(e.Player.playerID.characterID);
+            if (playerData == null)
+                return;
+
+            RejectInvite(playerData);
         }
 
         private void RegisterTimers()
@@ -307,7 +332,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return GetTeamByName(teamNameOrId, exactMatch);
         }
 
-        public bool InvitePlayer(Team team, PlayerData targetPlayer, int inviteTTL = 10)
+        public bool InvitePlayer(Team team, PlayerData targetPlayer, float inviteTTL = 15)
         {
             if (!team.LeaderId.HasValue)
                 return false;
@@ -322,8 +347,18 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (GetInvites().Any(x => x.Target == targetPlayer))
                 return false; // player already has a pending invite
 
+
+            UnturnedPlayer unturnedPlayer = UnturnedPlayer.FromCSteamID((CSteamID)targetPlayer.Id);
+            if (unturnedPlayer == null)
+                return false;
+
+            SteamPlayer steamPlayer = unturnedPlayer.SteamPlayer();
+            if (steamPlayer == null)
+                return false;
+
             TeamInvite invite = new TeamInvite(callerPlayer, targetPlayer, team, DateTime.Now, TimeSpan.FromSeconds(inviteTTL));
             invites.Add(invite);
+            InviteManager.SendInviteRequest(steamPlayer, callerPlayer.Name, team.Name, (float)inviteTTL);
             OnPlayerInvited?.Invoke(this, new TeamInviteEventArgs(invite));
             return true;
         }

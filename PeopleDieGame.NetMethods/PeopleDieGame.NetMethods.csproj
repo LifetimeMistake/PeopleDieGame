@@ -64,23 +64,34 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\References\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\References\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>..\References\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\References\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Managers\InviteManager.cs" />
     <Compile Include="Managers\ShopMenuManager.cs" />
     <Compile Include="Models\AdvancedSleekProgress.cs" />
     <Compile Include="Models\EventArgs\BuyButtonPressedEventArgs.cs" />
+    <Compile Include="Models\EventArgs\InviteResponseEventArgs.cs" />
     <Compile Include="Models\EventArgs\ItemPurchaseRequestEventArgs.cs" />
+    <Compile Include="Models\InviteRequestUI.cs" />
     <Compile Include="Models\ShopElement.cs" />
     <Compile Include="Models\ShopUI.cs" />
+    <Compile Include="Models\UpdateBehaviour.cs" />
     <Compile Include="NetMethodsLoader.cs" />
     <Compile Include="CustomNetReflection.cs" />
     <Compile Include="Managers\BossBarManager.cs" />
     <Compile Include="NetMethods\BossBarManager_NetMethods.cs" />
     <Compile Include="Managers\MapMarkerManager.cs" />
     <Compile Include="Models\MapMarker.cs" />
+    <Compile Include="NetMethods\InviteManager_NetMethods.cs" />
     <Compile Include="NetMethods\MapMarkerManager_NetMethods.cs" />
     <Compile Include="NetMethods\ShopMenuManager_NetMethods.cs" />
     <Compile Include="Patches\NetReflection_GetServerMethodInfo_Patch.cs" />
