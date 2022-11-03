@@ -9,6 +9,7 @@ namespace PeopleDieGame.ServerPlugin.Models
     public class CachedItem
     {
         public ushort Id { get; private set; }
+        public ulong LastOwnerId { get; private set; }
         public UnturnedPlayer Player { get; private set; }
         public InteractableVehicle Vehicle { get; private set; }
         public InteractableStorage Storage { get; private set; }
@@ -106,6 +107,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         private void SetPlayer(UnturnedPlayer player)
         {
             Location = CachedItemLocation.Player;
+            LastOwnerId = (ulong)player.CSteamID; 
             RegionItem = null;
             Player = player;
             Vehicle = null;

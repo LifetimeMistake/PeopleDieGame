@@ -3,6 +3,7 @@ using PeopleDieGame.ServerPlugin.Enums;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
+using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
@@ -34,24 +35,43 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private Altar altar { get => GetAltar(); }
 
+        public List<InteractableStorage> Receptacles { get; private set; }
+
         public event EventHandler<AltarSubmitEventArgs> OnAltarSubmitItems;
 
         public void Init()
         {
-            ResizeReceptacles();
+            
+            objectiveManager.ObjectiveItemUpdated += ObjectiveManager_ObjectiveItemUpdated;
+            gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
         }
+
 
         public void Dispose()
         {
             UnregisterTimers();
         }
 
+        private void GameManager_OnGameStateChanged(object sender, EventArgs e)
+        {
+            GameState gameState = gameManager.GetGameState();
+            if (gameState == GameState.InGame)
+            {
+                RegisterTimers();
+            }
+            else
+            {
+                UnregisterTimers();
+            }
+        }
+
         private void RegisterTimers()
         {
             UnregisterTimers();
             timerManager.Register(CheckAltarAbandoned, 300);
+            timerManager.Register(TryAddReceptacles, 60);
         }
 
         private void UnregisterTimers()
@@ -59,14 +79,60 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Unregister(CheckAltarAbandoned);
         }
 
-        private void ResizeReceptacles()
+        private void TryAddReceptacles()
         {
-            if (altar.Receptacles.Count == 0)
-                return;
-
-            foreach (InteractableStorage storage in altar.Receptacles)
+            if (BarricadeManager.regions == null)
             {
-                storage.items.resize(2, 2);
+                Debug.LogWarning("Attempted to load altar receptacles but in-game BarricadeManager was not ready yet (this message is harmless)");
+                return;
+            }
+
+            Receptacles = new List<InteractableStorage>();
+            foreach (InteractableStorage storage in UnityEngine.Object.FindObjectsOfType<InteractableStorage>())
+            {
+                if (IsPointInAltar(storage.transform.position))
+                {
+                    Receptacles.Add(storage);
+                    storage.items.resize(2, 2);
+                }
+            }
+            Debug.Log($"Loaded {Receptacles.Count} altar receptacles!");
+            timerManager.Unregister(TryAddReceptacles);
+        }
+
+        private void ObjectiveManager_ObjectiveItemUpdated(object sender, ObjectiveItemEventArgs e)
+        {
+            if (e.ObjectiveItem.State == ObjectiveState.Stored)
+            {
+                CachedItem cachedItem = objectiveManager.GetItemCache(e.ObjectiveItem.ItemId);
+                if (Receptacles.Contains(cachedItem.Storage))
+                {
+                    e.ObjectiveItem.State = ObjectiveState.Secured;
+
+                    ObjectiveItem[] securedItems = objectiveManager.GetObjectiveItems().Where(x => x.State == ObjectiveState.Secured).ToArray();
+                    if (securedItems.Length != objectiveManager.GetObjectiveItems().Length)
+                        return;
+                    // now we know that all items are secured
+
+                    PlayerData playerData = playerDataManager.GetPlayer(cachedItem.LastOwnerId);
+
+                    if (!playerData.TeamId.HasValue)
+                    {
+                        cachedItem.Storage.items.removeItem(0);
+
+                        BossArena arena = arenaManager.GetArena(e.ObjectiveItem.ArenaId);
+                        Vector3 ejectPosition = cachedItem.Storage.transform.position;
+                        ejectPosition.z += 2;
+
+                        objectiveManager.SpawnObjectiveItem(e.ObjectiveItem, ejectPosition);
+                        ChatHelper.Say(playerData, "Artefakt wypadł z pojemnika (nie jesteś członkiem żadnej z drużyn!)");
+                    }
+
+                    Team team = teamManager.GetTeam(playerData.TeamId.Value);
+                    altar.ItemsSubmitted = true;
+                    OnAltarSubmitItems?.Invoke(this, new AltarSubmitEventArgs(team));
+                }
+                    
             }
         }
 
@@ -93,69 +159,51 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
 
             storage.items.resize(2, 2);
-            altar.Receptacles.Add(storage);
+            Receptacles.Add(storage);
         }
 
         public bool ResetReceptacles()
         {
-            if (altar.Receptacles.Count == 0)
+            if (Receptacles.Count == 0)
                 return false;
 
-            altar.Receptacles = new List<InteractableStorage>();
+            Receptacles.Clear();
             return true;
         }
 
-        public bool IsPlayerInAltar(PlayerData playerData)
+        public bool IsPointInAltar(Vector3S point)
         {
-            UnturnedPlayer player = UnturnedPlayer.FromCSteamID((CSteamID)playerData.Id);
-            return Vector3.Distance(altar.Position.Value, player.Position) <= altar.Radius;
-        }
-
-        public bool SubmitItems(PlayerData playerData)
-        {
-            if (!playerData.TeamId.HasValue)
-                return false;
-
-            Team team = teamManager.GetTeam(playerData.TeamId.Value);
-
-            if (altar.Receptacles.Count == 0)
-                throw new Exception("Altar does not have any receptacles");
-
-            ObjectiveItem[] objectiveItems = objectiveManager.GetObjectiveItems();
-
-            foreach (var storage in altar.Receptacles)
-            {
-                ItemJar item = storage.items.items.FirstOrDefault();
-                if (item != null)
-                {
-                    if (objectiveItems.Any(x => x.ItemId == item.item.id))
-                        continue;
-                }
-                return false;
-            }
-
-            OnAltarSubmitItems?.Invoke(this, new AltarSubmitEventArgs(team));
-            return true;
+            return Vector3.Distance(altar.Position.Value, point) <= altar.Radius;
         }
 
         private void CheckAltarAbandoned()
         {
-            if (altar.Receptacles.Count == 0)
+            if (Provider.clients.Count == 0)
                 return;
 
-            List<InteractableStorage> fullStorageList = altar.Receptacles.Where(x => x.items.items.Count > 0).ToList();
+            if (altar.ItemsSubmitted)
+                return;
+
+            if (Receptacles.Count == 0)
+                return;
+
+            List<InteractableStorage> fullStorageList = Receptacles.Where(x => x.items.items.Count > 0).ToList();
 
             if (fullStorageList.Count == 0)
                 return;
 
             ObjectiveItem[] objectiveItems = objectiveManager.GetObjectiveItems();
 
+            if (objectiveItems.Count() == 0)
+                return;
+
             List<InteractableStorage> storageList = fullStorageList.Where(x => objectiveItems.Any(y => y.ItemId == x.items.items.FirstOrDefault().item.id)).ToList();
 
             foreach (SteamPlayer player in Provider.clients)
             {
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.playerID.steamID);
-                if (!IsPlayerInAltar(playerData))
+                UnturnedPlayer unturnedPlayer = UnturnedPlayer.FromSteamPlayer(player);
+                
+                if (!IsPointInAltar(unturnedPlayer.Position))
                     continue;
                 return;
             }

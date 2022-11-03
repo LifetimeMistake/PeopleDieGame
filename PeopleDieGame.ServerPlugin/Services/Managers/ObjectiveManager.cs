@@ -126,6 +126,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                         objectiveItem.State = ObjectiveState.Roaming;
                         break;
                     case CachedItemLocation.Storage:
+                        if (objectiveItem.State == ObjectiveState.Secured)
+                            break;
                         objectiveItem.State = ObjectiveState.Stored;
                         break;
                     default:
@@ -262,7 +264,14 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return false;
 
             ObjectiveItem objectiveItem = objectiveItems[itemId];
-            objectiveItem.State = ObjectiveState.AwaitingDrop;
+            objectiveItem.State = ObjectiveState.Lost;
+            
+            if (!cachedItems.ContainsKey(objectiveItem.ItemId))
+            {
+                CachedItem cache = new CachedItem(objectiveItem.ItemId);
+                cachedItems.Add(objectiveItem.ItemId, cache);
+            }
+            
             ObjectiveItemUpdated?.Invoke(this, new ObjectiveItemEventArgs(objectiveItem));
             return true;
         }

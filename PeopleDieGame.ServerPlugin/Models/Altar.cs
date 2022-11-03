@@ -13,15 +13,15 @@ namespace PeopleDieGame.ServerPlugin.Models
     {
         public Vector3S? Position { get; set; }
         public double Radius { get; set; }
-        public List<InteractableStorage> Receptacles { get; set; }
         public byte BoundId { get; set; }
+        public bool ItemsSubmitted { get; set; }
 
         public Altar()
         {
             Position = null;
             Radius = 0;
-            Receptacles = new List<InteractableStorage>();
             BoundId = 0;
+            ItemsSubmitted = false;
         }
 
         public void SetPosition(Vector3S position)

@@ -80,14 +80,14 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
 
                 sb.AppendLine($"Promień obszaru: {altar.Radius}");
 
-                if (altar.Receptacles.Count == 0)
+                if (altarManager.Receptacles.Count == 0)
                 {
                     sb.AppendLine("Altar nie posiada pojemników");
                 } 
                 else
                 {
                     sb.AppendLine("Pojemniki:");
-                    foreach (InteractableStorage storage in altar.Receptacles)
+                    foreach (InteractableStorage storage in altarManager.Receptacles)
                     {
                         sb.AppendLine($"\tID: {storage.name} | {storage.transform.position}");
                     }
