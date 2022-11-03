@@ -14,8 +14,8 @@ namespace PeopleDieGame.NetMethods.Managers
     public static class BossBarManager
     {
         private static Color differenceColor = Environment.GetCommandLineArgs().Contains("--i-have-autism") ? Color.white : new Color(255 / 255f, 201 / 255f, 14 / 255f);
-        private static readonly ClientStaticMethod<string, float> SendUpdateBossBar = ClientStaticMethod<string, float>.Get(new ClientStaticMethod<string, float>.ReceiveDelegate(ReceiveUpdateBossBar));
-        private static readonly ClientStaticMethod SendRemoveBossBar = ClientStaticMethod.Get(new ClientStaticMethod.ReceiveDelegate(ReceiveRemoveBossBar));
+        private static readonly ClientStaticMethod<string, float> sendUpdateBossBar = ClientStaticMethod<string, float>.Get(new ClientStaticMethod<string, float>.ReceiveDelegate(ReceiveUpdateBossBar));
+        private static readonly ClientStaticMethod sendRemoveBossBar = ClientStaticMethod.Get(new ClientStaticMethod.ReceiveDelegate(ReceiveRemoveBossBar));
         private static bool showBar = false;
         private static FieldRef<ISleekElement> container = FieldRef.GetFieldRef<ISleekElement>(typeof(PlayerLifeUI), "_container");
         private static ISleekElement frame;
@@ -80,12 +80,12 @@ namespace PeopleDieGame.NetMethods.Managers
 
         public static void UpdateBossBar(string name, float health, SteamPlayer player)
         {
-            SendUpdateBossBar.Invoke(SDG.NetTransport.ENetReliability.Reliable, player.transportConnection, name, health);
+            sendUpdateBossBar.Invoke(SDG.NetTransport.ENetReliability.Reliable, player.transportConnection, name, health);
         }
 
         public static void RemoveBossBar(SteamPlayer player)
         {
-            SendRemoveBossBar.Invoke(SDG.NetTransport.ENetReliability.Reliable, player.transportConnection);
+            sendRemoveBossBar.Invoke(SDG.NetTransport.ENetReliability.Reliable, player.transportConnection);
         }
     }
 }

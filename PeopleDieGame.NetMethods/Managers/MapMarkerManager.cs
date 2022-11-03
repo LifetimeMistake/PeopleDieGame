@@ -15,11 +15,11 @@ namespace PeopleDieGame.NetMethods.Managers
 {
     public static class MapMarkerManager
     {
-        private static readonly ClientStaticMethod<MapMarker> SendMarker = ClientStaticMethod<MapMarker>.Get(new ClientStaticMethod<MapMarker>.ReceiveDelegate(ReceiveMarker));
-        private static readonly ClientStaticMethod<Guid, Vector3> SendMarkerPosition = ClientStaticMethod<Guid, Vector3>.Get(new ClientStaticMethod<Guid, Vector3>.ReceiveDelegate(ReceiveMarkerPosition));
-        private static readonly ClientStaticMethod<Guid, string> SendMarkerLabel = ClientStaticMethod<Guid, string>.Get(new ClientStaticMethod<Guid, string>.ReceiveDelegate(ReceiveMarkerLabel));
-        private static readonly ClientStaticMethod<Guid, Color> SendMarkerColor = ClientStaticMethod<Guid, Color>.Get(new ClientStaticMethod<Guid, Color>.ReceiveDelegate(ReceiveMarkerColor));
-        private static readonly ClientStaticMethod<Guid> SendRemoveMarker = ClientStaticMethod<Guid>.Get(new ClientStaticMethod<Guid>.ReceiveDelegate(ReceiveRemoveMarker));
+        private static readonly ClientStaticMethod<MapMarker> sendMarker = ClientStaticMethod<MapMarker>.Get(new ClientStaticMethod<MapMarker>.ReceiveDelegate(ReceiveMarker));
+        private static readonly ClientStaticMethod<Guid, Vector3> sendMarkerPosition = ClientStaticMethod<Guid, Vector3>.Get(new ClientStaticMethod<Guid, Vector3>.ReceiveDelegate(ReceiveMarkerPosition));
+        private static readonly ClientStaticMethod<Guid, string> sendMarkerLabel = ClientStaticMethod<Guid, string>.Get(new ClientStaticMethod<Guid, string>.ReceiveDelegate(ReceiveMarkerLabel));
+        private static readonly ClientStaticMethod<Guid, Color> sendMarkerColor = ClientStaticMethod<Guid, Color>.Get(new ClientStaticMethod<Guid, Color>.ReceiveDelegate(ReceiveMarkerColor));
+        private static readonly ClientStaticMethod<Guid> sendRemoveMarker = ClientStaticMethod<Guid>.Get(new ClientStaticMethod<Guid>.ReceiveDelegate(ReceiveRemoveMarker));
 
         private static Dictionary<Guid, MapMarker> markers = new Dictionary<Guid, MapMarker>();
         private static Dictionary<Guid, ISleekImage> markerImages = new Dictionary<Guid, ISleekImage>();
@@ -112,7 +112,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             foreach(MapMarker mapMarker in markers.Values)
-                SendMarker.Invoke(ENetReliability.Reliable, player.transportConnection, mapMarker);
+                sendMarker.Invoke(ENetReliability.Reliable, player.transportConnection, mapMarker);
         }
 
         public static void ClearMarkers()
@@ -121,7 +121,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             foreach (MapMarker mapMarker in markers.Values)
-                SendRemoveMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), mapMarker.Id);
+                sendRemoveMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), mapMarker.Id);
         }
 
         public static MapMarker CreateMarker(Vector3 position, string label = null, Color color = default)
@@ -131,7 +131,7 @@ namespace PeopleDieGame.NetMethods.Managers
 
             MapMarker mapMarker = new MapMarker(Guid.NewGuid(), position, label, color);
             markers.Add(mapMarker.Id, mapMarker);
-            SendMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), mapMarker);
+            sendMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), mapMarker);
             return mapMarker;
         }
 
@@ -144,7 +144,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             markers[markerId].Position = position;
-            SendMarkerPosition.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, position);
+            sendMarkerPosition.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, position);
         }
 
         public static void UpdateMarkerLabel(Guid markerId, string label)
@@ -156,7 +156,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             markers[markerId].Label = label;
-            SendMarkerLabel.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, label);
+            sendMarkerLabel.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, label);
         }
 
         public static void UpdateMarkerColor(Guid markerId, Color color)
@@ -168,7 +168,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             markers[markerId].Color = color;
-            SendMarkerColor.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, color);
+            sendMarkerColor.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId, color);
         }
 
         public static void RemoveMarker(Guid markerId)
@@ -180,7 +180,7 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             markers.Remove(markerId);
-            SendRemoveMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId);
+            sendRemoveMarker.Invoke(ENetReliability.Reliable, Provider.EnumerateClients_Remote(), markerId);
         }
 
         public static List<MapMarker> GetMarkers()
