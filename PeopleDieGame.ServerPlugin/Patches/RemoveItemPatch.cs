@@ -19,7 +19,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
         public static bool Prefix(Items __instance)
 		{
             AltarManager altarManager = ServiceLocator.Instance.LocateService<AltarManager>();
-            if (altarManager.Receptacles.Any(x => x.items == __instance))
+            if (altarManager.GetReceptacles().Any(x => x.items == __instance))
                 return false;
             return true;
 		}

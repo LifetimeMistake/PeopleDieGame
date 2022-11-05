@@ -34,7 +34,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
 			if (storage == null)
 				return true;
 
-			if (altarManager.Receptacles.Contains(storage))
+			if (altarManager.GetReceptacles().Contains(storage))
 				return false;
 
 			return true;

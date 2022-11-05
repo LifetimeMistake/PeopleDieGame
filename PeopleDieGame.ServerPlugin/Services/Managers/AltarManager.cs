@@ -35,7 +35,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private Altar altar { get => GetAltar(); }
 
-        public List<InteractableStorage> Receptacles { get; private set; }
+        private List<InteractableStorage> receptacles = new List<InteractableStorage>();
 
         public event EventHandler<AltarSubmitEventArgs> OnAltarSubmitItems;
 
@@ -87,16 +87,15 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return;
             }
 
-            Receptacles = new List<InteractableStorage>();
             foreach (InteractableStorage storage in UnityEngine.Object.FindObjectsOfType<InteractableStorage>())
             {
                 if (IsPointInAltar(storage.transform.position))
                 {
-                    Receptacles.Add(storage);
+                    receptacles.Add(storage);
                     storage.items.resize(2, 2);
                 }
             }
-            Debug.Log($"Loaded {Receptacles.Count} altar receptacles!");
+            Debug.Log($"Loaded {receptacles.Count} altar receptacles!");
             timerManager.Unregister(TryAddReceptacles);
         }
 
@@ -105,7 +104,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (e.ObjectiveItem.State == ObjectiveState.Stored)
             {
                 CachedItem cachedItem = objectiveManager.GetItemCache(e.ObjectiveItem.ItemId);
-                if (Receptacles.Contains(cachedItem.Storage))
+                if (receptacles.Contains(cachedItem.Storage))
                 {
                     e.ObjectiveItem.State = ObjectiveState.Secured;
 
@@ -159,21 +158,26 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
 
             storage.items.resize(2, 2);
-            Receptacles.Add(storage);
+            receptacles.Add(storage);
         }
 
         public bool ResetReceptacles()
         {
-            if (Receptacles.Count == 0)
+            if (receptacles.Count == 0)
                 return false;
 
-            Receptacles.Clear();
+            receptacles.Clear();
             return true;
         }
 
         public bool IsPointInAltar(Vector3S point)
         {
             return Vector3.Distance(altar.Position.Value, point) <= altar.Radius;
+        }
+
+        public InteractableStorage[] GetReceptacles()
+        {
+            return receptacles.ToArray();
         }
 
         private void CheckAltarAbandoned()
@@ -184,10 +188,10 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (altar.ItemsSubmitted)
                 return;
 
-            if (Receptacles.Count == 0)
+            if (receptacles.Count == 0)
                 return;
 
-            List<InteractableStorage> fullStorageList = Receptacles.Where(x => x.items.items.Count > 0).ToList();
+            List<InteractableStorage> fullStorageList = receptacles.Where(x => x.items.items.Count > 0).ToList();
 
             if (fullStorageList.Count == 0)
                 return;
