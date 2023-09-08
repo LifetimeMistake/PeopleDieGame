@@ -142,7 +142,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         private void ProcessIntermission()
         {
             float timeRemaining = intermissionEndTime - Time.realtimeSinceStartup;
-            if (Time.realtimeSinceStartup > 0)
+            if (timeRemaining <= 0)
             {
                 StartStateInGame();
                 return;

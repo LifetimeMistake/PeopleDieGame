@@ -55,7 +55,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
                     if (Time.realtimeSinceStartup - item.lastDropped > (itemList[i].isDropped ? Provider.modeConfigData.Items.Despawn_Dropped_Time : Provider.modeConfigData.Items.Despawn_Natural_Time))
                     {
                         itemList.RemoveAt(i);
-                        SendDestroyItem.Invoke(ENetReliability.Reliable, Regions.EnumerateClients(despawnItems_X, despawnItems_Y, ItemManager.ITEM_REGIONS), despawnItems_X, despawnItems_Y, instanceID, false);
+                        SendDestroyItem.Invoke(ENetReliability.Reliable, Regions.GatherClientConnections(despawnItems_X, despawnItems_Y, ItemManager.ITEM_REGIONS), despawnItems_X, despawnItems_Y, instanceID, false);
                     }
                 }
 

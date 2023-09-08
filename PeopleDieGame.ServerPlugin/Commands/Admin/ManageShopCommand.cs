@@ -114,7 +114,9 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 }
                 else // find item by name
                 {
-                    item = Assets.find(EAssetType.ITEM).FirstOrDefault(x => x.FriendlyName != null && x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
+                    List<ItemAsset> assets = new List<ItemAsset>();
+                    Assets.find<ItemAsset>(assets);
+                    item = assets.FirstOrDefault(x => x.FriendlyName != null && x.FriendlyName.ToLowerInvariant().Contains(command[0].ToLowerInvariant())) as ItemAsset;
                     if (item == null)
                     {
                         ChatHelper.Say(caller, $"Przedmiot o nazwie \"{command[0]}\" nie istnieje");

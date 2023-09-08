@@ -31,7 +31,7 @@ namespace PeopleDieGame.NetMethods.Managers
             if (!Provider.isServer)
                 return;
 
-            sendUpdateShopItems.Invoke(SDG.NetTransport.ENetReliability.Reliable, Provider.EnumerateClients_Remote(), items);
+            sendUpdateShopItems.Invoke(SDG.NetTransport.ENetReliability.Reliable, Provider.GatherRemoteClientConnections(), items);
         }
 
         public static void UpdateShopItems(SteamPlayer player, Dictionary<ushort, float> items)
