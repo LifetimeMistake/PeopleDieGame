@@ -22,6 +22,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private FieldRef<float> fireDamage;
         private FieldRef<EZombiePath> path;
+        private FieldRef<ZombieRegion> region;
 
         private delegate void VoidDelegate();
         private VoidDelegate baseUpdate;
@@ -41,6 +42,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
         public EZombiePath Path { get => path.Value; set => path.Value = value; }
         public EZombiePath? PathOverride { get => pathOverride; set => SetPathOverride(value); }
+        public ZombieRegion zombieRegion { get => region.Value; set => region.Value = value; }
         public bool AIEnabled { get; set; }
 
         public ManagedZombie()
@@ -61,6 +63,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
             fireDamage = FieldRef.GetFieldRef<Zombie, float>(this, "fireDamage");
             path = FieldRef.GetFieldRef<Zombie, EZombiePath>(this, "path");
+            region = FieldRef.GetFieldRef<Zombie, ZombieRegion>(this, "zombieRegion");
 
             Reset();
         }
@@ -105,79 +108,6 @@ namespace PeopleDieGame.ServerPlugin.Models
             pathOverride = path;
             if (path.HasValue)
                 Path = path.Value;
-        }
-
-        public static void UpdateAttacks(Zombie zombie, float targetDistance, ref float boulderThrowDelay, ref bool isThrowRelocating,
-            ref float lastAttack, ref float lastRelocate, ref float lastStartle, ref float lastSpecial, ref Player player, ref AIPath seeker, ref float specialStartleDelay,
-            ref float specialUseDelay, ref float specialAttackDelay)
-        {
-            ManagedZombie managedZombie = zombie as ManagedZombie;
-
-            if (managedZombie != null && !managedZombie.AIEnabled)
-                return;
-
-            Transform zombieTransform = ((MonoBehaviour)zombie).transform;
-            VoidDelegate RandomizeBoulderThrowDelay = AccessTools.MethodDelegate<VoidDelegate>(AccessTools.Method(typeof(Zombie), "RandomizeBoulderThrowDelay"), zombie);
-            if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.MEGA || zombie.speciality == EZombieSpeciality.BOSS_KUWAIT || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Throw) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > boulderThrowDelay)
-            {
-                if (targetDistance < 20f)
-                {
-                    if (isThrowRelocating)
-                    {
-                        if (Time.time - lastRelocate > 1.5f)
-                        {
-                            isThrowRelocating = false;
-                            lastSpecial = Time.time;
-                            RandomizeBoulderThrowDelay();
-                        }
-                    }
-                    else
-                    {
-                        isThrowRelocating = true;
-                        lastRelocate = Time.time;
-                    }
-                }
-                else
-                {
-                    isThrowRelocating = false;
-                    lastSpecial = Time.time;
-                    RandomizeBoulderThrowDelay();
-                    seeker.canMove = false;
-                    ZombieManager.sendZombieThrow(zombie);
-                }
-            }
-            else
-            {
-                isThrowRelocating = false;
-            }
-            if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.ACID || zombie.speciality == EZombieSpeciality.BOSS_NUCLEAR || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Spit) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > specialUseDelay)
-            {
-                lastSpecial = Time.time;
-                specialUseDelay = UnityEngine.Random.Range(4f, 8f);
-                seeker.canMove = false;
-                ZombieManager.sendZombieSpit(zombie);
-            }
-            if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.BOSS_WIND || zombie.speciality == EZombieSpeciality.BOSS_ELVER_STOMPER || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Stomp) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > specialUseDelay && (player.transform.position - zombieTransform.position).sqrMagnitude < 144f)
-            {
-                lastSpecial = Time.time;
-                specialUseDelay = UnityEngine.Random.Range(4f, 8f);
-                seeker.canMove = false;
-                ZombieManager.sendZombieStomp(zombie);
-            }
-            if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.BOSS_FIRE || zombie.speciality == EZombieSpeciality.BOSS_MAGMA || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Breath) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > specialUseDelay && (player.transform.position - zombieTransform.position).sqrMagnitude < 529f)
-            {
-                lastSpecial = Time.time;
-                specialUseDelay = UnityEngine.Random.Range(4f, 8f);
-                seeker.canMove = false;
-                ZombieManager.sendZombieBreath(zombie);
-            }
-            if (player != null && ((managedZombie == null && (zombie.speciality == EZombieSpeciality.BOSS_ELECTRIC || (zombie.speciality == EZombieSpeciality.BOSS_ALL && UnityEngine.Random.value < 0.2f))) || (managedZombie != null && managedZombie.CanUseAbility(ZombieAbilities.Charge) && UnityEngine.Random.value < 0.2f)) && Time.time - lastStartle > specialStartleDelay && Time.time - lastAttack > specialAttackDelay && Time.time - lastSpecial > specialUseDelay && (player.transform.position - zombieTransform.position).sqrMagnitude > 4f && (player.transform.position - zombieTransform.position).sqrMagnitude < 4096f)
-            {
-                lastSpecial = Time.time;
-                specialUseDelay = UnityEngine.Random.Range(4f, 8f);
-                seeker.canMove = false;
-                ZombieManager.sendZombieCharge(zombie);
-            }
         }
     }
 }

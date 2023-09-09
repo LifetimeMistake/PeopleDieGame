@@ -31,5 +31,18 @@ namespace PeopleDieGame.Reflection
             FieldInfo fieldInfo = AccessTools.Field(type, fieldName);
             return new FieldRef<F>(fieldInfo, null);
         }
+
+        public static FieldRef<F> GetFieldRef<I, F>(I instance, FieldInfo fieldInfo)
+        {
+            if (fieldInfo.DeclaringType != typeof(I))
+                throw new ArgumentException("Field does not belong to the provided instance");
+
+            return new FieldRef<F>(fieldInfo, instance);
+        }
+
+        public static FieldRef<F> GetFieldRef<F>(FieldInfo fieldInfo)
+        {
+            return new FieldRef<F>(fieldInfo, null);
+        }
     }
 }
