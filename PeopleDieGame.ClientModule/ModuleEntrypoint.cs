@@ -47,7 +47,7 @@ namespace PeopleDieGame.ClientModule
         {
             Debug.Log("Loading services...");
             PluginAutoFacRegistrar pluginAutoFacRegistrar = new PluginAutoFacRegistrar();
-            ServiceLocator serviceLocator = new ServiceLocator();
+            serviceLocator = new ServiceLocator();
             serviceLocator.Initialize(pluginAutoFacRegistrar);
             serviceLocator.BeginLifetimeScope();
 
