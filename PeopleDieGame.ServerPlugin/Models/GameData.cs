@@ -23,6 +23,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         public double MegaZombieKillReward { get; set; }
         public double Bounty { get; set; }
         public int IntermissionTime { get; set; }
+        public int ClosingTime { get; set; }
 
         public GameData()
         {
@@ -43,6 +44,8 @@ namespace PeopleDieGame.ServerPlugin.Models
             ZombieKillReward = 10;
             MegaZombieKillReward = 150;
             Bounty = 100;
+            IntermissionTime = 10;
+            ClosingTime = 30;
         }
     }
 }
