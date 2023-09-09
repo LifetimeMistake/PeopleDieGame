@@ -89,16 +89,30 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             timerManager.Unregister(UpdateFights);
         }
 
+        private void ResetArenas()
+        {
+            foreach (BossFight fight in GetBossFights())
+            {
+                EndBossFight(fight, BossFightState.Cancelled);
+            }
+            foreach (BossArena arena in GetArenas())
+            {
+                arena.Conquered = false;
+            }
+        }
+
         private void GameManager_OnGameStateChanged(object sender, EventArgs e)
         {
             GameState gameState = gameManager.GetGameState();
             if (gameState == GameState.InGame)
             {
                 RegisterTimers();
+                ResetArenas();
             }
             else
             {
                 UnregisterTimers();
+                ResetArenas();
             }
         }
 
