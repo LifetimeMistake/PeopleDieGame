@@ -51,7 +51,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return;
 
 
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)e.Caller.playerID.steamID);
+            PlayerData playerData = playerDataManager.GetData((ulong)e.Caller.playerID.steamID);
             if (playerData == null)
             {
                 Debug.LogWarning($"Failed to get player {e.Caller.playerID.steamID}'s data.");
@@ -96,7 +96,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                     return;
                 }
 
-                PlayerData leaderData = playerDataManager.GetPlayer(e.Team.LeaderId.Value);
+                PlayerData leaderData = playerDataManager.GetData(e.Team.LeaderId.Value);
 
                 TeamInfo teamInfo = new TeamInfo(e.Team.Id, e.Team.Name, e.Team.Description, e.Team.BankBalance, leaderData.Id, leaderData.Name);
                 ClientDataRPC.UpdateTeamInfo(steamPlayer, teamInfo);

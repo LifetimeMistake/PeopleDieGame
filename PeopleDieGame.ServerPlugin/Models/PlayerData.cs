@@ -1,15 +1,18 @@
-﻿using System;
+﻿using PeopleDieGame.ServerPlugin.Services.Managers;
+using System;
+using static Rocket.Unturned.Events.UnturnedPlayerEvents;
+using System.Text;
 
 namespace PeopleDieGame.ServerPlugin.Models
 {
     public class PlayerData
     {
-        public ulong Id { get; private set; }
-        public string Name { get; private set; }
-        public string Bio { get; private set; }
+        public ulong Id { get; set; }
+        public string Name { get; set; }
+        public string Bio { get; set; }
         public int? TeamId { get; set; }
-        public float WalletBalance { get; private set; }
-        public float Bounty { get; private set; }
+        public float WalletBalance { get; set; }
+        public float Bounty { get; set; }
 
         public PlayerData(ulong id, string name, string bio = "", int? teamId = null, float walletBalance = 0)
         {
@@ -21,42 +24,15 @@ namespace PeopleDieGame.ServerPlugin.Models
             Bounty = 0;
         }
 
-        public void SetBio(string bio)
+        public override string ToString()
         {
-            Bio = bio ?? throw new ArgumentNullException(nameof(bio));
-        }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Profil gracza \"{Name}\"");
+            sb.AppendLine($"ID drużyny: {(TeamId.HasValue ? TeamId.Value.ToString() : "Brak")}");
+            if (Bio != "")
+                sb.AppendLine($"Bio: \"{Bio}\"");
 
-        public void SetName(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name));
-
-            Name = name;
-        }
-
-        public void SetBalance(float amount)
-        {
-            WalletBalance = amount;
-        }
-
-        public void Deposit(float amount)
-        {
-            WalletBalance += amount;
-        }
-
-        public void Withdraw(float amount)
-        {
-            WalletBalance = Math.Max(0, WalletBalance - amount);
-        }
-
-        public void ResetBounty()
-        {
-            Bounty = 0;
-        }
-
-        public void AddBounty(float amount)
-        {
-            Bounty += amount;
+            return sb.ToString();
         }
     }
 }

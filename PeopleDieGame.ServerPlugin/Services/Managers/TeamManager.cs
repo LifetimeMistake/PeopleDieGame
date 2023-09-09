@@ -85,7 +85,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void InviteManager_OnInviteAccepted(object sender, InviteResponseEventArgs e)
         {
-            PlayerData playerData = playerDataManager.GetPlayer(e.Player.playerID.characterID);
+            PlayerData playerData = playerDataManager.GetData(e.Player.playerID.characterID);
             if (playerData == null)
                 return;
 
@@ -94,7 +94,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void InviteManager_OnInviteRejected(object sender, InviteResponseEventArgs e)
         {
-            PlayerData playerData = playerDataManager.GetPlayer(e.Player.playerID.characterID);
+            PlayerData playerData = playerDataManager.GetData(e.Player.playerID.characterID);
             if (playerData == null)
                 return;
 
@@ -138,7 +138,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             foreach (SteamPlayer steamPlayer in Provider.clients)
             {
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)steamPlayer.playerID.steamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)steamPlayer.playerID.steamID);
                 UnturnedPlayer unturnedPlayer = UnturnedPlayer.FromSteamPlayer(steamPlayer);
 
                 if (!playerData.TeamId.HasValue)
@@ -154,7 +154,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                         return;
 
                     DepositIntoBank(team, playerData.WalletBalance);
-                    playerDataManager.SetPlayerBalance(playerData, 0);
+                    playerDataManager.UpdateBalance(playerData, 0);
                     ChatHelper.Say(playerData, $"Środki z twojego portfela trafiły do banku twojej drużyny");
                 }
             }
@@ -289,7 +289,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public List<PlayerData> GetTeamMembers(Team team)
         {
-            return playerDataManager.GetPlayers().Where(x => x.TeamId == team.Id).ToList();
+            return playerDataManager.GetAllData().Where(x => x.TeamId == team.Id).ToList();
         }
 
         public List<PlayerData> GetOnlineTeamMembers(Team team)
@@ -337,7 +337,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (!team.LeaderId.HasValue)
                 return false;
 
-            PlayerData callerPlayer = playerDataManager.GetPlayer(team.LeaderId.Value);
+            PlayerData callerPlayer = playerDataManager.GetData(team.LeaderId.Value);
             if (callerPlayer == null)
                 return false; // failed to get team leader
 
@@ -423,7 +423,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             if (team.LeaderId.HasValue)
             {
-                PlayerData leaderData = playerDataManager.GetPlayer(team.LeaderId.Value);
+                PlayerData leaderData = playerDataManager.GetData(team.LeaderId.Value);
                 sb.AppendLine($"Lider: \"{leaderData.Name}\"");
             }
             else

@@ -26,7 +26,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
         public void Execute(IRocketPlayer caller, string[] command)
         {
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-            List<PlayerData> playerDataList = playerDataManager.GetPlayers().OrderBy(x => x.Bounty).ToList();
+            List<PlayerData> playerDataList = playerDataManager.GetAllData().OrderBy(x => x.Bounty).ToList();
             StringBuilder sb = new StringBuilder();
 
             double totalBounty = 0;

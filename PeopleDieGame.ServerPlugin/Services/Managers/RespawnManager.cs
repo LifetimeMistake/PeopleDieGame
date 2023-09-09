@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             ChatHelper.Say(player, "Witaj w świecie żywych!");
             VectorPAR? worldRespawn = dataManager.GameData.DefaultRespawnPoint;
 
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+            PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
             if (playerData == null)
             {
                 ChatHelper.Say(player, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");

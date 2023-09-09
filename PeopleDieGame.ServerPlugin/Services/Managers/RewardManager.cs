@@ -23,7 +23,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         [InjectDependency]
         private LoadoutManager loadoutManager { get; set; }
 
-
         public event EventHandler<RewardEventArgs> OnPlayerReceivePlayerReward;
         public event EventHandler<RewardEventArgs> OnPlayerReceiveZombieReward;
         public event EventHandler<PlayerEventArgs> OnPlayerReceiveDeathPenalty;
@@ -49,9 +48,9 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             foreach (UnturnedPlayer player in arenaManager.GetPlayersInsideArena(arena, team))
             {
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
-                playerDataManager.DepositIntoWallet(playerData, arena.CompletionReward);
-                playerDataManager.AddBounty(playerData, arena.CompletionBounty);
+                PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
+                playerDataManager.UpdateBalance(playerData, playerData.WalletBalance + arena.CompletionReward);
+                playerDataManager.UpdateBounty(playerData, arena.CompletionBounty);
             }
 
             if (!arena.RewardLoadoutId.HasValue)
@@ -71,8 +70,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return;
             }
 
-            PlayerData victimData = playerDataManager.GetPlayer((ulong)player.CSteamID);
-            PlayerData killerData = playerDataManager.GetPlayer((ulong)murderer);
+            PlayerData victimData = playerDataManager.GetData((ulong)player.CSteamID);
+            PlayerData killerData = playerDataManager.GetData((ulong)murderer);
 
             if (victimData == null)
                 return;
@@ -123,7 +122,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (stat != SDG.Unturned.EPlayerStat.KILLS_ZOMBIES_NORMAL)
                 return;
 
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+            PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
 
             if (playerData == null)
                 return;
@@ -131,33 +130,33 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             ZombieKill(playerData);
         }
 
-        public void PlayerKill(PlayerData victim, PlayerData killer)
+        private void PlayerKill(PlayerData victim, PlayerData killer)
         {
             float reward = dataManager.GameData.PlayerKillReward;
             float bounty = dataManager.GameData.Bounty;
             float total = reward + victim.Bounty;
 
-            playerDataManager.AddBounty(killer, bounty);
-            playerDataManager.DepositIntoWallet(killer, total);
+            playerDataManager.UpdateBalance(killer, killer.WalletBalance + total);
+            playerDataManager.UpdateBounty(killer, bounty);
 
-            playerDataManager.ResetBounty(victim);
-            playerDataManager.SetPlayerBalance(victim, Mathf.Round(victim.WalletBalance / 2));
+            playerDataManager.UpdateBalance(victim, Mathf.Round(victim.WalletBalance / 2));
+            playerDataManager.UpdateBounty(victim, 0);
             OnPlayerReceivePlayerReward?.Invoke(this, new RewardEventArgs(killer, total));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }
 
-        public void ZombieKill(PlayerData player)
+        private void ZombieKill(PlayerData player)
         {
             float reward;
             reward = dataManager.GameData.ZombieKillReward;
 
-            playerDataManager.DepositIntoWallet(player, reward);
+            playerDataManager.UpdateBalance(player, player.WalletBalance + reward);
             OnPlayerReceiveZombieReward?.Invoke(this, new RewardEventArgs(player, reward));
         }
 
-        public void RandomDeath(PlayerData player)
+        private void RandomDeath(PlayerData player)
         {
-            playerDataManager.SetPlayerBalance(player, Mathf.Round(player.WalletBalance / 2));
+            playerDataManager.UpdateBalance(player, Mathf.Round(player.WalletBalance / 2));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(player));
         }
     }

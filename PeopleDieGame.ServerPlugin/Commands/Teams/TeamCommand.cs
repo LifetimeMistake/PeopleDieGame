@@ -103,7 +103,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 }
 
                 UnturnedPlayer player = (UnturnedPlayer)caller;
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
                 if (playerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
@@ -152,7 +152,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 }
 
                 UnturnedPlayer player = (UnturnedPlayer)caller;
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
                 if (playerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");
@@ -187,7 +187,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
             {
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 UnturnedPlayer player = (UnturnedPlayer)caller;
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)player.CSteamID);
 
                 if (!callerPlayerData.TeamId.HasValue)
                 {
@@ -245,7 +245,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -336,7 +336,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -411,7 +411,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -478,7 +478,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -534,7 +534,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -585,7 +585,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -637,7 +637,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 GameManager gameManager = ServiceLocator.Instance.LocateService<GameManager>();
                 LoadoutManager loadoutManager = ServiceLocator.Instance.LocateService<LoadoutManager>();
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -702,7 +702,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (playerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie udało się odnaleźć profilu gracza??)");

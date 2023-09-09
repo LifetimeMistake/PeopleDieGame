@@ -25,7 +25,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
         public void Execute(IRocketPlayer caller, string[] command)
         {
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+            PlayerData playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
 
             if (playerData == null)
             {
@@ -40,7 +40,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
             }
             else
             {
-                playerData.SetBio(string.Join(" ", command));
+                playerDataManager.UpdateBio(playerData, string.Join(" ", command));
                 ChatHelper.Say(caller, $"Ustawiono twoje bio na: \"{playerData.Bio}\"");
 
                 return;

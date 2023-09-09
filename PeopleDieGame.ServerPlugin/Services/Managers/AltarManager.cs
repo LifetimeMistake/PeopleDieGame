@@ -113,7 +113,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                         return;
                     // now we know that all items are secured
 
-                    PlayerData playerData = playerDataManager.GetPlayer(cachedItem.LastOwnerId);
+                    PlayerData playerData = playerDataManager.GetData(cachedItem.LastOwnerId);
 
                     if (!playerData.TeamId.HasValue)
                     {

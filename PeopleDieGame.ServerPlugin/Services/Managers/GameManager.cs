@@ -89,7 +89,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Witaj jasiu na serverze hentai!");
-            sb.AppendLine($"Obecnie mierzy się z sobą {playerDataManager.GetPlayerCount() - 1} innych graczy z {teamManager.GetTeamCount()} drużyn");
+            sb.AppendLine($"Obecnie mierzy się z sobą {playerDataManager.GetRegisteredPlayerCount() - 1} innych graczy z {teamManager.GetTeamCount()} drużyn");
             sb.AppendLine($"Na serwerze online jest {Provider.clients.Count} osób");
             sb.AppendLine($"Obecny stan gry: {GameStateHelper.GetFriendlyName(GetGameState())}");
 

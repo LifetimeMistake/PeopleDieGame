@@ -73,7 +73,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
 
                 UnturnedPlayer unturnedPlayer = (UnturnedPlayer)caller;
                 SteamPlayer steamPlayer = unturnedPlayer.SteamPlayer();
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)unturnedPlayer.CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)unturnedPlayer.CSteamID);
 
                 if (playerData == null)
                 {
@@ -269,7 +269,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                     return;
                 }
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (!callerPlayerData.TeamId.HasValue)
                 {
                     ChatHelper.Say(caller, "Musisz należeć do drużyny, by korzystać z sklepu.");

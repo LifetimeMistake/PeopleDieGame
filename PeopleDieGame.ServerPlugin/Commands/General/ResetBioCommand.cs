@@ -25,14 +25,14 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
         public void Execute(IRocketPlayer caller, string[] command)
         {
             PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-            PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+            PlayerData playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
             if (playerData == null)
             {
                 ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
                 return;
             }
 
-            playerData.SetBio("");
+            playerDataManager.UpdateBio(playerData, "");
             ChatHelper.Say(caller, "Zresetowano twoje bio!");
         }
     }

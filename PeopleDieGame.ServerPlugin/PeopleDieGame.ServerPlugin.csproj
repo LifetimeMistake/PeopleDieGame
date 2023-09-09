@@ -184,7 +184,6 @@
     <Compile Include="Services\Providers\GroupMappingProvider.cs" />
     <Compile Include="Services\Providers\MarkerSyncProvider.cs" />
     <Compile Include="Services\Providers\ObjectiveEventMessageProvider.cs" />
-    <Compile Include="Services\Providers\RewardEventMessageProvider.cs" />
     <Compile Include="Services\Providers\ShopEventMessageProvider.cs" />
     <Compile Include="Services\Managers\RewardManager.cs" />
     <Compile Include="Services\Managers\DataManager.cs" />

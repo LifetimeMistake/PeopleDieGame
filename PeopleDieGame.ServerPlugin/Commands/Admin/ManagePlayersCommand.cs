@@ -19,7 +19,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
 
         public string Help => "";
 
-        public string Syntax => "<getteam/jointeam/leaveteam/promoteplayer/setbio/getbalance/setbalance/deposit/withdraw> <playerName/playerId> [<teamName/teamId/bio/amount>]";
+        public string Syntax => "<getteam/jointeam/leaveteam/promoteplayer/setbio/getbalance/setbalance> <playerName/playerId> [<teamName/teamId/bio/amount>]";
         public List<string> Aliases => new List<string>();
 
         public List<string> Permissions => new List<string>();
@@ -56,12 +56,6 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     break;
                 case "setbalance":
                     VerbSetBalance(caller, verbArgs);
-                    break;
-                case "deposit":
-                    VerbDeposit(caller, verbArgs);
-                    break;
-                case "withdraw":
-                    VerbWithdraw(caller, verbArgs);
                     break;
                 default:
                     ChatHelper.Say(caller, $"Nieprawidłowy argument.");
@@ -275,7 +269,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 }
 
                 string bio = string.Join(" ", command.Skip(1));
-                playerData.SetBio(bio);
+                playerDataManager.UpdateBio(playerData, bio);
 
                 if (bio == "")
                 {
@@ -311,7 +305,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                double amount = playerDataManager.GetPlayerBalance(playerData);
+                double amount = playerData.WalletBalance;
                 ChatHelper.Say(caller, $"Gracz \"{playerData.Name}\" ma ${amount} w portfelu");
             }
             catch (Exception ex)
@@ -346,82 +340,12 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                playerDataManager.SetPlayerBalance(playerData, amount);
+                playerDataManager.UpdateBalance(playerData, amount);
                 ChatHelper.Say(caller, "Ustawiono ilość środków gracza");
             }
             catch (Exception ex)
             {
                 ExceptionHelper.Handle(ex, caller, $"Nie udało się ustawić ilości środków gracza z powodu błedu serwera: {ex.Message}");
-            }
-        }
-
-        private void VerbDeposit(IRocketPlayer caller, string[] command)
-        {
-            if (command.Length == 0)
-            {
-                ChatHelper.Say(caller, "Musisz podać nazwę lub ID gracza");
-                ShowSyntax(caller);
-                return;
-            }
-
-            try
-            {
-                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
-
-                if (playerData == null)
-                {
-                    ChatHelper.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
-                    return;
-                }
-
-                if (!float.TryParse(command[1], out float amount))
-                {
-                    ChatHelper.Say(caller, "Musisz podać ilość środków do zdeponowania");
-                    return;
-                }
-
-                playerDataManager.DepositIntoWallet(playerData, amount);
-                ChatHelper.Say(caller, "Zdeponowano środki do portfela gracza");
-            }
-            catch (Exception ex)
-            {
-                ExceptionHelper.Handle(ex, caller, $"Nie udało się zdeponować środków do portfela gracza z powodu błedu serwera: {ex.Message}");
-            }
-        }
-
-        private void VerbWithdraw(IRocketPlayer caller, string[] command)
-        {
-            if (command.Length == 0)
-            {
-                ChatHelper.Say(caller, "Musisz podać nazwę lub ID gracza");
-                ShowSyntax(caller);
-                return;
-            }
-
-            try
-            {
-                PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-                PlayerData playerData = playerDataManager.ResolvePlayer(command[0], false);
-
-                if (playerData == null)
-                {
-                    ChatHelper.Say(caller, $"Nie znaleziono gracza \"{command[0]}\"");
-                    return;
-                }
-
-                if (!float.TryParse(command[1], out float amount))
-                {
-                    ChatHelper.Say(caller, "Musisz podać ilość środków do wypłacenia");
-                    return;
-                }
-
-                playerDataManager.WithdrawFromWallet(playerData, amount);
-                ChatHelper.Say(caller, "Wypłacono środki z portfela gracza");
-            }
-            catch (Exception ex)
-            {
-                ExceptionHelper.Handle(ex, caller, $"Nie udało się wypłacić środków z portfela gracza z powodu błedu serwera: {ex.Message}");
             }
         }
     }

@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                PlayerData callerPlayerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                PlayerData callerPlayerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                 if (callerPlayerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");

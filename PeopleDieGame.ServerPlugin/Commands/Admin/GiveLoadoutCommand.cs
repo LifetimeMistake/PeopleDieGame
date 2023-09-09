@@ -48,7 +48,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
 
                 if (command.Length == 1)
                 {
-                    playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                    playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
                         ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");

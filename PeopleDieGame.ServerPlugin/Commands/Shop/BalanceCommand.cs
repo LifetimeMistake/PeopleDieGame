@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 }
                 UnturnedPlayer player = (UnturnedPlayer)caller;
                 PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
                 if (playerData == null)
                 {
                     ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");

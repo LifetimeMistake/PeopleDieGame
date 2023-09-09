@@ -66,7 +66,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
 
                 if (command.Length == 0)
                 {
-                    playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                    playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
                         ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");
@@ -84,7 +84,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
                     }
                 }
 
-                ChatHelper.Say(caller, playerDataManager.GetPlayerSummary(playerData));
+                ChatHelper.Say(caller, playerData.ToString());
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.General
 
                 if (command.Length == 0)
                 {
-                    PlayerData playerData = playerDataManager.GetPlayer((ulong)((UnturnedPlayer)caller).CSteamID);
+                    PlayerData playerData = playerDataManager.GetData((ulong)((UnturnedPlayer)caller).CSteamID);
                     if (playerData == null)
                     {
                         ChatHelper.Say(caller, "Wystąpił błąd (nie można odnaleźć profilu gracza??)");

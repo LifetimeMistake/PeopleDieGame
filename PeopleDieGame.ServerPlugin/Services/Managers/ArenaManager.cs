@@ -219,7 +219,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             return Provider.clients
                 .Select(x => UnturnedPlayer.FromPlayer(x.player))
-                .Where(x => team == null || playerDataManager.GetPlayer((ulong)x.CSteamID).TeamId == team.Id)
+                .Where(x => team == null || playerDataManager.GetData((ulong)x.CSteamID).TeamId == team.Id)
                 .Where(x =>
                 {
                     return Vector3.Distance(arena.ActivationPoint, x.Position) <= arena.DeactivationDistance
@@ -231,7 +231,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             return Provider.clients
                 .Select(x => UnturnedPlayer.FromPlayer(x.player))
-                .Where(x => team == null || playerDataManager.GetPlayer((ulong)x.CSteamID).TeamId == team.Id)
+                .Where(x => team == null || playerDataManager.GetData((ulong)x.CSteamID).TeamId == team.Id)
                 .Where(x =>
                 {
                     return Vector3.Distance(arena.ActivationPoint, x.Position) <= arena.ActivationDistance;
@@ -339,7 +339,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 if (activatedArena == null)
                     continue;
 
-                PlayerData playerData = playerDataManager.GetPlayer((ulong)player.CSteamID);
+                PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
                 if (playerData == null || !playerData.TeamId.HasValue)
                     continue;
 
@@ -405,7 +405,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
                 Dictionary<int, int> attackerGroups = participants
                 // Count the number of attackers from each team
-                .Select(x => playerDataManager.GetPlayer((ulong)x.CSteamID))
+                .Select(x => playerDataManager.GetData((ulong)x.CSteamID))
                 .Where(x => x != null && x.TeamId.HasValue)
                 .GroupBy(x => x.TeamId)
                 .ToDictionary(x => x.Key.Value, x => x.Count());

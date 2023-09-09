@@ -6,6 +6,9 @@ using System.Text;
 using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
+using PeopleDieGame.NetMethods.RPCs;
+using PeopleDieGame.NetMethods.Models;
+using Rocket.Unturned.Player;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -13,29 +16,31 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
     {
         [InjectDependency]
         private DataManager dataManager { get; set; }
-        [InjectDependency]
-        private TeamManager teamManager { get; set; }
 
-        public event EventHandler<PlayerEventArgs> OnWalletBalanceChanged;
-        public event EventHandler<PlayerEventArgs> OnWalletDepositedInto;
-        public event EventHandler<PlayerEventArgs> OnWalletWithdrawnFrom;
-        public event EventHandler<PlayerEventArgs> OnBountyAdded;
-        public event EventHandler<PlayerEventArgs> OnBountyReset;
+        private Dictionary<ulong, UnturnedPlayer> playerConnections;
+
+        public event EventHandler<PlayerEventArgs> OnBalanceUpdated;
+        public event EventHandler<PlayerEventArgs> OnBountyUpdated;
+        public event EventHandler<PlayerEventArgs> OnBioUpdated;
 
         public void Init()
         {
+            playerConnections = new Dictionary<ulong, UnturnedPlayer>();
             UnturnedEvents.Instance.OnPlayerConnected += Instance_OnPlayerConnected;
+            UnturnedEvents.Instance.OnPlayerDisconnected += Instance_OnPlayerDisconnected;
         }
 
         public void Dispose()
         {
             UnturnedEvents.Instance.OnPlayerConnected -= Instance_OnPlayerConnected;
+            UnturnedEvents.Instance.OnPlayerDisconnected -= Instance_OnPlayerDisconnected;
+            playerConnections = null;
         }
 
         private void Instance_OnPlayerConnected(Rocket.Unturned.Player.UnturnedPlayer player)
         {
             Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
-            PlayerData playerData = GetPlayer((ulong)player.CSteamID);
+            PlayerData playerData = GetData((ulong)player.CSteamID);
 
             if (playerData == null)
             {
@@ -45,11 +50,25 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
             else
             {
-                playerData.SetName(player.DisplayName);
+                playerData.Name = player.DisplayName;
             }
+
+            SendDataUpdate(playerData);
         }
 
-        public PlayerData GetPlayer(ulong id)
+        private void Instance_OnPlayerDisconnected(Rocket.Unturned.Player.UnturnedPlayer player)
+        {
+            playerConnections.Remove((ulong)player.CSteamID);
+        }
+
+        private void SendDataUpdate(PlayerData data)
+        {
+            UnturnedPlayer player = playerConnections[data.Id];
+            PlayerInfo info = new PlayerInfo(data.Id, data.Name, data.Bio, data.TeamId, data.WalletBalance, data.Bounty);
+            ClientDataRPC.UpdatePlayerInfo(player.SteamPlayer(), info);
+        }
+
+        public PlayerData GetData(ulong id)
         {
             Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
             if (!players.ContainsKey(id))
@@ -58,7 +77,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return players[id];
         }
 
-        public PlayerData GetPlayerByName(string name, bool exactMatch = true)
+        public PlayerData GetData(string name, bool exactMatch = true)
         {
             Dictionary<ulong, PlayerData> players = dataManager.GameData.PlayerData;
             if (exactMatch)
@@ -67,12 +86,12 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return players.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
-        public PlayerData[] GetPlayers()
+        public PlayerData[] GetAllData()
         {
             return dataManager.GameData.PlayerData.Values.ToArray();
         }
 
-        public int GetPlayerCount()
+        public int GetRegisteredPlayerCount()
         {
             return dataManager.GameData.PlayerData.Count;
         }
@@ -83,71 +102,34 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (ulong.TryParse(playerNameOrId, out id))
             {
                 // might be an ID but idk
-                PlayerData playerData = GetPlayer(id);
+                PlayerData playerData = GetData(id);
                 if (playerData != null)
                     return playerData;
             }
 
             // otherwise try matching by name
-            return GetPlayerByName(playerNameOrId, exactMatch);
+            return GetData(playerNameOrId, exactMatch);
         }
 
-        public string GetPlayerSummary(PlayerData playerData)
+        public void UpdateBalance(PlayerData playerData, float amount)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Profil gracza \"{playerData.Name}\"");
-
-            if (playerData.TeamId.HasValue)
-            {
-                Team team = teamManager.GetTeam(playerData.TeamId.Value);
-                sb.AppendLine($"Drużyna: \"{team.Name}\"");
-            }
-            else
-            {
-                sb.AppendLine($"Drużyna: Brak drużyny");
-            }
-
-            if (playerData.Bio != "")
-                sb.AppendLine($"Bio: \"{playerData.Bio}\"");
-
-            return sb.ToString();
+            playerData.WalletBalance = amount;
+            SendDataUpdate(playerData);
+            OnBalanceUpdated?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public float GetPlayerBalance(PlayerData playerData)
+        public void UpdateBounty(PlayerData playerData, float amount)
         {
-            return playerData.WalletBalance;
+            playerData.Bounty = amount;
+            SendDataUpdate(playerData);
+            OnBountyUpdated?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public void SetPlayerBalance(PlayerData playerData, float amount)
+        public void UpdateBio(PlayerData playerData, string bio)
         {
-            playerData.SetBalance(amount);
-            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
-        }
-
-        public void DepositIntoWallet(PlayerData playerData, float amount)
-        {
-            playerData.Deposit(amount);
-            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
-            OnWalletDepositedInto?.Invoke(this, new PlayerEventArgs(playerData));
-        }
-
-        public void WithdrawFromWallet(PlayerData playerData, float amount)
-        {
-            playerData.Withdraw(amount);
-            OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
-            OnWalletWithdrawnFrom?.Invoke(this, new PlayerEventArgs(playerData));
-        }
-
-        public void AddBounty(PlayerData playerData, float amount)
-        {
-            playerData.AddBounty(amount);
-            OnBountyAdded?.Invoke(this, new PlayerEventArgs(playerData));
-        }
-
-        public void ResetBounty(PlayerData playerData)
-        {
-            playerData.ResetBounty();
-            OnBountyReset?.Invoke(this, new PlayerEventArgs(playerData));
+            playerData.Bio = bio;
+            SendDataUpdate(playerData);
+            OnBioUpdated?.Invoke(this, new PlayerEventArgs(playerData));
         }
     }
 }
