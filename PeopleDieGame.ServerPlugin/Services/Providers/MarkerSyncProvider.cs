@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using Rocket.Unturned.Events;
 using System;
 using System.Collections.Generic;

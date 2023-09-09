@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using SDG.Unturned;

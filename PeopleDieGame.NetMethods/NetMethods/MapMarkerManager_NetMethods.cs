@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using PeopleDieGame.NetMethods.Models;
 using SDG.NetPak;
 using SDG.Unturned;

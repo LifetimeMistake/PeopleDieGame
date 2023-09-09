@@ -8,10 +8,10 @@ namespace PeopleDieGame.ServerPlugin.Models
         public string Name { get; private set; }
         public string Bio { get; private set; }
         public int? TeamId { get; set; }
-        public double WalletBalance { get; private set; }
-        public double Bounty { get; private set; }
+        public float WalletBalance { get; private set; }
+        public float Bounty { get; private set; }
 
-        public PlayerData(ulong id, string name, string bio = "", int? teamId = null, double walletBalance = 0)
+        public PlayerData(ulong id, string name, string bio = "", int? teamId = null, float walletBalance = 0)
         {
             Id = id;
             Name = name;
@@ -34,17 +34,17 @@ namespace PeopleDieGame.ServerPlugin.Models
             Name = name;
         }
 
-        public void SetBalance(double amount)
+        public void SetBalance(float amount)
         {
             WalletBalance = amount;
         }
 
-        public void Deposit(double amount)
+        public void Deposit(float amount)
         {
             WalletBalance += amount;
         }
 
-        public void Withdraw(double amount)
+        public void Withdraw(float amount)
         {
             WalletBalance = Math.Max(0, WalletBalance - amount);
         }
@@ -54,7 +54,7 @@ namespace PeopleDieGame.ServerPlugin.Models
             Bounty = 0;
         }
 
-        public void AddBounty(double amount)
+        public void AddBounty(float amount)
         {
             Bounty += amount;
         }

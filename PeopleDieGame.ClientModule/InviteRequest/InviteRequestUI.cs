@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.ClientModule.InviteRequest.EventArgs;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
@@ -9,27 +9,30 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PeopleDieGame.NetMethods.Models
+namespace PeopleDieGame.ClientModule.InviteRequest
 {
-    public static class InviteRequestUI
+    public class InviteRequestUI
     {
-        private static int PADDING = 10;
-        private static float FADEIN_TIME = 0.3f;
-        private static float FADEOUT_TIME = 0.15f;
-        private static bool active;
-        private static float timeout;
-        private static float popupTime;
+        private int PADDING = 10;
+        private float FADEIN_TIME = 0.3f;
+        private float FADEOUT_TIME = 0.15f;
 
-        private static ISleekElement container;
-        private static ISleekImage timeoutBar;
-        private static ISleekLabel titleLabel;
-        private static ISleekLabel descriptionLabel;
-        private static ISleekButton acceptButton;
-        private static ISleekButton rejectButton;
-        private static GameObject timerObject;
-        private static UpdateBehaviour timer;
+        public bool Active;
+        private float timeout;
+        private float popupTime;
 
-        static InviteRequestUI()
+        private ISleekElement container;
+        private ISleekImage timeoutBar;
+        private ISleekLabel titleLabel;
+        private ISleekLabel descriptionLabel;
+        private ISleekButton acceptButton;
+        private ISleekButton rejectButton;
+        private GameObject timerObject;
+        private UpdateBehaviour timer;
+
+        public event EventHandler<OnSubmitInviteResponse> OnSubmitInvite;
+
+        public InviteRequestUI()
         {
             container = Glazier.Get().CreateBox();
             container.sizeScale_X = 0.4f;
@@ -97,41 +100,41 @@ namespace PeopleDieGame.NetMethods.Models
             Close();
         }
 
-        private static void AcceptButton_onClickedButton(ISleekElement button)
+        private void AcceptButton_onClickedButton(ISleekElement button)
         {
-            if (!active)
+            if (!Active)
                 return;
 
             Accept();
         }
 
-        private static void RejectButton_onClickedButton(ISleekElement button)
+        private void RejectButton_onClickedButton(ISleekElement button)
         {
-            if (!active)
+            if (!Active)
                 return;
 
             Reject();
         }
 
-        private static void Accept()
+        private void Accept()
         {
             acceptButton.isClickable = true;
             rejectButton.isClickable = false;
-            InviteManager.SendInviteResponse(true);
+            OnSubmitInvite?.Invoke(this, new OnSubmitInviteResponse(true));
             Close();
         }
 
-        private static void Reject()
+        private void Reject()
         {
             acceptButton.isClickable = false;
             rejectButton.isClickable = true;
-            InviteManager.SendInviteResponse(false);
+            OnSubmitInvite?.Invoke(this, new OnSubmitInviteResponse(false));
             Close();
         }
 
-        public static void Open(string inviterName, string teamName, float inviteTTL)
+        public void Open(string inviterName, string teamName, float inviteTTL)
         {
-            if (active)
+            if (Active)
                 return;
 
             descriptionLabel.text = $"Przychodzące zaproszenie od <style=H3>{inviterName}</style>\ndo drużyny <style=H3>{teamName}</style>";
@@ -144,29 +147,29 @@ namespace PeopleDieGame.NetMethods.Models
             acceptButton.isClickable = true;
             rejectButton.isClickable = true;
 
-            active = true;
+            Active = true;
             timeout = inviteTTL;
             popupTime = Time.realtimeSinceStartup;
             timer.Start();
         }
 
-        public static void Close()
+        public void Close()
         {
-            if (!active)
+            if (!Active)
                 return;
 
             container.positionScale_Y = -0.0075f;
             container.lerpPositionScale(container.positionScale_X, -container.sizeScale_Y, ESleekLerp.LINEAR, FADEOUT_TIME);
 
-            active = false;
+            Active = false;
             timeout = 0;
             popupTime = 0;
             timer.Stop();
         }
 
-        private static void Timer_OnFixedUpdate(object sender, System.EventArgs e)
+        private void Timer_OnFixedUpdate(object sender, System.EventArgs e)
         {
-            if (!active)
+            if (!Active)
                 return;
 
             if (Time.realtimeSinceStartup >= popupTime + timeout)

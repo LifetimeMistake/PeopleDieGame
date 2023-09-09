@@ -8,11 +8,12 @@ using System.Text;
 using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
-using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.RPCs;
 using UnityEngine;
 using PeopleDieGame.NetMethods.Models.EventArgs;
 using PeopleDieGame.ServerPlugin.Helpers;
 using Rocket.Core.Steam;
+using PeopleDieGame.NetMethods.Models;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -35,13 +36,13 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public void Init()
         {
             teamManager.OnBankBalanceChanged += TeamManager_OnBankBalanceChanged;
-            ShopMenuManager.OnItemPurchaseRequested += ShopMenuManager_OnItemPurchaseRequested;
+            ShopRPC.OnItemPurchaseRequested += ShopMenuManager_OnItemPurchaseRequested;
         }
 
         public void Dispose()
         {
             teamManager.OnBankBalanceChanged -= TeamManager_OnBankBalanceChanged;
-            ShopMenuManager.OnItemPurchaseRequested -= ShopMenuManager_OnItemPurchaseRequested;
+            ShopRPC.OnItemPurchaseRequested -= ShopMenuManager_OnItemPurchaseRequested;
         }
 
         private void ShopMenuManager_OnItemPurchaseRequested(object sender, ItemPurchaseRequestEventArgs e)
@@ -95,17 +96,20 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                     return;
                 }
 
-                ShopMenuManager.UpdateBalance(steamPlayer, (float)e.Team.BankBalance);
+                PlayerData leaderData = playerDataManager.GetPlayer(e.Team.LeaderId.Value);
+
+                TeamInfo teamInfo = new TeamInfo(e.Team.Id, e.Team.Name, e.Team.Description, e.Team.BankBalance, leaderData.Id, leaderData.Name);
+                ClientDataRPC.UpdateTeamInfo(steamPlayer, teamInfo);
             }
         }
 
         private void BroadcastItemsUpdated()
         {
             Dictionary<ushort, float> items = GetSerializableItemList();
-            ShopMenuManager.UpdateShopItems(items);
+            ShopRPC.UpdateShopItems(items);
         }
 
-        public ShopItem AddItem(ushort unturnedItemId, double price)
+        public ShopItem AddItem(ushort unturnedItemId, float price)
         {
             Dictionary<ushort, ShopItem> shopItems = dataManager.GameData.ShopItems;
             ItemAsset item = Assets.find(EAssetType.ITEM, unturnedItemId) as ItemAsset;
@@ -176,7 +180,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return GetItemByName(shopItemNameOrId, exactMatch);
         }
 
-        public void SetItemPrice(ShopItem shopItem, double price)
+        public void SetItemPrice(ShopItem shopItem, float price)
         {
             shopItem.SetPrice(price);
             OnShopItemPriceChanged?.Invoke(this, new ShopItemEventArgs(shopItem));

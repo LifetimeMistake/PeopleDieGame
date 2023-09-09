@@ -7,31 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PeopleDieGame.NetMethods.Managers
+namespace PeopleDieGame.NetMethods.RPCs
 {
-    public static class InviteManager
+    public static class InviteRPC
     {
         private static readonly ClientStaticMethod<string, string, float> sendInviteRequest = ClientStaticMethod<string, string, float>.Get(new ClientStaticMethod<string, string, float>.ReceiveDelegate(ReceiveInviteRequest));
         private static readonly ServerStaticMethod<bool> sendInviteRequestResponse = ServerStaticMethod<bool>.Get(new ServerStaticMethod<bool>.ReceiveDelegateWithContext(ReceiveInviteRequestResponse));
 
+        public static event EventHandler<InviteSentEventArgs> OnInviteSent;
         public static event EventHandler<InviteResponseEventArgs> OnInviteAccepted;
         public static event EventHandler<InviteResponseEventArgs> OnInviteRejected;
-
-        [SteamCall(ESteamCallValidation.ONLY_FROM_SERVER)]
-        public static void ReceiveInviteRequest(string inviterName, string teamName, float inviteTTL)
-        {
-            InviteRequestUI.Open(inviterName, teamName, inviteTTL);
-        }
-
-        [SteamCall(ESteamCallValidation.SERVERSIDE)]
-        public static void ReceiveInviteRequestResponse(in ServerInvocationContext context, bool result)
-        {
-            InviteResponseEventArgs eventArgs = new InviteResponseEventArgs(context.GetCallingPlayer());
-            if (result)
-                OnInviteAccepted?.Invoke(null, eventArgs);
-            else
-                OnInviteRejected?.Invoke(null, eventArgs);
-        }
 
         public static void SendInviteRequest(SteamPlayer player, string inviterName, string teamName, float inviteTTL)
         {
@@ -47,6 +32,22 @@ namespace PeopleDieGame.NetMethods.Managers
                 return;
 
             sendInviteRequestResponse.Invoke(SDG.NetTransport.ENetReliability.Reliable, result);
+        }
+
+        [SteamCall(ESteamCallValidation.ONLY_FROM_SERVER)]
+        public static void ReceiveInviteRequest(string inviterName, string teamName, float inviteTTL)
+        {
+            OnInviteSent.Invoke(null, new InviteSentEventArgs(inviterName, teamName, inviteTTL));
+        }
+
+        [SteamCall(ESteamCallValidation.SERVERSIDE)]
+        public static void ReceiveInviteRequestResponse(in ServerInvocationContext context, bool result)
+        {
+            InviteResponseEventArgs eventArgs = new InviteResponseEventArgs(context.GetCallingPlayer());
+            if (result)
+                OnInviteAccepted?.Invoke(null, eventArgs);
+            else
+                OnInviteRejected?.Invoke(null, eventArgs);
         }
     }
 }

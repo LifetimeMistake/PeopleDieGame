@@ -13,7 +13,7 @@ using PeopleDieGame.ServerPlugin.Enums;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
 using PeopleDieGame.ServerPlugin.Services.Providers;
-using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.RPCs;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {

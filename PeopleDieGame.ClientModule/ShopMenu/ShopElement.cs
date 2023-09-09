@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Models.EventArgs;
+﻿using PeopleDieGame.ClientModule.ShopMenu.EventArgs;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PeopleDieGame.NetMethods.Models
+namespace PeopleDieGame.ClientModule.ShopMenu
 {
     public class ShopElement
     {
@@ -22,7 +22,7 @@ namespace PeopleDieGame.NetMethods.Models
         private float price;
         private ItemAsset asset;
 
-        public event EventHandler<BuyButtonPressedEventArgs> OnBuyButtonPressed;
+        public event EventHandler<RequestItemPurchaseEventArgs> OnBuyButtonPressed;
 
         public ushort ItemId { get => itemId; }
         public float Price
@@ -151,7 +151,7 @@ namespace PeopleDieGame.NetMethods.Models
 
         private void BuyButton_onClickedButton(ISleekElement button)
         {
-            OnBuyButtonPressed?.Invoke(this, new BuyButtonPressedEventArgs(itemId, 1));
+            OnBuyButtonPressed?.Invoke(this, new RequestItemPurchaseEventArgs(itemId, 1));
         }
     }
 }

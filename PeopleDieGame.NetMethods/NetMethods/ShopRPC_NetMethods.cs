@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using SDG.NetPak;
 using SDG.Unturned;
 using System;
@@ -9,15 +9,9 @@ using System.Threading.Tasks;
 
 namespace PeopleDieGame.NetMethods.NetMethods
 {
-    [NetInvokableGeneratedClass(typeof(ShopMenuManager))]
-    public static class ShopMenuManager_NetMethods
+    [NetInvokableGeneratedClass(typeof(ShopRPC))]
+    public static class ShopRPC_NetMethods
     {
-        [NetInvokableGeneratedMethod("ReceiveOpenShop", ENetInvokableGeneratedMethodPurpose.Read)]
-        public static void ReceiveOpenShop_Read(in ClientInvocationContext context)
-        {
-            ShopMenuManager.ReceiveOpenShop();
-        }
-
         [NetInvokableGeneratedMethod("ReceiveUpdateShopItems", ENetInvokableGeneratedMethodPurpose.Read)]
         public static void ReceiveUpdateShopItems_Read(in ClientInvocationContext context)
         {
@@ -37,7 +31,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
                 items.Add(itemId, price);
             }
 
-            ShopMenuManager.ReceiveUpdateShopItems(items);
+            ShopRPC.ReceiveUpdateShopItems(items);
         }
 
         [NetInvokableGeneratedMethod("ReceiveUpdateShopItems", ENetInvokableGeneratedMethodPurpose.Write)]
@@ -51,22 +45,6 @@ namespace PeopleDieGame.NetMethods.NetMethods
             }
         }
 
-        [NetInvokableGeneratedMethod("ReceiveUpdateBalance", ENetInvokableGeneratedMethodPurpose.Read)]
-        public static void ReceiveUpdateBalance_Read(in ClientInvocationContext context)
-        {
-            NetPakReader reader = context.reader;
-            if (!reader.ReadFloat(out float teamBalance))
-                return;
-
-            ShopMenuManager.ReceiveUpdateBalance(teamBalance);
-        }
-
-        [NetInvokableGeneratedMethod("ReceiveUpdateBalance", ENetInvokableGeneratedMethodPurpose.Write)]
-        public static void ReceiveUpdateBalance_Write(NetPakWriter writer, float teamBalance)
-        {
-            writer.WriteFloat(teamBalance);
-        }
-
         [NetInvokableGeneratedMethod("ReceiveItemPurchaseRequest", ENetInvokableGeneratedMethodPurpose.Read)]
         public static void ReceiveRequestItemPurchase_Read(in ServerInvocationContext context)
         {
@@ -77,7 +55,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
             if (!reader.ReadUInt8(out byte amount))
                 return;
 
-            ShopMenuManager.ReceiveItemPurchaseRequest(context, itemId, amount);
+            ShopRPC.ReceiveItemPurchaseRequest(context, itemId, amount);
         }
 
         [NetInvokableGeneratedMethod("ReceiveItemPurchaseRequest", ENetInvokableGeneratedMethodPurpose.Write)]

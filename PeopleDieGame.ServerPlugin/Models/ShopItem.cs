@@ -8,9 +8,9 @@ namespace PeopleDieGame.ServerPlugin.Models
         public ushort UnturnedItemId { get; private set; }
         public string Name { get { return GetName(); } }
         public string Description { get { return GetDescription(); } }
-        public double Price { get; private set; }
+        public float Price { get; private set; }
 
-        public ShopItem(ushort unturnedItemId, double price)
+        public ShopItem(ushort unturnedItemId, float price)
         {
             UnturnedItemId = unturnedItemId;
             Price = price;
@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Models
             return item.itemDescription;
         }
 
-        public void SetPrice(double amount)
+        public void SetPrice(float amount)
         {
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));

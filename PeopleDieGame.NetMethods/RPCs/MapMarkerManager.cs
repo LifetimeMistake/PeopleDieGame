@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PeopleDieGame.NetMethods.Managers
+namespace PeopleDieGame.NetMethods.RPCs
 {
     public static class MapMarkerManager
     {

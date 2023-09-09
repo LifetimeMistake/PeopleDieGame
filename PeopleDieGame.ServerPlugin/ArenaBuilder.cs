@@ -10,8 +10,8 @@ namespace PeopleDieGame.ServerPlugin
         private string arenaName;
         private double activationDistance = 0;
         private double deactivationDistance = 0;
-        private double completionBounty = 0;
-        private double completionReward = 0;
+        private float completionBounty = 0;
+        private float completionReward = 0;
         private Vector3 activationPoint;
         private VectorPAR bossSpawnpoint;
         private Vector3S rewardSpawnpoint;
@@ -23,8 +23,8 @@ namespace PeopleDieGame.ServerPlugin
         public string ArenaName { get => arenaName; }
         public double ActivationDistance { get => activationDistance; }
         public double DeactivationDistance { get => deactivationDistance; }
-        public double CompletionBounty { get => completionBounty; }
-        public double CompletionReward { get => completionReward; }
+        public float CompletionBounty { get => completionBounty; }
+        public float CompletionReward { get => completionReward; }
         public Vector3 ActivationPoint { get => activationPoint; }
         public VectorPAR BossSpawnpoint { get => bossSpawnpoint; }
         public Vector3S RewardSpawnpoint { get => rewardSpawnpoint; }
@@ -57,7 +57,7 @@ namespace PeopleDieGame.ServerPlugin
             deactivationDistance = distance;
         }
 
-        public void SetCompletionReward(double reward)
+        public void SetCompletionReward(float reward)
         {
             if (reward < 0)
                 throw new ArgumentOutOfRangeException(nameof(reward));
@@ -65,7 +65,7 @@ namespace PeopleDieGame.ServerPlugin
             completionReward = reward;
         }
 
-        public void SetCompletionBounty(double bounty)
+        public void SetCompletionBounty(float bounty)
         {
             if (bounty < 0)
                 throw new ArgumentOutOfRangeException(nameof(bounty));

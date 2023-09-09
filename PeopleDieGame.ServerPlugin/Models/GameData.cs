@@ -18,10 +18,10 @@ namespace PeopleDieGame.ServerPlugin.Models
         public int LastArenaId { get; set; }
         public VectorPAR? DefaultRespawnPoint { get; set; }
         public GameState State { get; set; }
-        public double PlayerKillReward { get; set; }
-        public double ZombieKillReward { get; set; }
-        public double MegaZombieKillReward { get; set; }
-        public double Bounty { get; set; }
+        public float PlayerKillReward { get; set; }
+        public float ZombieKillReward { get; set; }
+        public float MegaZombieKillReward { get; set; }
+        public float Bounty { get; set; }
         public int IntermissionTime { get; set; }
         public int ClosingTime { get; set; }
 
