@@ -25,7 +25,7 @@ namespace PeopleDieGame.Reflection
         {
             if (arguments.Length != parameterCount)
                 throw new ArgumentException($"Method expected {parameterCount} parameters, but {arguments.Length} parameters have been provided.");
-            
+
             return method.Invoke(instance, arguments);
         }
 
@@ -38,6 +38,19 @@ namespace PeopleDieGame.Reflection
         public static MethodRef GetMethodRef(Type type, string methodName)
         {
             MethodInfo methodInfo = AccessTools.Method(type, methodName);
+            return new MethodRef(methodInfo, null);
+        }
+
+        public static MethodRef GetMethodRef<I>(I instance, MethodInfo methodInfo)
+        {
+            if (methodInfo.DeclaringType != typeof(I))
+                throw new ArgumentException("Method does not belong to the provided instance");
+
+            return new MethodRef(methodInfo, instance);
+        }
+
+        public static MethodRef GetMethodRef(MethodInfo methodInfo)
+        {
             return new MethodRef(methodInfo, null);
         }
     }

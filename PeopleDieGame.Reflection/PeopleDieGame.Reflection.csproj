@@ -48,6 +48,7 @@
     <Compile Include="MethodRef.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FieldRef.cs" />
+    <Compile Include="EnumInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
