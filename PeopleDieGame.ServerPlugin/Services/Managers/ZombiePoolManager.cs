@@ -86,6 +86,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             component.id = zombieId;
             component.speciality = 0;
             component.bound = boundId;
+            component.zombieRegion = ZombieManager.regions[(int)boundId];
             component.type = 0;
             component.shirt = 0;
             component.pants = 0;

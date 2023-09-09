@@ -22,6 +22,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
         private FieldRef<float> fireDamage;
         private FieldRef<EZombiePath> path;
+        private FieldRef<ZombieRegion> region;
 
         private delegate void VoidDelegate();
         private VoidDelegate baseUpdate;
@@ -41,6 +42,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         public float FireDamage { get => fireDamage.Value; set => fireDamage.Value = value; }
         public EZombiePath Path { get => path.Value; set => path.Value = value; }
         public EZombiePath? PathOverride { get => pathOverride; set => SetPathOverride(value); }
+        public ZombieRegion zombieRegion { get => region.Value; set => region.Value = value; }
         public bool AIEnabled { get; set; }
 
         public ManagedZombie()
@@ -61,6 +63,7 @@ namespace PeopleDieGame.ServerPlugin.Models
 
             fireDamage = FieldRef.GetFieldRef<Zombie, float>(this, "fireDamage");
             path = FieldRef.GetFieldRef<Zombie, EZombiePath>(this, "path");
+            region = FieldRef.GetFieldRef<Zombie, ZombieRegion>(this, "zombieRegion");
 
             Reset();
         }
