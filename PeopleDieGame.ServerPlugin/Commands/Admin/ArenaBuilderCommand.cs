@@ -8,6 +8,7 @@ using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
+using System.Text;
 
 namespace PeopleDieGame.ServerPlugin.Commands.Admin
 {
@@ -358,7 +359,13 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
             {
                 if (command.Length == 0)
                 {
-                    ChatHelper.Say(caller, "Musisz podać nazwę boss'a");
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Musisz podać nazwę boss'a");
+                    sb.AppendLine("Dostępne modele:");
+                    foreach (string name in ServiceLocator.Instance.LocateServicesOfType<IZombieModel>().Select(x => x.Name.ToLowerInvariant()))
+                        sb.AppendLine($" - {name}");
+
+                    ChatHelper.Say(caller, sb);
                     return;
                 }
 
