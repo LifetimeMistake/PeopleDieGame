@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PeopleDieGame.ServerPlugin.Helpers
 {
     public static class SequenceHelper
     {
-        public static bool ContainsSubequence<T>(this IEnumerable<T> parent, IEnumerable<T> target)
+        public static bool ContainsSubequence<T>(this IEnumerable<T> parent, IEnumerable<T> target, Func<T, T, bool> predicate = null)
         {
+            if (predicate == null)
+                predicate = new Func<T, T, bool>((e1, e2) => e1.Equals(e2));
+
             bool foundOneMatch = false;
             var enumeratedTarget = target.ToList();
             int enumPos = 0;
@@ -15,7 +19,7 @@ namespace PeopleDieGame.ServerPlugin.Helpers
             {
                 while (parentEnum.MoveNext())
                 {
-                    if (enumeratedTarget[enumPos].Equals(parentEnum.Current))
+                    if (predicate(enumeratedTarget[enumPos], parentEnum.Current))
                     {
                         // Match, so move the target enum forward
                         foundOneMatch = true;
@@ -32,7 +36,7 @@ namespace PeopleDieGame.ServerPlugin.Helpers
                         foundOneMatch = false;
                         enumPos = 0;
 
-                        if (enumeratedTarget[enumPos].Equals(parentEnum.Current))
+                        if (predicate(enumeratedTarget[enumPos], parentEnum.Current))
                         {
                             foundOneMatch = true;
                             enumPos++;
@@ -44,8 +48,11 @@ namespace PeopleDieGame.ServerPlugin.Helpers
             }
         }
 
-        public static int GetSubsequenceIndex<T>(this IEnumerable<T> parent, IEnumerable<T> target)
+        public static int GetSubsequenceIndex<T>(this IEnumerable<T> parent, IEnumerable<T> target, Func<T, T, bool> predicate = null)
         {
+            if (predicate == null)
+                predicate = new Func<T, T, bool>((e1, e2) => e1.Equals(e2));
+
             bool foundOneMatch = false;
             var enumeratedTarget = target.ToList();
             int enumPos = 0;
@@ -55,7 +62,7 @@ namespace PeopleDieGame.ServerPlugin.Helpers
             {
                 while (parentEnum.MoveNext())
                 {
-                    if (enumeratedTarget[enumPos].Equals(parentEnum.Current))
+                    if (predicate(enumeratedTarget[enumPos], parentEnum.Current))
                     {
                         // Match, so move the target enum forward
                         foundOneMatch = true;
@@ -72,7 +79,7 @@ namespace PeopleDieGame.ServerPlugin.Helpers
                         foundOneMatch = false;
                         enumPos = 0;
 
-                        if (enumeratedTarget[enumPos].Equals(parentEnum.Current))
+                        if (predicate(enumeratedTarget[enumPos], parentEnum.Current))
                         {
                             foundOneMatch = true;
                             enumPos++;
