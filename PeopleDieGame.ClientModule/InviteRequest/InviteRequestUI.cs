@@ -1,4 +1,5 @@
 ﻿using PeopleDieGame.ClientModule.InviteRequest.EventArgs;
+using PeopleDieGame.ClientModule.Models;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;

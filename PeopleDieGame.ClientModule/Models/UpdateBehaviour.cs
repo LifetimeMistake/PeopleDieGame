@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PeopleDieGame.NetMethods.Models
+namespace PeopleDieGame.ClientModule.Models
 {
     public class UpdateBehaviour : MonoBehaviour
     {

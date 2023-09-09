@@ -79,12 +79,9 @@
     <Compile Include="InviteRequest\InviteRequestUI.cs" />
     <Compile Include="InviteRequest\InviteRequestService.cs" />
     <Compile Include="IService.cs" />
-    <Compile Include="Models\AdvancedSleekProgress.cs" />
     <Compile Include="ClientData.cs" />
-    <Compile Include="Models\MapMarker.cs" />
     <Compile Include="Models\UpdateBehaviour.cs" />
     <Compile Include="ShopMenu\ShopMenuService.cs" />
-    <Compile Include="UpdateBehaviour.cs" />
     <Compile Include="ModuleEntrypoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShopMenu\EventArgs\RequestItemPurchaseEventArgs.cs" />

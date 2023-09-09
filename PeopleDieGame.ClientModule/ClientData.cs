@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PeopleDieGame.ClientModule.Models
+namespace PeopleDieGame.ClientModule
 {
     public class ClientData
     {
