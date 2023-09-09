@@ -21,12 +21,12 @@ namespace PeopleDieGame.ServerPlugin.Models
         public Vector3S RewardSpawnPoint { get; private set; }
         public double ActivationDistance { get; private set; }
         public double DeactivationDistance { get; private set; }
-        public double CompletionBounty { get; private set; }
-        public double CompletionReward { get; private set; }
+        public float CompletionBounty { get; private set; }
+        public float CompletionReward { get; private set; }
         public byte BoundId { get; private set; }
         public int? RewardLoadoutId { get; private set; }
 
-        public BossArena(int id, string name, bool conquered, IZombieModel bossModel, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId, int? rewardLoadoutId)
+        public BossArena(int id, string name, bool conquered, IZombieModel bossModel, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, float completionBounty, float completionReward, byte boundId, int? rewardLoadoutId)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -44,7 +44,7 @@ namespace PeopleDieGame.ServerPlugin.Models
         }
 
         [JsonConstructor]
-        public BossArena(int id, string name, bool conquered, Type bossType, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, double completionBounty, double completionReward, byte boundId, int? rewardLoadoutId)
+        public BossArena(int id, string name, bool conquered, Type bossType, Vector3S activationPoint, VectorPAR bossSpawnPoint, Vector3S rewardSpawnPoint, double activationDistance, double deactivationDistance, float completionBounty, float completionReward, byte boundId, int? rewardLoadoutId)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -102,7 +102,7 @@ namespace PeopleDieGame.ServerPlugin.Models
             DeactivationDistance = distance;
         }
 
-        public void SetCompletionReward(double reward)
+        public void SetCompletionReward(float reward)
         {
             if (reward < 0)
                 throw new ArgumentOutOfRangeException(nameof(reward));
@@ -110,7 +110,7 @@ namespace PeopleDieGame.ServerPlugin.Models
             CompletionReward = reward;
         }
 
-        public void SetCompletionBounty(double bounty)
+        public void SetCompletionBounty(float bounty)
         {
             if (bounty < 0)
                 throw new ArgumentOutOfRangeException(nameof(bounty));

@@ -13,7 +13,7 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Enums;
 using UnityEngine;
 using PeopleDieGame.Reflection;
-using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.RPCs;
 using PeopleDieGame.NetMethods.Models.EventArgs;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
@@ -55,8 +55,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             loadoutManager.OnLoadoutRemoved += LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
-            InviteManager.OnInviteAccepted += InviteManager_OnInviteAccepted;
-            InviteManager.OnInviteRejected += InviteManager_OnInviteRejected;
+            InviteRPC.OnInviteAccepted += InviteManager_OnInviteAccepted;
+            InviteRPC.OnInviteRejected += InviteManager_OnInviteRejected;
 
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
@@ -78,8 +78,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         {
             loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
-            InviteManager.OnInviteAccepted -= InviteManager_OnInviteAccepted;
-            InviteManager.OnInviteRejected -= InviteManager_OnInviteRejected;
+            InviteRPC.OnInviteAccepted -= InviteManager_OnInviteAccepted;
+            InviteRPC.OnInviteRejected -= InviteManager_OnInviteRejected;
             UnregisterTimers();
         }
 
@@ -174,7 +174,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return true;
         }
 
-        public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null, double bankFunds = 1000)
+        public Team CreateTeam(string name, string description = "", Loadout defaultLoadout = null, float bankFunds = 1000)
         {
             Dictionary<int, Team> teams = dataManager.GameData.Teams;
             if (GetTeamByName(name) != null)
@@ -358,7 +358,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
             TeamInvite invite = new TeamInvite(callerPlayer, targetPlayer, team, DateTime.Now, TimeSpan.FromSeconds(inviteTTL));
             invites.Add(invite);
-            InviteManager.SendInviteRequest(steamPlayer, callerPlayer.Name, team.Name, (float)inviteTTL);
+            InviteRPC.SendInviteRequest(steamPlayer, callerPlayer.Name, team.Name, (float)inviteTTL);
             OnPlayerInvited?.Invoke(this, new TeamInviteEventArgs(invite));
             return true;
         }
@@ -437,25 +437,25 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return sb.ToString();
         }
 
-        public double GetBankBalance(Team team)
+        public float GetBankBalance(Team team)
         {
             return team.BankBalance;
         }
 
-        public void SetBankBalance(Team team, double amount)
+        public void SetBankBalance(Team team, float amount)
         {
             team.SetBalance(amount);
             OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
-        public void DepositIntoBank(Team team, double amount)
+        public void DepositIntoBank(Team team, float amount)
         {
             team.Deposit(amount);
             OnBankDepositedInto?.Invoke(this, new TeamBankEventArgs(team, amount));
             OnBankBalanceChanged?.Invoke(this, new TeamBankEventArgs(team, team.BankBalance));
         }
 
-        public void WithdrawFromBank(Team team, double amount)
+        public void WithdrawFromBank(Team team, float amount)
         {
             team.Withdraw(amount);
             OnBankWithdrawnFrom?.Invoke(this, new TeamBankEventArgs(team, amount));

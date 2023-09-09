@@ -15,10 +15,10 @@ namespace PeopleDieGame.ServerPlugin
         public int? DefaultLoadoutId { get; private set; }
         public ulong? LeaderId { get; private set; }
         public CSteamID? GroupID { get; set; }
-        public double BankBalance { get; private set; }
+        public float BankBalance { get; private set; }
         public VectorPAR? RespawnPoint { get; set; }
 
-        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, CSteamID? groupId = null, double bankBalance = 1000, VectorPAR? respawnPoint = null)
+        public Team(int id, string name, string description = "", int? defaultLoadoutId = null, ulong? leaderId = null, CSteamID? groupId = null, float bankBalance = 1000, VectorPAR? respawnPoint = null)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -62,17 +62,17 @@ namespace PeopleDieGame.ServerPlugin
             LeaderId = player?.Id ?? null;
         }
 
-        public void SetBalance(double amount)
+        public void SetBalance(float amount)
         {
             BankBalance = amount;
         }
 
-        public void Deposit(double amount)
+        public void Deposit(float amount)
         {
             BankBalance += amount;
         }
 
-        public void Withdraw(double amount)
+        public void Withdraw(float amount)
         {
             BankBalance = Math.Max(0, BankBalance - amount);
         }

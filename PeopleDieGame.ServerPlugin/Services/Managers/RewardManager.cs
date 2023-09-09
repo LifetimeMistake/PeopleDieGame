@@ -4,6 +4,7 @@ using System;
 using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Models.EventArgs;
+using UnityEngine;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -132,22 +133,22 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void PlayerKill(PlayerData victim, PlayerData killer)
         {
-            double reward = dataManager.GameData.PlayerKillReward;
-            double bounty = dataManager.GameData.Bounty;
-            double total = reward + victim.Bounty;
+            float reward = dataManager.GameData.PlayerKillReward;
+            float bounty = dataManager.GameData.Bounty;
+            float total = reward + victim.Bounty;
 
             playerDataManager.AddBounty(killer, bounty);
             playerDataManager.DepositIntoWallet(killer, total);
 
             playerDataManager.ResetBounty(victim);
-            playerDataManager.SetPlayerBalance(victim, Math.Round(victim.WalletBalance / 2));
+            playerDataManager.SetPlayerBalance(victim, Mathf.Round(victim.WalletBalance / 2));
             OnPlayerReceivePlayerReward?.Invoke(this, new RewardEventArgs(killer, total));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(victim));
         }
 
         public void ZombieKill(PlayerData player)
         {
-            double reward;
+            float reward;
             reward = dataManager.GameData.ZombieKillReward;
 
             playerDataManager.DepositIntoWallet(player, reward);
@@ -156,7 +157,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void RandomDeath(PlayerData player)
         {
-            playerDataManager.SetPlayerBalance(player, Math.Round(player.WalletBalance / 2));
+            playerDataManager.SetPlayerBalance(player, Mathf.Round(player.WalletBalance / 2));
             OnPlayerReceiveDeathPenalty?.Invoke(this, new PlayerEventArgs(player));
         }
     }

@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Enums;
 using PeopleDieGame.ServerPlugin.Models;

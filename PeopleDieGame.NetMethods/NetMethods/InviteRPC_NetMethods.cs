@@ -1,4 +1,4 @@
-﻿using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.NetMethods.RPCs;
 using SDG.NetPak;
 using SDG.Unturned;
 using System;
@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace PeopleDieGame.NetMethods.NetMethods
 {
-    [NetInvokableGeneratedClass(typeof(InviteManager))]
-    public static class InviteManager_NetMethods
+    [NetInvokableGeneratedClass(typeof(InviteRPC))]
+    public static class InviteRPC_NetMethods
     {
         [NetInvokableGeneratedMethod("ReceiveInviteRequest", ENetInvokableGeneratedMethodPurpose.Read)]
         public static void ReceiveInviteRequest_Read(in ClientInvocationContext context)
@@ -25,7 +25,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
             if (!reader.ReadFloat(out float inviteTTL))
                 return;
 
-            InviteManager.ReceiveInviteRequest(inviterName, teamName, inviteTTL);
+            InviteRPC.ReceiveInviteRequest(inviterName, teamName, inviteTTL);
         }
 
         [NetInvokableGeneratedMethod("ReceiveInviteRequest", ENetInvokableGeneratedMethodPurpose.Write)]
@@ -43,7 +43,7 @@ namespace PeopleDieGame.NetMethods.NetMethods
             if (!reader.ReadBit(out bool result))
                 return;
 
-            InviteManager.ReceiveInviteRequestResponse(context, result);
+            InviteRPC.ReceiveInviteRequestResponse(context, result);
         }
 
         [NetInvokableGeneratedMethod("ReceiveInviteRequestResponse", ENetInvokableGeneratedMethodPurpose.Write)]

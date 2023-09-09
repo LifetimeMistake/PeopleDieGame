@@ -1,5 +1,5 @@
 ﻿using Pathfinding.RVO.Sampled;
-using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.RPCs;
 using PeopleDieGame.ServerPlugin.Autofac;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;

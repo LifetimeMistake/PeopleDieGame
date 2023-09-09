@@ -22,8 +22,12 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         private PlayerDataManager playerDataManager { get; set; }
         [InjectDependency]
         private TimerManager timerManager { get; set; }
+        [InjectDependency]
+        private AltarManager altarManager { get; set; }
 
         private float intermissionEndTime = 0;
+        private float closingEndTime = 0;
+        private Team winnerTeam;
 
         public event EventHandler OnGameStateChanged;
         public event EventHandler OnGameStarted;
@@ -31,12 +35,19 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void Init()
         {
+            altarManager.OnAltarSubmitItems += AltarManager_OnAltarSubmitItems;
             timerManager.Register(ProcessState, 60);
         }
 
         public void Dispose()
         {
             timerManager.Unregister(ProcessState);
+        }
+
+        private void AltarManager_OnAltarSubmitItems(object sender, Models.EventArgs.AltarSubmitEventArgs e)
+        {
+            winnerTeam = e.Team;
+            EndGame();
         }
 
         public GameState GetGameState()
@@ -136,13 +147,15 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void StartStateGameFinished()
         {
+            closingEndTime = Time.realtimeSinceStartup + dataManager.GameData.ClosingTime;
+            ChatHelper.Say($"Drużyna {winnerTeam.Name} wygrała, gg i guess");
             SetGameState(GameState.Finished);
         }
 
         private void ProcessIntermission()
         {
             float timeRemaining = intermissionEndTime - Time.realtimeSinceStartup;
-            if (timeRemaining <= 0)
+            if (timeRemaining < 0)
             {
                 StartStateInGame();
                 return;
@@ -153,7 +166,11 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         private void ProcessGameFinished()
         {
-
+            float timeRemaining = closingEndTime - Time.realtimeSinceStartup;
+            if (timeRemaining < 0)
+            {
+                SetGameState(GameState.InLobby);
+            }
         }
 
         private void ProcessState()

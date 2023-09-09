@@ -9,7 +9,7 @@ using PeopleDieGame.ServerPlugin.Helpers;
 using PeopleDieGame.ServerPlugin.Models;
 using PeopleDieGame.ServerPlugin.Services.Managers;
 using System.Runtime.CompilerServices;
-using PeopleDieGame.NetMethods.Managers;
+using PeopleDieGame.NetMethods.RPCs;
 using Mono.Cecil.Cil;
 using SDG.Unturned;
 using Steamworks;
@@ -94,9 +94,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Shop
                 }
 
                 Dictionary<ushort, float> items = shopManager.GetSerializableItemList();
-                ShopMenuManager.UpdateBalance(steamPlayer, (float)team.BankBalance);
-                ShopMenuManager.UpdateShopItems(steamPlayer, items);
-                ShopMenuManager.OpenShopUI(steamPlayer);
+                ShopRPC.UpdateShopItems(steamPlayer, items);
             }
             catch(Exception ex)
             {

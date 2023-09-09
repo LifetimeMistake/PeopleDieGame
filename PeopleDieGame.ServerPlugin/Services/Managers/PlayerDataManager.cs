@@ -113,32 +113,32 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             return sb.ToString();
         }
 
-        public double GetPlayerBalance(PlayerData playerData)
+        public float GetPlayerBalance(PlayerData playerData)
         {
             return playerData.WalletBalance;
         }
 
-        public void SetPlayerBalance(PlayerData playerData, double amount)
+        public void SetPlayerBalance(PlayerData playerData, float amount)
         {
             playerData.SetBalance(amount);
             OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public void DepositIntoWallet(PlayerData playerData, double amount)
+        public void DepositIntoWallet(PlayerData playerData, float amount)
         {
             playerData.Deposit(amount);
             OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
             OnWalletDepositedInto?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public void WithdrawFromWallet(PlayerData playerData, double amount)
+        public void WithdrawFromWallet(PlayerData playerData, float amount)
         {
             playerData.Withdraw(amount);
             OnWalletBalanceChanged?.Invoke(this, new PlayerEventArgs(playerData));
             OnWalletWithdrawnFrom?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
-        public void AddBounty(PlayerData playerData, double amount)
+        public void AddBounty(PlayerData playerData, float amount)
         {
             playerData.AddBounty(amount);
             OnBountyAdded?.Invoke(this, new PlayerEventArgs(playerData));

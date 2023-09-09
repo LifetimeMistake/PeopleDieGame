@@ -312,8 +312,8 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 return;
             }
 
-            double reward;
-            if (!double.TryParse(command[1], out reward))
+            float reward;
+            if (!float.TryParse(command[1], out reward))
             {
                 ChatHelper.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
                 return;
@@ -351,8 +351,8 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 return;
             }
 
-            double bounty;
-            if (!double.TryParse(command[1], out bounty))
+            float bounty;
+            if (!float.TryParse(command[1], out bounty))
             {
                 ChatHelper.Say(caller, "Artykuł 13 paragraf 7 - kto defekuje się do paczkomatu");
                 return;

@@ -1,5 +1,4 @@
-﻿using MonoMod.Utils;
-using PeopleDieGame.NetMethods.Managers;
+﻿using PeopleDieGame.ClientModule.ShopMenu.EventArgs;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
@@ -8,27 +7,29 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PeopleDieGame.NetMethods.Models
+namespace PeopleDieGame.ClientModule.ShopMenu
 {
-    public static class ShopUI
+    public class ShopUI
     {
-        private static readonly int PADDING = 10;
-        private static Dictionary<ushort, float> shopItems = new Dictionary<ushort, float>();
-        private static Dictionary<ushort, ShopElement> itemDisplays = new Dictionary<ushort, ShopElement>();
+        private readonly int PADDING = 10;
+        private Dictionary<ushort, float> shopItems = new Dictionary<ushort, float>();
+        private Dictionary<ushort, ShopElement> itemDisplays = new Dictionary<ushort, ShopElement>();
 
-        private static bool active;
-        private static float balance;
+        public bool Active;
+        private float balance;
 
-        private static ISleekElement container;
-        private static ISleekElement headerContainer;
-        private static ISleekLabel titleLabel;
-        private static ISleekButton closeButton;
-        private static ISleekLabel balanceLabel;
-        private static ISleekElement contentContainer;
-        private static ISleekField searchBar;
-        private static ISleekScrollView itemView;
+        private ISleekElement container;
+        private ISleekElement headerContainer;
+        private ISleekLabel titleLabel;
+        private ISleekButton closeButton;
+        private ISleekLabel balanceLabel;
+        private ISleekElement contentContainer;
+        private ISleekField searchBar;
+        private ISleekScrollView itemView;
 
-        static ShopUI()
+        public event EventHandler<RequestItemPurchaseEventArgs> OnRequestItemPurchase;
+
+        public ShopUI()
         {
             container = Glazier.Get().CreateBox();
             container.sizeScale_X = 0.6f;
@@ -107,20 +108,20 @@ namespace PeopleDieGame.NetMethods.Models
             Close();
         }
 
-        private static void CloseButton_onClickedButton(ISleekElement button)
+        private void CloseButton_onClickedButton(ISleekElement button)
         {
             Close();
         }
 
-        private static void SearchBar_onTyped(ISleekField field, string text)
+        private void SearchBar_onTyped(ISleekField field, string text)
         {
-            if (!active)
+            if (!Active)
                 return;
 
             UpdateFilter(text);
         }
 
-        private static void ClearView()
+        private void ClearView()
         {
             foreach (ShopElement element in itemDisplays.Values)
                 element.OnBuyButtonPressed -= OnBuyButtonPressed;
@@ -129,12 +130,12 @@ namespace PeopleDieGame.NetMethods.Models
             itemDisplays.Clear();
         }
 
-        private static void RenderView()
+        private void RenderView()
         {
             List<ShopElement> elements = itemDisplays.Values.Where(x => x.Active).ToList();
             int offset_Y = 0;
 
-            for(int i = 0; i < elements.Count; i++)
+            for (int i = 0; i < elements.Count; i++)
             {
                 ShopElement element = elements[i];
                 element.container.positionOffset_Y = offset_Y;
@@ -155,9 +156,9 @@ namespace PeopleDieGame.NetMethods.Models
             itemView.contentSizeOffset = new Vector2(0, offset_Y);
         }
 
-        private static void UpdateFilter(string filter = "")
+        private void UpdateFilter(string filter = "")
         {
-            foreach(ShopElement element in itemDisplays.Values)
+            foreach (ShopElement element in itemDisplays.Values)
             {
                 element.Active = element.ItemAsset.FriendlyName.ToLowerInvariant().Contains(filter.ToLowerInvariant());
             }
@@ -165,7 +166,7 @@ namespace PeopleDieGame.NetMethods.Models
             RenderView();
         }
 
-        private static void UpdateAvailability()
+        private void UpdateAvailability()
         {
             foreach (ShopElement element in itemDisplays.Values)
             {
@@ -173,10 +174,10 @@ namespace PeopleDieGame.NetMethods.Models
             }
         }
 
-        private static void RebuildView()
+        private void RebuildView()
         {
             ClearView();
-            foreach(KeyValuePair<ushort, float> kvp in shopItems)
+            foreach (KeyValuePair<ushort, float> kvp in shopItems)
             {
                 ShopElement shopElement = new ShopElement(itemView, kvp.Key, kvp.Value);
                 shopElement.OnBuyButtonPressed += OnBuyButtonPressed; ;
@@ -186,14 +187,14 @@ namespace PeopleDieGame.NetMethods.Models
             UpdateAvailability();
         }
 
-        private static void OnBuyButtonPressed(object sender, EventArgs.BuyButtonPressedEventArgs e)
+        private void OnBuyButtonPressed(object sender, EventArgs.RequestItemPurchaseEventArgs e)
         {
-            ShopMenuManager.RequestItemPurchase(e.ItemId, e.Amount);
+            OnRequestItemPurchase?.Invoke(sender, e);
         }
 
-        public static void Open()
+        public void Open()
         {
-            if (active)
+            if (Active)
                 return;
 
             PlayerUI.isLocked = true;
@@ -201,32 +202,34 @@ namespace PeopleDieGame.NetMethods.Models
             searchBar.text = "";
             UpdateFilter("");
             container.isVisible = true;
-            active = true;
+            Active = true;
         }
 
-        public static void UpdateItems(Dictionary<ushort, float> items)
+        public void UpdateItems(Dictionary<ushort, float> items)
         {
             shopItems.Clear();
-            shopItems.AddRange(items);
+            foreach (KeyValuePair<ushort, float> item in items)
+                shopItems.Add(item.Key, item.Value);
+
             RebuildView();
 
-            if (active)
+            if (Active)
                 UpdateFilter(searchBar.text);
         }
 
-        public static void UpdateBalance(float teamBalance)
+        public void UpdateBalance(float teamBalance)
         {
             balance = teamBalance;
             balanceLabel.text = $"Stan konta: ${teamBalance}";
             UpdateAvailability();
         }
 
-        public static void Close()
+        public void Close()
         {
             PlayerLifeUI.open();
             PlayerUI.isLocked = false;
             container.isVisible = false;
-            active = false;
+            Active = false;
         }
     }
 }

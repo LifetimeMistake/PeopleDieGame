@@ -239,7 +239,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[0], out double amount))
+                if (!float.TryParse(command[0], out float amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiednią wyskość nagrody areny");
                     return;
@@ -271,7 +271,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[0], out double amount))
+                if (!float.TryParse(command[0], out float amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać odpowiednią wyskość bounty areny");
                     return;

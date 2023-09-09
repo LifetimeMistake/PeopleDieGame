@@ -340,7 +340,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double amount))
+                if (!float.TryParse(command[1], out float amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać ilość środków do ustawienia");
                     return;
@@ -375,7 +375,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double amount))
+                if (!float.TryParse(command[1], out float amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać ilość środków do zdeponowania");
                     return;
@@ -410,7 +410,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                if (!double.TryParse(command[1], out double amount))
+                if (!float.TryParse(command[1], out float amount))
                 {
                     ChatHelper.Say(caller, "Musisz podać ilość środków do wypłacenia");
                     return;
