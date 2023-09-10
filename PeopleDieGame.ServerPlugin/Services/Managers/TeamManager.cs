@@ -18,6 +18,8 @@ using PeopleDieGame.NetMethods.Models.EventArgs;
 using System.Runtime.InteropServices.WindowsRuntime;
 using PeopleDieGame.NetMethods.Models;
 using static Rocket.Unturned.Events.UnturnedPlayerEvents;
+using Rocket.Unturned.Events;
+using Rocket.Core.Steam;
 
 namespace PeopleDieGame.ServerPlugin.Services.Managers
 {
@@ -49,6 +51,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<TeamInviteEventArgs> OnInvitationRejected;
         public event EventHandler<TeamBankEventArgs> OnBankBalanceChanged;
         public event EventHandler<TeamBaseClaimEventArgs> OnBaseClaimCreated;
+        public event EventHandler<PlayerEventArgs> OnTeamDataSynced;
 
         private Dictionary<int, ClaimBubble> claims = new Dictionary<int, ClaimBubble>();
         private List<TeamInvite> invites = new List<TeamInvite>();
@@ -59,6 +62,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             gameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
             InviteRPC.OnInviteAccepted += InviteManager_OnInviteAccepted;
             InviteRPC.OnInviteRejected += InviteManager_OnInviteRejected;
+            playerDataManager.OnPlayerDataSynced += PlayerDataManager_OnPlayerDataSynced;
 
             if (gameManager.GetGameState() == GameState.InGame)
                 RegisterTimers();
@@ -76,12 +80,32 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
         }
 
+        private void PlayerDataManager_OnPlayerDataSynced(object sender, PlayerEventArgs e)
+        {
+            PlayerData playerData = e.Player;
+            if (!playerData.TeamId.HasValue)
+                return;
+
+            Team team = GetTeam(playerData.TeamId.Value);
+            if (team == null)
+                throw new Exception("Could not get team");
+
+            TeamInfo info = BuildTeamInfo(team);
+            UnturnedPlayer player = playerDataManager.GetPlayerConnection(playerData.Id);
+            if (player == null)
+                throw new Exception("Could not obtain player connection");
+
+            ClientDataRPC.UpdateTeamInfo(player.SteamPlayer(), info);
+            OnTeamDataSynced?.Invoke(this, e);
+        }
+
         public void Dispose()
         {
             loadoutManager.OnLoadoutRemoved -= LoadoutManager_OnLoadoutRemoved;
             gameManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
             InviteRPC.OnInviteAccepted -= InviteManager_OnInviteAccepted;
             InviteRPC.OnInviteRejected -= InviteManager_OnInviteRejected;
+            playerDataManager.OnPlayerDataSynced -= PlayerDataManager_OnPlayerDataSynced;
             UnregisterTimers();
         }
 

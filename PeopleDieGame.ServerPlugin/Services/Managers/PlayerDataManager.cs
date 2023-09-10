@@ -22,6 +22,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
         public event EventHandler<PlayerEventArgs> OnBalanceUpdated;
         public event EventHandler<PlayerEventArgs> OnBountyUpdated;
         public event EventHandler<PlayerEventArgs> OnBioUpdated;
+        public event EventHandler<PlayerEventArgs> OnPlayerDataSynced;
 
         public void Init()
         {
@@ -54,6 +55,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             }
 
             SendDataUpdate(playerData);
+            OnPlayerDataSynced?.Invoke(this, new PlayerEventArgs(playerData));
         }
 
         private void Instance_OnPlayerDisconnected(Rocket.Unturned.Player.UnturnedPlayer player)
