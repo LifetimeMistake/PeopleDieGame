@@ -110,12 +110,51 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             // otherwise try matching by name
             return GetData(playerNameOrId, exactMatch);
         }
+        public void AddBalance(PlayerData playerData, float amount)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            UpdateBalance(playerData, playerData.WalletBalance + amount);
+        }
+
+        public void RemoveBalance(PlayerData playerData, float amount)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            float newBalance = playerData.WalletBalance - amount;
+            if (newBalance < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            UpdateBalance(playerData, newBalance);
+        }
 
         public void UpdateBalance(PlayerData playerData, float amount)
         {
             playerData.WalletBalance = amount;
             SendDataUpdate(playerData);
             OnBalanceUpdated?.Invoke(this, new PlayerEventArgs(playerData));
+        }
+
+        public void AddBounty(PlayerData playerData, float amount)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            UpdateBounty(playerData, playerData.Bounty + amount);
+        }
+
+        public void RemoveBounty(PlayerData playerData, float amount)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            float newBounty = playerData.Bounty - amount;
+            if (newBounty < 0)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            UpdateBounty(playerData, newBounty);
         }
 
         public void UpdateBounty(PlayerData playerData, float amount)

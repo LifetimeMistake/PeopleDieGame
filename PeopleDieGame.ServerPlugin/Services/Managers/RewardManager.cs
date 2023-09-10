@@ -49,8 +49,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             foreach (UnturnedPlayer player in arenaManager.GetPlayersInsideArena(arena, team))
             {
                 PlayerData playerData = playerDataManager.GetData((ulong)player.CSteamID);
-                playerDataManager.UpdateBalance(playerData, playerData.WalletBalance + arena.CompletionReward);
-                playerDataManager.UpdateBounty(playerData, arena.CompletionBounty);
+                playerDataManager.AddBalance(playerData, arena.CompletionReward);
+                playerDataManager.AddBounty(playerData, arena.CompletionBounty);
             }
 
             if (!arena.RewardLoadoutId.HasValue)
@@ -136,8 +136,8 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             float bounty = dataManager.GameData.Bounty;
             float total = reward + victim.Bounty;
 
-            playerDataManager.UpdateBalance(killer, killer.WalletBalance + total);
-            playerDataManager.UpdateBounty(killer, bounty);
+            playerDataManager.AddBalance(killer, total);
+            playerDataManager.AddBounty(killer, bounty);
 
             playerDataManager.UpdateBalance(victim, Mathf.Round(victim.WalletBalance / 2));
             playerDataManager.UpdateBounty(victim, 0);
@@ -150,7 +150,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             float reward;
             reward = dataManager.GameData.ZombieKillReward;
 
-            playerDataManager.UpdateBalance(player, player.WalletBalance + reward);
+            playerDataManager.AddBalance(player, reward);
             OnPlayerReceiveZombieReward?.Invoke(this, new RewardEventArgs(player, reward));
         }
 
