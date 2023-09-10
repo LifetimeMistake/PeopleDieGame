@@ -158,6 +158,7 @@
     <Compile Include="Models\EventArgs\BossFightParticipantEventArgs.cs" />
     <Compile Include="Models\EventArgs\ObjectiveItemEventArgs.cs" />
     <Compile Include="Models\EventArgs\TeamBaseClaimEventArgs.cs" />
+    <Compile Include="Models\EventArgs\TeamLoadoutChangedEventArgs.cs" />
     <Compile Include="Models\ObjectiveItem.cs" />
     <Compile Include="Models\RegionItem.cs" />
     <Compile Include="Patches\AltarStoringPatch.cs" />

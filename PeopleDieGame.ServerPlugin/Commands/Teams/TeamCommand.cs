@@ -117,7 +117,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                 }
 
                 string teamName = string.Join(" ", command);
-                if (teamManager.GetTeamByName(teamName, true) != null)
+                if (teamManager.GetTeam(teamName, true) != null)
                 {
                     ChatHelper.Say(caller, "Drużyna o tej nazwie już istnieje.");
                     return;
@@ -512,7 +512,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     return;
                 }
 
-                if (!teamManager.SetLeader(team, targetPlayerData))
+                if (!teamManager.UpdateLeader(team, targetPlayerData))
                 {
                     ChatHelper.Say(caller, "Nie udało się zmienić przywódcy z powodu błedu serwera.");
                     return;
@@ -567,7 +567,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     }
 
                     string teamName = string.Join(" ", command);
-                    team.SetName(teamName);
+                    teamManager.UpdateName(team, teamName);
                     ChatHelper.Say(caller, $"Ustawiono nazwę Twojej drużyny na: \"{teamName}\"");
                 }
             }
@@ -618,7 +618,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                     }
 
                     string teamDescription = string.Join(" ", command);
-                    team.SetDescription(teamDescription);
+                    teamManager.UpdateDescription(team, teamDescription);
                     ChatHelper.Say(caller, $"Ustawiono opis Twojej drużyny na: \"{teamDescription}\"");
                 }
             }
@@ -678,7 +678,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Teams
                         return;
                     }
 
-                    team.SetDefaultLoadout(loadout);
+                    teamManager.UpdateLoadout(team, loadout);
                     ChatHelper.Say(caller, $"Ustawiono zestaw Twojej drużyny na: \"{loadout.Name}\"");
                 }
             }

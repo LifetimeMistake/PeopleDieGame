@@ -204,7 +204,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
             {
                 TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
                 string name = string.Join(" ", command);
-                if (teamManager.GetTeamByName(name) != null)
+                if (teamManager.GetTeam(name) != null)
                 {
                     ChatHelper.Say(caller, "Drużyna o tej nazwie już istnieje");
                     return;
@@ -422,7 +422,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 }
 
                 string name = string.Join(" ", command.Skip(1));
-                team.SetName(name);
+                teamManager.UpdateName(team, name);
 
                 ChatHelper.Say(caller, $"Ustawiono nazwę drużyny na \"{name}\"");
             }
@@ -456,7 +456,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                 }
 
                 string desc = string.Join(" ", command.Skip(1));
-                team.SetDescription(desc);
+                teamManager.UpdateDescription(team, desc);
 
                 ChatHelper.Say(caller, $"Ustawiono opis drużyny na \"{desc}\"");
             }
@@ -493,7 +493,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                team.SetDefaultLoadout(loadout);
+                teamManager.UpdateLoadout(team, loadout);
                 ChatHelper.Say(caller, "Ustawiono nowy zestaw wyposażenia!");
             }
             catch (Exception ex)
@@ -522,7 +522,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                team.SetDefaultLoadout(null);
+                teamManager.UpdateLoadout(team, null);
                 ChatHelper.Say(caller, "Zresetowano zestaw wyposażenia drużyny");
             }
             catch (Exception ex)
@@ -551,7 +551,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                double amount = teamManager.GetBankBalance(team);
+                double amount = team.BankBalance;
                 ChatHelper.Say(caller, $"Drużyna \"{team.Name}\" ma ${amount} w banku");
             }
             catch (Exception ex)
@@ -586,7 +586,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                teamManager.SetBankBalance(team, amount);
+                teamManager.UpdateBalance(team, amount);
                 ChatHelper.Say(caller, "Ustawiono ilość środków drużyny");
             }
             catch (Exception ex)
@@ -621,7 +621,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                teamManager.DepositIntoBank(team, amount);
+                teamManager.AddBalance(team, amount);
                 ChatHelper.Say(caller, "Zdeponowano środki do banku drużyny");
             }
             catch (Exception ex)
@@ -656,7 +656,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                teamManager.WithdrawFromBank(team, amount);
+                teamManager.RemoveBalance(team, amount);
                 ChatHelper.Say(caller, "Wypłacono środki z banku drużyny");
             }
             catch (Exception ex)

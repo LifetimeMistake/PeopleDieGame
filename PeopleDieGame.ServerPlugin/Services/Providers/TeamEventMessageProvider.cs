@@ -21,8 +21,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             teamManager.OnPlayerJoinedTeam += TeamManager_OnPlayerJoinedTeam;
             teamManager.OnPlayerLeftTeam += TeamManager_OnPlayerLeftTeam;
             teamManager.OnTeamLeaderChanged += TeamManager_OnTeamLeaderChanged;
-            teamManager.OnBankDepositedInto += TeamManager_OnBankDepositedInto;
-            teamManager.OnBankWithdrawnFrom += TeamManager_OnBankWithdrawnFrom;
             teamManager.OnBankBalanceChanged += TeamManager_OnBankBalanceChanged;
         }
 
@@ -35,17 +33,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             teamManager.OnPlayerJoinedTeam -= TeamManager_OnPlayerJoinedTeam;
             teamManager.OnPlayerLeftTeam -= TeamManager_OnPlayerLeftTeam;
             teamManager.OnTeamLeaderChanged -= TeamManager_OnTeamLeaderChanged;
-            teamManager.OnBankDepositedInto -= TeamManager_OnBankDepositedInto;
-            teamManager.OnBankWithdrawnFrom -= TeamManager_OnBankWithdrawnFrom;
             teamManager.OnBankBalanceChanged -= TeamManager_OnBankBalanceChanged;
-        }
-
-        private void TeamManager_OnBankWithdrawnFrom(object sender, Models.EventArgs.TeamBankEventArgs e)
-        {
-            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
-            {
-                ChatHelper.Say(player, $"Z konta bankowego twojej drużyny zostało wypłacone ${e.Amount}");
-            }
         }
 
         private void TeamManager_OnBankBalanceChanged(object sender, Models.EventArgs.TeamBankEventArgs e)
@@ -53,14 +41,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Providers
             foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
             {
                 ChatHelper.Say(player, $"Nowy stan konta bankowego twojej drużyny: ${e.Amount}");
-            }
-        }
-
-        private void TeamManager_OnBankDepositedInto(object sender, Models.EventArgs.TeamBankEventArgs e)
-        {
-            foreach (PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
-            {
-                ChatHelper.Say(player, $"Do konta bankowego twojej drużyny zostało wpłacone ${e.Amount}");
             }
         }
 

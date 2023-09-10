@@ -35,13 +35,11 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
 
         public void Init()
         {
-            teamManager.OnBankBalanceChanged += TeamManager_OnBankBalanceChanged;
             ShopRPC.OnItemPurchaseRequested += ShopMenuManager_OnItemPurchaseRequested;
         }
 
         public void Dispose()
         {
-            teamManager.OnBankBalanceChanged -= TeamManager_OnBankBalanceChanged;
             ShopRPC.OnItemPurchaseRequested -= ShopMenuManager_OnItemPurchaseRequested;
         }
 
@@ -83,24 +81,6 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return;
 
             ChatHelper.Say(UnturnedPlayer.FromSteamPlayer(e.Caller), $"Zakupiono {shopItem.Name} (x{e.Amount})");
-        }
-
-        private void TeamManager_OnBankBalanceChanged(object sender, TeamBankEventArgs e)
-        {
-            foreach(PlayerData player in teamManager.GetOnlineTeamMembers(e.Team))
-            {
-                SteamPlayer steamPlayer = UnturnedPlayer.FromCSteamID((CSteamID)player.Id)?.SteamPlayer();
-                if (steamPlayer == null)
-                {
-                    Debug.LogError($"Failed to find Steam connection belonging to player {player.Id}");
-                    return;
-                }
-
-                PlayerData leaderData = playerDataManager.GetData(e.Team.LeaderId.Value);
-
-                TeamInfo teamInfo = new TeamInfo(e.Team.Id, e.Team.Name, e.Team.Description, e.Team.BankBalance, leaderData.Id, leaderData.Name);
-                ClientDataRPC.UpdateTeamInfo(steamPlayer, teamInfo);
-            }
         }
 
         private void BroadcastItemsUpdated()
@@ -227,7 +207,7 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             if (!player.GiveItem(shopItem.UnturnedItemId, amount))
                 throw new Exception($"Nie udało się dodać {shopItem.Name} (x{amount}) do ekwipunku gracza, konto nieobciążone");
 
-            teamManager.WithdrawFromBank(team, shopItem.Price * amount);
+            teamManager.RemoveBalance(team, shopItem.Price * amount);
 
             OnShopItemBought?.Invoke(this, new BuyItemEventArgs(shopItem, buyer, team, amount, shopItem.Price * amount));
             return true;

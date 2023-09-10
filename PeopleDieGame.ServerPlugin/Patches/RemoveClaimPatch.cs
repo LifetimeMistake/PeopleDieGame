@@ -21,7 +21,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
         public static void Postfix(ref InteractableClaim __instance)
         {
             TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-            Team team = teamManager.GetTeamByGroup((CSteamID)__instance.group);
+            Team team = teamManager.GetTeam((CSteamID)__instance.group);
 
             if (team == null)
                 throw new Exception($"Player {__instance.owner} attempted to place a claimflag (does not belong to a team)");

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PeopleDieGame.NetMethods.NetMethods
 {
@@ -86,13 +87,39 @@ namespace PeopleDieGame.NetMethods.NetMethods
             if (!reader.ReadFloat(out float bankBalance))
                 return;
 
-            if (!reader.ReadUInt64(out ulong leaderId))
+            if (!reader.ReadBit(out bool hasLeader))
                 return;
 
-            if (!reader.ReadString(out string leaderName))
+            ulong? leaderId = null;
+            string leaderName = null;
+            if (hasLeader)
+            {
+                if (!reader.ReadUInt64(out ulong _leaderId))
+                    return;
+
+                leaderId = _leaderId;
+
+                if (!reader.ReadString(out leaderName))
+                    return;
+            }
+
+            if (!reader.ReadBit(out bool hasClaim))
                 return;
 
-            TeamInfo teamInfo = new TeamInfo(id, name, description, bankBalance, leaderId, leaderName);
+            ClaimInfo? claim = null;
+
+            if (hasClaim)
+            {
+                if (!reader.ReadNormalVector3(out Vector3 position))
+                    return;
+
+                if (!reader.ReadFloat(out float squareRadius))
+                    return;
+
+                claim = new ClaimInfo(position, squareRadius);
+            }
+
+            TeamInfo teamInfo = new TeamInfo(id, name, description, bankBalance, leaderId, leaderName, claim);
             ClientDataRPC.ReceiveUpdateTeamInfo(teamInfo);
         }
 
@@ -103,12 +130,27 @@ namespace PeopleDieGame.NetMethods.NetMethods
             if (!teamInfo.HasValue)
                 return;
 
-            writer.WriteInt32(teamInfo.Value.Id);
-            writer.WriteString(teamInfo.Value.Name);
-            writer.WriteString(teamInfo.Value.Description);
-            writer.WriteFloat(teamInfo.Value.BankBalance);
-            writer.WriteUInt64(teamInfo.Value.LeaderId);
-            writer.WriteString(teamInfo.Value.LeaderName);
+            TeamInfo info = teamInfo.Value;
+
+            writer.WriteInt32(info.Id);
+            writer.WriteString(info.Name);
+            writer.WriteString(info.Description);
+            writer.WriteFloat(info.BankBalance);
+
+            writer.WriteBit(info.LeaderId.HasValue);
+            if (info.LeaderId.HasValue)
+            {
+                writer.WriteUInt64(info.LeaderId.Value);
+                writer.WriteString(info.LeaderName);
+            }
+
+            writer.WriteBit(info.Claim.HasValue);
+            if (info.Claim.HasValue)
+            {
+                ClaimInfo claim = info.Claim.Value;
+                writer.WriteNormalVector3(claim.Position);
+                writer.WriteFloat(claim.SquareRadius);
+            }
         }
     }
 }

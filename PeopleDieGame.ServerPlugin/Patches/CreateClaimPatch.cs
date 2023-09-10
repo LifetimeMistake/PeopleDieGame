@@ -25,7 +25,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
 				return true;
 
 			TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-			Team team = teamManager.GetTeamByGroup((CSteamID)group);
+			Team team = teamManager.GetTeam((CSteamID)group);
 
 			PlayerDataManager playerDataManager = ServiceLocator.Instance.LocateService<PlayerDataManager>();
 			PlayerData playerData = playerDataManager.GetData(owner);

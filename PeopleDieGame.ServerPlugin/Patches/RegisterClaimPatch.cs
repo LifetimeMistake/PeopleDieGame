@@ -25,7 +25,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
 			ClaimBubble bubble = _bubble.Value;
 
 			TeamManager teamManager = ServiceLocator.Instance.LocateService<TeamManager>();
-			Team team = teamManager.GetTeamByGroup((CSteamID)__instance.group);
+			Team team = teamManager.GetTeam((CSteamID)__instance.group);
 
 			if (__instance.isPlant)
 			{
@@ -38,7 +38,7 @@ namespace PeopleDieGame.ServerPlugin.Patches
 			else if (bubble == null)
 			{
 				bubble = ClaimManager.registerBubble(__instance.transform.position, 32f, __instance.owner, __instance.group);
-				teamManager.SetClaim(team, bubble);
+				teamManager.UpdateClaim(team, bubble);
 			}
 
 			return false;

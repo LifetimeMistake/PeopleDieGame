@@ -86,6 +86,14 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
                 return players.Values.FirstOrDefault(x => x.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
         }
 
+        public UnturnedPlayer GetPlayerConnection(ulong id)
+        {
+            if (!playerConnections.ContainsKey(id))
+                return null;
+
+            return playerConnections[id];
+        }
+
         public PlayerData[] GetAllData()
         {
             return dataManager.GameData.PlayerData.Values.ToArray();
@@ -110,6 +118,13 @@ namespace PeopleDieGame.ServerPlugin.Services.Managers
             // otherwise try matching by name
             return GetData(playerNameOrId, exactMatch);
         }
+
+        public void UpdateTeamMembership(PlayerData playerData, int? teamId)
+        {
+            playerData.TeamId = teamId;
+            SendDataUpdate(playerData);
+        }
+
         public void AddBalance(PlayerData playerData, float amount)
         {
             if (amount < 0)

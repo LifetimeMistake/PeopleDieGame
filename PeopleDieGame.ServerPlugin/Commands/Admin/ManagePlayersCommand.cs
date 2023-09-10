@@ -240,7 +240,7 @@ namespace PeopleDieGame.ServerPlugin.Commands.Admin
                     return;
                 }
 
-                team.SetTeamLeader(playerData);
+                teamManager.UpdateLeader(team, playerData);
                 ChatHelper.Say(caller, "Awansowano gracza na lidera drużyny");
             }
             catch (Exception ex)
